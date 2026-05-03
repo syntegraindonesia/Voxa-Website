@@ -5,34 +5,50 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import Catalog from "./pages/Catalog";
+import ProductDetail from "./pages/ProductDetail";
+import Compare from "./pages/Compare";
+import Bisnis from "./pages/Bisnis";
+import Pemerintah from "./pages/Pemerintah";
+import Showroom from "./pages/Showroom";
+import Tentang from "./pages/Tentang";
+import Bantuan from "./pages/Bantuan";
+import Guide from "./pages/Guide";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 function Router() {
-  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
+      <Route path="/" component={Home} />
+      <Route path="/catalog/:category" component={Catalog} />
+      <Route path="/products/:id" component={ProductDetail} />
+      <Route path="/compare" component={Compare} />
+      <Route path="/bisnis" component={Bisnis} />
+      <Route path="/pemerintah" component={Pemerintah} />
+      <Route path="/showroom" component={Showroom} />
+      <Route path="/tentang" component={Tentang} />
+      <Route path="/bantuan" component={Bantuan} />
+      <Route path="/guide" component={Guide} />
+      <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
-
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
+      <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Toaster />
-          <Router />
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            <main className="flex-1">
+              <Router />
+            </main>
+            <Footer />
+          </div>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

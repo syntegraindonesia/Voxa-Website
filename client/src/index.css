@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -43,16 +44,21 @@
 }
 
 :root {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-600);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --radius: 0.65rem;
+  /* VOXA Brand Colors */
+  --voxa-cyan: #00B4D8;
+  --primary: oklch(0.72 0.18 210);
+  --primary-foreground: oklch(1.0 0 0);
+  --sidebar-primary: oklch(0.72 0.18 210);
+  --sidebar-primary-foreground: oklch(1.0 0 0);
+  --accent: oklch(0.72 0.18 210);
+  --accent-foreground: oklch(1.0 0 0);
+  --ring: oklch(0.72 0.18 210);
+  --chart-1: oklch(0.72 0.18 210);
+  --chart-2: oklch(0.60 0.18 210);
+  --chart-3: oklch(0.50 0.15 210);
+  --chart-4: oklch(0.40 0.12 210);
+  --chart-5: oklch(0.30 0.10 210);
+  --radius: 0.5rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.235 0.015 65);
   --card: oklch(1 0 0);
@@ -119,6 +125,11 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+  .font-display {
+    font-family: 'Bebas Neue', 'Inter', sans-serif;
+    letter-spacing: 0.02em;
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
@@ -131,6 +142,32 @@
   input[type="radio"]:not(:disabled) {
     @apply cursor-pointer;
   }
+}
+
+/* Announcement bar scroll animation */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+  display: flex;
+  width: max-content;
+  white-space: nowrap;
+}
+
+/* Product card hover */
+.product-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 180, 216, 0.18);
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
 }
 
 @layer components {
