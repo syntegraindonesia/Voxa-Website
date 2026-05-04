@@ -42,3 +42,9 @@
 - [x] Navbar: nav links LEFT, VOXA logo CENTER, icons RIGHT (exact Gymshark format)
 - [x] Mega dropdown: opens from left, two-column (category list left → sub-items right on hover)
 - [x] Hero: underlined CTA links at bottom-left (not buttons), Gymshark-exact style
+
+## Hero Section Update
+
+- [x] Remove any slider/carousel from hero, replace with single static image
+- [x] Set hero height to 60–70vh (not full-screen)
+- [x] Keep bottom-left text, dark gradient overlay, underlined CTA links

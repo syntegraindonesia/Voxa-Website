@@ -37,26 +37,27 @@ const guideArticles = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
-      {/* ===== HERO SECTION ===== */}
-      <section className="relative w-full overflow-hidden bg-black" style={{ height: 'calc(100vh - 5.75rem)' }}>
-        {/* Full-width cinematic background */}
+      {/* ===== HERO SECTION — single static image, 65vh ===== */}
+      <section className="relative w-full overflow-hidden bg-black" style={{ height: '65vh', minHeight: '420px', maxHeight: '780px' }}>
+        {/* Single static background image — no slider, no animation */}
         <img
           src={HERO_BG}
-          alt="VOXA Hero"
-          className="absolute inset-0 w-full h-full object-cover object-center opacity-80"
+          alt="VOXA — Kendaraan Listrik untuk Jalanan Indonesia"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          style={{ opacity: 0.82 }}
         />
-        {/* Gradient: strong at bottom for text, subtle on sides */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
+        {/* Dark gradient overlay: strong at bottom for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-transparent" />
 
-        {/* Bottom-left hero copy — Gymshark exact */}
-        <div className="absolute bottom-0 left-0 px-6 md:px-10 pb-10 md:pb-14">
-          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl text-white leading-tight mb-2 tracking-wide">
+        {/* Bottom-left hero copy */}
+        <div className="absolute bottom-0 left-0 px-6 md:px-10 pb-8 md:pb-12">
+          <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-white leading-tight mb-2 tracking-wide">
             KENDARAAN LISTRIK<br />
             <span className="text-[#00B4D8]">UNTUK JALANAN</span><br />
             INDONESIA.
           </h1>
-          <p className="text-gray-200 text-sm md:text-base mb-5 leading-relaxed max-w-sm">
+          <p className="text-gray-200 text-sm mb-4 leading-relaxed max-w-xs md:max-w-sm">
             Desain modern, performa tangguh, dan hemat energi untuk jalanan Indonesia.
           </p>
           {/* Underlined CTA links — Gymshark style */}
@@ -74,16 +75,6 @@ export default function Home() {
               Bandingkan Model
             </Link>
           </div>
-        </div>
-
-        {/* Pause icon — Gymshark bottom-right */}
-        <div className="absolute bottom-5 right-5">
-          <button className="text-white/50 hover:text-white/80 transition-colors" aria-label="Pause video">
-            <div className="flex gap-1">
-              <div className="w-0.5 h-4 bg-current rounded-full" />
-              <div className="w-0.5 h-4 bg-current rounded-full" />
-            </div>
-          </button>
         </div>
       </section>
 
