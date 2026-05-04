@@ -37,40 +37,64 @@ const guideArticles = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
-      {/* ===== HERO SECTION — single static image, 65vh ===== */}
-      <section className="relative w-full overflow-hidden bg-black" style={{ height: '65vh', minHeight: '420px', maxHeight: '780px' }}>
-        {/* Single static background image — no slider, no animation */}
+      {/* ===== HERO SECTION — Gymshark proportions ===== */}
+      <section
+        className="relative w-full overflow-hidden bg-black"
+        style={{
+          /* Desktop: 65vh | Tablet: 60vh | Mobile: 52vh */
+          height: 'clamp(320px, 52vh, 520px)',
+        }}
+      >
+        {/* Responsive height overrides via Tailwind md/lg */}
+        <style>{`
+          @media (min-width: 768px)  { .voxa-hero { height: clamp(380px, 60vh, 640px) !important; } }
+          @media (min-width: 1024px) { .voxa-hero { height: clamp(440px, 65vh, 760px) !important; } }
+        `}</style>
+
+        {/* Static background image */}
         <img
           src={HERO_BG}
           alt="VOXA — Kendaraan Listrik untuk Jalanan Indonesia"
-          className="absolute inset-0 w-full h-full object-cover object-center"
-          style={{ opacity: 0.82 }}
+          className="voxa-hero absolute inset-0 w-full h-full object-cover object-center"
+          style={{ opacity: 0.85 }}
         />
-        {/* Dark gradient overlay: strong at bottom for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-transparent" />
 
-        {/* Bottom-left hero copy */}
-        <div className="absolute bottom-0 left-0 px-6 md:px-10 pb-8 md:pb-12">
-          <h1 className="font-display text-3xl md:text-4xl lg:text-5xl text-white leading-tight mb-2 tracking-wide">
-            KENDARAAN LISTRIK<br />
-            <span className="text-[#00B4D8]">UNTUK JALANAN</span><br />
+        {/* Gradient: left-heavy for text legibility, fades right */}
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.30) 45%, rgba(0,0,0,0.05) 100%)' }} />
+        {/* Bottom fade for text anchor */}
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.10) 40%, transparent 100%)' }} />
+
+        {/* Bottom-left text block — 6–8% left padding, 8–10% bottom padding */}
+        <div
+          className="absolute bottom-0 left-0"
+          style={{ paddingLeft: 'clamp(1.5rem, 7vw, 5rem)', paddingBottom: 'clamp(1.5rem, 9%, 4rem)' }}
+        >
+          {/* Headline: controlled size, no excessive wrapping */}
+          <h1
+            className="font-display text-white leading-none tracking-wide mb-1.5"
+            style={{ fontSize: 'clamp(1.6rem, 3.8vw, 3rem)' }}
+          >
+            KENDARAAN LISTRIK{' '}
+            <span className="text-[#00B4D8]">UNTUK JALANAN</span>{' '}
             INDONESIA.
           </h1>
-          <p className="text-gray-200 text-sm mb-4 leading-relaxed max-w-xs md:max-w-sm">
+          {/* Subtext: compact, close to headline */}
+          <p className="text-gray-200 leading-snug mb-3" style={{ fontSize: 'clamp(0.75rem, 1.1vw, 0.9rem)', maxWidth: '28rem' }}>
             Desain modern, performa tangguh, dan hemat energi untuk jalanan Indonesia.
           </p>
-          {/* Underlined CTA links — Gymshark style */}
-          <div className="flex items-center gap-6">
+          {/* CTAs: tight gap, underlined Gymshark style */}
+          <div className="flex items-center gap-5">
             <Link
               href="/catalog/sepeda-listrik"
-              className="text-white text-sm font-semibold underline underline-offset-4 decoration-white hover:decoration-[#00B4D8] hover:text-[#00B4D8] transition-colors"
+              className="text-white font-semibold underline underline-offset-4 decoration-white hover:decoration-[#00B4D8] hover:text-[#00B4D8] transition-colors"
+              style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)' }}
             >
               Temukan Produk
             </Link>
             <Link
               href="/compare"
-              className="text-white text-sm font-semibold underline underline-offset-4 decoration-white hover:decoration-[#00B4D8] hover:text-[#00B4D8] transition-colors"
+              className="text-white font-semibold underline underline-offset-4 decoration-white hover:decoration-[#00B4D8] hover:text-[#00B4D8] transition-colors"
+              style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)' }}
             >
               Bandingkan Model
             </Link>
@@ -79,9 +103,9 @@ export default function Home() {
       </section>
 
       {/* ===== CATEGORY BLOCK ===== */}
-      <section className="py-20 bg-gray-50">
+      <section className="pt-12 pb-16 bg-gray-50">
         <div className="container">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h2 className="font-display text-4xl md:text-5xl text-gray-900 tracking-wide mb-3">VOXA UNTUK SIAPA?</h2>
             <p className="text-gray-500 text-lg">Temukan model yang paling sesuai dengan kebutuhan Anda</p>
           </div>
