@@ -37,18 +37,18 @@ const guideArticles = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
-      {/* ===== HERO SECTION — Gymshark proportions ===== */}
+      {/* ===== HERO SECTION — Gymshark proportions: ~85–90vh ===== */}
       <section
         className="relative w-full overflow-hidden bg-black"
         style={{
-          /* Desktop: 65vh | Tablet: 60vh | Mobile: 52vh */
-          height: 'clamp(320px, 52vh, 520px)',
+          /* Mobile: 70vh | Tablet: 82vh | Desktop: 88vh — matches Gymshark reference */
+          height: 'clamp(480px, 70vh, 700px)',
         }}
       >
-        {/* Responsive height overrides via Tailwind md/lg */}
+        {/* Responsive height overrides */}
         <style>{`
-          @media (min-width: 768px)  { .voxa-hero { height: clamp(380px, 60vh, 640px) !important; } }
-          @media (min-width: 1024px) { .voxa-hero { height: clamp(440px, 65vh, 760px) !important; } }
+          @media (min-width: 768px)  { .voxa-hero { height: clamp(560px, 82vh, 860px) !important; } }
+          @media (min-width: 1024px) { .voxa-hero { height: clamp(620px, 88vh, 960px) !important; } }
         `}</style>
 
         {/* Static background image */}
