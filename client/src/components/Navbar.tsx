@@ -95,9 +95,12 @@ export default function Navbar() {
   };
 
   const handleMouseLeaveArea = () => {
-    // Close immediately — no delay
+    // Small delay so cursor can move from trigger into dropdown without it closing
+    closeTimer.current = setTimeout(() => setMegaOpen(false), 80);
+  };
+
+  const handleMouseEnterDropdown = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
-    setMegaOpen(false);
   };
 
   const activeSubItems = produkKamiCategories[activeCategory]?.subItems ?? [];
@@ -132,7 +135,7 @@ export default function Navbar() {
 
           {/* LEFT: Nav links */}
           <nav className="hidden lg:flex items-center gap-0 flex-1">
-            {/* Produk Kami — hover trigger */}
+            {/* Produk Kami — hover trigger wrapper (trigger + dropdown share same parent so no gap) */}
             <div
               className="relative"
               onMouseEnter={handleMouseEnterTrigger}
@@ -148,70 +151,66 @@ export default function Navbar() {
                 Produk Kami
               </button>
 
-              {/* ── Mega Dropdown — attached to the trigger div ── */}
-              {megaOpen && (
-                <div
-                  className="fixed left-0 right-0 bg-white border-t border-gray-100 z-50 shadow-sm animate-fadeIn"
-                  style={{ top: 'calc(var(--navbar-top, 36px) + 56px)' }}
-                  onMouseEnter={handleMouseEnterTrigger}
-                  onMouseLeave={handleMouseLeaveArea}
-                >
-                  {/* Backdrop */}
-                  <div
-                    className="fixed inset-0 bg-black/10 -z-10"
-                    style={{ top: 'calc(var(--navbar-top, 36px) + 56px)' }}
-                    onClick={handleMouseLeaveArea}
-                  />
-
-                  {/* Two-panel layout — exactly like Gymshark */}
-                  <div className="flex" style={{ minHeight: '280px', maxWidth: '900px' }}>
+              {/* ── Mega Dropdown — absolute, compact, CSS visibility transition ── */}
+              <div
+                className={`absolute top-full left-0 bg-white border border-gray-100 shadow-lg z-50 transition-all duration-150 ${
+                  megaOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-1 pointer-events-none'
+                }`}
+                style={{ width: '640px', marginTop: '0' }}
+                onMouseEnter={handleMouseEnterDropdown}
+                onMouseLeave={handleMouseLeaveArea}
+              >
+                  {/* Two-panel layout */}
+                  <div className="flex">
 
                     {/* LEFT PANEL: Category list */}
-                    <div className="w-72 border-r border-gray-100 py-8">
+                    <div className="w-52 border-r border-gray-100 py-6">
                       {produkKamiCategories.map((cat, idx) => (
                         <button
                           key={cat.name}
                           onMouseEnter={() => setActiveCategory(idx)}
-                          className={`flex items-center justify-between w-full px-10 py-3 text-left transition-colors ${
+                          className={`flex items-center justify-between w-full px-6 py-3 text-left transition-colors ${
                             activeCategory === idx
                               ? 'text-gray-900'
                               : 'text-gray-500 hover:text-gray-900'
                           }`}
                         >
                           <span
-                            className={`text-base font-medium transition-all ${
-                              activeCategory === idx ? 'underline underline-offset-4 decoration-gray-900' : ''
+                            className={`text-sm font-medium transition-all ${
+                              activeCategory === idx ? 'font-semibold underline underline-offset-4' : ''
                             }`}
                           >
                             {cat.name}
                           </span>
                           <ChevronRight
-                            size={14}
+                            size={13}
                             strokeWidth={1.5}
-                            className={`transition-opacity ${activeCategory === idx ? 'opacity-100' : 'opacity-0'}`}
+                            className={`transition-opacity ${activeCategory === idx ? 'opacity-100' : 'opacity-30'}`}
                           />
                         </button>
                       ))}
 
                       {/* See All link */}
-                      <div className="px-10 mt-6 pt-4 border-t border-gray-100">
+                      <div className="px-6 mt-4 pt-4 border-t border-gray-100">
                         <Link
                           href={produkKamiCategories[activeCategory]?.href ?? '/catalog/sepeda-listrik'}
-                          className="text-sm text-gray-400 hover:text-gray-900 transition-colors"
+                          className="text-xs text-gray-400 hover:text-gray-900 transition-colors"
                         >
                           Lihat Semua →
                         </Link>
                       </div>
                     </div>
 
-                    {/* RIGHT PANEL: Sub-items list — plain single column */}
-                    <div className="flex-1 py-8 px-10">
-                      <div className="space-y-1">
+                    {/* RIGHT PANEL: Sub-items — 2 columns for long lists */}
+                    <div className="flex-1 py-6 px-6">
+                      <div className={`grid gap-x-6 gap-y-0.5 ${
+                        activeSubItems.length > 7 ? 'grid-cols-2' : 'grid-cols-1'
+                      }`}>
                         {activeSubItems.map((item) => (
                           <Link
                             key={item.href}
                             href={item.href}
-                            className="block py-2 text-base text-gray-500 hover:text-gray-900 transition-colors"
+                            className="block py-3 text-sm text-gray-500 hover:text-gray-900 transition-colors"
                           >
                             {item.name}
                           </Link>
@@ -221,7 +220,6 @@ export default function Navbar() {
 
                   </div>
                 </div>
-              )}
             </div>
 
             {/* Other nav links */}

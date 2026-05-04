@@ -68,3 +68,16 @@
 - [x] Right panel: sub-items appear when hovering a category, plain text links, no headers/columns
 - [x] No gray background, no complex grid, no category headers — clean minimal like Gymshark
 - [x] Smooth fade transition, thin top border separator only
+
+## Dropdown Fix (Compact + No Gap)
+
+- [x] Compact dropdown: max-width 520–720px, absolute under nav item, no full-screen width
+- [x] Consistent white background throughout (no grey area)
+- [x] No transparent gap between nav item and dropdown panel (position: absolute, top: 100%, no margin-top)
+- [x] Hover bridge: wrap nav item + dropdown in same parent, hover on either keeps it open
+- [x] Two-column layout: left categories (hover to reveal) + right sub-items list
+- [x] Proper padding: 24–32px inside, 12–16px vertical spacing between links
+- [x] Active category: bold + underline indicator
+- [x] "Lihat Semua" as subtle secondary link at bottom
+- [x] Smooth opacity + translateY transition (150–200ms)
+- [x] Mobile: accordion menu instead of hover dropdown
