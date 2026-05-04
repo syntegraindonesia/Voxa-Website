@@ -59,3 +59,12 @@
 - [x] Section 8: "VOXA UNTUK SIAPA?" lifestyle tiles
 - [x] Section 9: Lifestyle/community collage section
 - [x] Section 10: Footer — 4-column, newsletter, social icons, payment icons
+
+## Mega Dropdown Rebuild (Gymshark Exact)
+
+- [x] Rebuild mega dropdown: two-panel layout (left categories + right sub-items), pure white background
+- [x] Dropdown opens ONLY on hover over nav item, closes immediately when mouse leaves entire dropdown area
+- [x] Left panel: large clean category names with chevron arrows (Sepeda Listrik, Batre, Sparepart)
+- [x] Right panel: sub-items appear when hovering a category, plain text links, no headers/columns
+- [x] No gray background, no complex grid, no category headers — clean minimal like Gymshark
+- [x] Smooth fade transition, thin top border separator only
