@@ -38,46 +38,50 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* ===== HERO SECTION ===== */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
-        <div className="absolute inset-0">
-          <img src={HERO_BG} alt="VOXA Hero" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-transparent" />
-        </div>
-        <div className="relative container py-24">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-[#00B4D8]/20 border border-[#00B4D8]/40 text-[#00B4D8] text-xs font-bold px-4 py-2 rounded-full mb-6 backdrop-blur-sm">
-              <Zap size={12} />
-              KENDARAAN LISTRIK INDONESIA
-            </div>
-            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl text-white leading-none mb-6 tracking-wide">
+      <section className="relative w-full overflow-hidden" style={{ height: 'calc(100vh - 4rem)' }}>
+        {/* Full-width background image */}
+        <img
+          src={HERO_BG}
+          alt="VOXA Hero"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+        />
+        {/* Dark gradient overlay — stronger at bottom-left for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
+
+        {/* Bottom-left text block */}
+        <div className="absolute bottom-0 left-0 right-0 px-6 md:px-12 lg:px-16 pb-12 md:pb-16">
+          <div className="max-w-xl">
+            <h1 className="font-display text-4xl md:text-6xl lg:text-7xl text-white leading-none mb-3 tracking-wide">
               KENDARAAN LISTRIK<br />
               <span className="text-[#00B4D8]">UNTUK JALANAN</span><br />
               INDONESIA.
             </h1>
-            <p className="text-gray-200 text-lg md:text-xl mb-10 leading-relaxed max-w-xl">
+            <p className="text-gray-200 text-sm md:text-base mb-6 leading-relaxed max-w-md">
               Desain modern, performa tangguh, dan hemat energi. Solusi mobilitas cerdas untuk gaya hidup Anda.
             </p>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-3">
               <Link
                 href="/catalog/sepeda-listrik"
-                className="inline-flex items-center gap-2 bg-[#00B4D8] text-white font-bold px-8 py-4 rounded-full hover:bg-[#0096b8] transition-all text-base shadow-lg hover:shadow-[#00B4D8]/30 hover:shadow-xl"
+                className="inline-flex items-center gap-2 bg-white text-gray-900 font-bold px-7 py-3 text-sm hover:bg-gray-100 transition-colors"
               >
                 Temukan Produk
-                <ArrowRight size={18} />
               </Link>
               <Link
                 href="/compare"
-                className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/30 text-white font-bold px-8 py-4 rounded-full hover:bg-white/20 transition-all text-base"
+                className="inline-flex items-center gap-2 border border-white text-white font-bold px-7 py-3 text-sm hover:bg-white/10 transition-colors"
               >
                 Bandingkan Model
               </Link>
             </div>
           </div>
         </div>
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60">
-          <span className="text-xs font-medium tracking-widest">SCROLL</span>
-          <div className="w-px h-10 bg-gradient-to-b from-white/60 to-transparent" />
+
+        {/* Pause/play icon hint — Gymshark style */}
+        <div className="absolute bottom-6 right-6 text-white/50">
+          <div className="w-8 h-8 border border-white/30 rounded-full flex items-center justify-center">
+            <div className="w-2 h-2 bg-white/50 rounded-full" />
+          </div>
         </div>
       </section>
 

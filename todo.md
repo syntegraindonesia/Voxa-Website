@@ -29,3 +29,10 @@
 - [x] Mobile-first responsive design throughout
 - [x] Write and pass vitest tests (10 tests passing)
 - [x] Final testing and checkpoint
+
+## Gymshark-Inspired Redesign
+
+- [x] Navbar: logo left, centered nav links, CTA + icons (search/wishlist/account/cart) on right
+- [x] Mega dropdown: 3-column layout (Sepeda Listrik, Batre, Sparepart) with Series → Products hierarchy
+- [x] Mega dropdown: hover open/close, fade+slide animation, dimmed backdrop
+- [x] Hero: full-width cinematic, dark gradient overlay, bottom-left headline + description + 2 CTAs
