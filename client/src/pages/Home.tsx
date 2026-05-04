@@ -38,50 +38,52 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* ===== HERO SECTION ===== */}
-      <section className="relative w-full overflow-hidden" style={{ height: 'calc(100vh - 4rem)' }}>
-        {/* Full-width background image */}
+      <section className="relative w-full overflow-hidden bg-black" style={{ height: 'calc(100vh - 5.75rem)' }}>
+        {/* Full-width cinematic background */}
         <img
           src={HERO_BG}
           alt="VOXA Hero"
-          className="absolute inset-0 w-full h-full object-cover object-center"
+          className="absolute inset-0 w-full h-full object-cover object-center opacity-80"
         />
-        {/* Dark gradient overlay — stronger at bottom-left for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
+        {/* Gradient: strong at bottom for text, subtle on sides */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent" />
 
-        {/* Bottom-left text block */}
-        <div className="absolute bottom-0 left-0 right-0 px-6 md:px-12 lg:px-16 pb-12 md:pb-16">
-          <div className="max-w-xl">
-            <h1 className="font-display text-4xl md:text-6xl lg:text-7xl text-white leading-none mb-3 tracking-wide">
-              KENDARAAN LISTRIK<br />
-              <span className="text-[#00B4D8]">UNTUK JALANAN</span><br />
-              INDONESIA.
-            </h1>
-            <p className="text-gray-200 text-sm md:text-base mb-6 leading-relaxed max-w-md">
-              Desain modern, performa tangguh, dan hemat energi. Solusi mobilitas cerdas untuk gaya hidup Anda.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/catalog/sepeda-listrik"
-                className="inline-flex items-center gap-2 bg-white text-gray-900 font-bold px-7 py-3 text-sm hover:bg-gray-100 transition-colors"
-              >
-                Temukan Produk
-              </Link>
-              <Link
-                href="/compare"
-                className="inline-flex items-center gap-2 border border-white text-white font-bold px-7 py-3 text-sm hover:bg-white/10 transition-colors"
-              >
-                Bandingkan Model
-              </Link>
-            </div>
+        {/* Bottom-left hero copy — Gymshark exact */}
+        <div className="absolute bottom-0 left-0 px-6 md:px-10 pb-10 md:pb-14">
+          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl text-white leading-tight mb-2 tracking-wide">
+            KENDARAAN LISTRIK<br />
+            <span className="text-[#00B4D8]">UNTUK JALANAN</span><br />
+            INDONESIA.
+          </h1>
+          <p className="text-gray-200 text-sm md:text-base mb-5 leading-relaxed max-w-sm">
+            Desain modern, performa tangguh, dan hemat energi untuk jalanan Indonesia.
+          </p>
+          {/* Underlined CTA links — Gymshark style */}
+          <div className="flex items-center gap-6">
+            <Link
+              href="/catalog/sepeda-listrik"
+              className="text-white text-sm font-semibold underline underline-offset-4 decoration-white hover:decoration-[#00B4D8] hover:text-[#00B4D8] transition-colors"
+            >
+              Temukan Produk
+            </Link>
+            <Link
+              href="/compare"
+              className="text-white text-sm font-semibold underline underline-offset-4 decoration-white hover:decoration-[#00B4D8] hover:text-[#00B4D8] transition-colors"
+            >
+              Bandingkan Model
+            </Link>
           </div>
         </div>
 
-        {/* Pause/play icon hint — Gymshark style */}
-        <div className="absolute bottom-6 right-6 text-white/50">
-          <div className="w-8 h-8 border border-white/30 rounded-full flex items-center justify-center">
-            <div className="w-2 h-2 bg-white/50 rounded-full" />
-          </div>
+        {/* Pause icon — Gymshark bottom-right */}
+        <div className="absolute bottom-5 right-5">
+          <button className="text-white/50 hover:text-white/80 transition-colors" aria-label="Pause video">
+            <div className="flex gap-1">
+              <div className="w-0.5 h-4 bg-current rounded-full" />
+              <div className="w-0.5 h-4 bg-current rounded-full" />
+            </div>
+          </button>
         </div>
       </section>
 

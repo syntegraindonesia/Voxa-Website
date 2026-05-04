@@ -36,3 +36,9 @@
 - [x] Mega dropdown: 3-column layout (Sepeda Listrik, Batre, Sparepart) with Series → Products hierarchy
 - [x] Mega dropdown: hover open/close, fade+slide animation, dimmed backdrop
 - [x] Hero: full-width cinematic, dark gradient overlay, bottom-left headline + description + 2 CTAs
+
+## Exact Gymshark Layout Rebuild
+
+- [x] Navbar: nav links LEFT, VOXA logo CENTER, icons RIGHT (exact Gymshark format)
+- [x] Mega dropdown: opens from left, two-column (category list left → sub-items right on hover)
+- [x] Hero: underlined CTA links at bottom-left (not buttons), Gymshark-exact style
