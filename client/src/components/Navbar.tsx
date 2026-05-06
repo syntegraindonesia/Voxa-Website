@@ -278,7 +278,7 @@ export default function Navbar() {
               <ShoppingBag size={18} strokeWidth={1.5} />
             </button>
             <Link
-              href="/catalog/sepeda-listrik"
+              href="/katalog"
               className="hidden lg:inline-flex items-center ml-3 px-4 py-2 bg-[#00B4D8] text-white text-xs font-bold tracking-wider uppercase hover:bg-[#0099bb] transition-colors"
             >
               Temukan VOXA Anda
@@ -310,7 +310,7 @@ export default function Navbar() {
               ))}
               <div className="pt-3 border-t border-gray-100">
                 <Link
-                  href="/catalog/sepeda-listrik"
+                  href="/katalog"
                   className="block w-full text-center py-3 bg-[#00B4D8] text-white text-sm font-bold tracking-wider uppercase"
                 >
                   Temukan VOXA Anda

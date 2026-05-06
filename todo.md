@@ -93,3 +93,11 @@
 - [x] Create /sparepart page — exact Sepeda Listrik layout, 11 products, filter chips (Motor/Controller/Charger/Rem/Ban)
 - [x] Wire /sepeda-listrik, /batre, /sparepart routes in App.tsx
 - [x] Keep /catalog/:category legacy routes for backward compatibility
+
+## Unified Katalog Page + Temukan VOXA Anda Fix
+
+- [x] Create /katalog unified discovery page with all products (Sepeda Listrik + Batre + Sparepart)
+- [x] Tab filters: Semua / Sepeda Listrik / Batre / Sparepart (dynamic, no reload)
+- [x] Same layout/grid/card as existing catalog pages
+- [x] Update "Temukan VOXA Anda" button in navbar to route to /katalog
+- [x] Wire /katalog route in App.tsx
