@@ -109,3 +109,11 @@
 - [x] Implement interactive gallery on product detail page (main image + thumbnails)
 - [x] Active thumbnail highlight (border/opacity)
 - [x] Consistent aspect ratio and object-fit: cover
+
+## Batre Product Name Standardization
+
+- [x] Update batre product names in products.ts (Tianneng, Chilwee, Greenlife, Lithium)
+- [x] Update filter chips in Batre.tsx to match new brand names
+- [x] Update filter chips in Katalog.tsx if batre filters exist (no hardcoded batre chips — uses data from products.ts)
+- [x] Update dropdown sub-items in Navbar.tsx for Batre category
+- [x] Verify product IDs remain consistent for image mapping (IDs unchanged, only display names updated)

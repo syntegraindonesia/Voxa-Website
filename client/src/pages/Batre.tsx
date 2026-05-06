@@ -3,7 +3,7 @@ import { Link } from 'wouter';
 import { ArrowRight, ChevronRight, Filter, SlidersHorizontal } from 'lucide-react';
 import { batre } from '@/data/products';
 
-const SERIES_FILTERS = ['Semua', 'Greenlife', 'TNE', 'Chilwee', 'Lithium'];
+const SERIES_FILTERS = ['Semua', 'Greenlife', 'Tianneng', 'Chilwee', 'Lithium'];
 
 const SORT_OPTIONS = [
   { value: 'default', label: 'Urutkan: Default' },

@@ -14,7 +14,7 @@ const categoryConfig = {
     title: 'BATERAI',
     subtitle: 'Pilihan baterai berkualitas untuk sepeda listrik Anda',
     products: batre,
-    series: ['Semua', 'Greenlife Series', 'TNE Series', 'Chilwee Series', 'Lithium Series'],
+    series: ['Semua', 'Greenlife Series', 'Tianneng Series', 'Chilwee Series', 'Lithium Series'],
   },
   'sparepart': {
     title: 'SPAREPART',
