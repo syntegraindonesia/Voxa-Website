@@ -25,9 +25,20 @@ export interface Product {
   badge?: string;
 }
 
-const BIKE_IMAGE = 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80';
-const BIKE_IMAGE_2 = 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=600&q=80';
-const BIKE_IMAGE_3 = 'https://images.unsplash.com/photo-1593764592116-bfb2a97c642a?w=600&q=80';
+// Product image URLs — uploaded to VOXA CDN
+const IMG_LIBERTY = '/manus-storage/liberty_863503d9.jpg';
+const IMG_LIBERTY_7 = '/manus-storage/liberty7_87615905.jpg';
+const IMG_LIBERTY_STAR = '/manus-storage/libertystar_a839a909.jpg';
+const IMG_LIBERTY_STYLISH = '/manus-storage/libertystylish_c26563ff.jpg';
+const IMG_LIBERTY_ULTIMATE = '/manus-storage/libertyultimate_cb0b8bd1.jpg';
+const IMG_EIFFEL_7 = '/manus-storage/eiffel7_87fdb467.jpg';
+const IMG_EIFFEL_CITY = '/manus-storage/eiffelcity_f685b4ee.jpg';
+const IMG_EIFFEL_RIDER = '/manus-storage/eiffelrider_33889eb7.jpg';
+const IMG_ELITE_FANTASY = '/manus-storage/elitefantasy_cb6fb25c.jpg';
+const IMG_ELITE_CITY = '/manus-storage/elitecity_f3aa376b.jpg';
+const IMG_ELITE_FANTASY_S = '/manus-storage/elitefantasys_11c37ab3.jpg';
+const IMG_ELITE_RIDER = '/manus-storage/eliterider_aa94aab7.jpg';
+const IMG_ELITE_RIDER_S = '/manus-storage/eliteriders_bea5046b.jpg';
 const BATTERY_IMAGE = 'https://images.unsplash.com/photo-1620714223084-8fcacc2dbe4d?w=600&q=80';
 
 export const products: Product[] = [
@@ -41,7 +52,7 @@ export const products: Product[] = [
     priceNum: 4500000,
     description: 'Sepeda listrik entry-level terbaik untuk mobilitas harian. Ringan, efisien, dan mudah dikendarai oleh siapa saja.',
     shortDesc: 'Pilihan harian yang ringan dan efisien',
-    image: BIKE_IMAGE,
+    image: IMG_LIBERTY,
     specs: { jarakTempuh: '40–50 km', baterai: '48V/12Ah', kecepatan: '25 km/jam', kegunaan: 'Harian', motor: '250W', pengisian: '4–6 jam', bobot: '22 kg' },
     features: ['Motor 250W brushless', 'Baterai 48V/12Ah', 'Rem cakram depan-belakang', 'Lampu LED terintegrasi'],
     useCases: ['Commuting harian', 'Belanja di sekitar kota', 'Perjalanan jarak pendek'],
@@ -57,7 +68,7 @@ export const products: Product[] = [
     priceNum: 5200000,
     description: 'Upgrade dari Liberty standar dengan kapasitas baterai lebih besar dan fitur tambahan untuk kenyamanan berkendara.',
     shortDesc: 'Liberty dengan baterai lebih besar',
-    image: BIKE_IMAGE_2,
+    image: IMG_LIBERTY_STAR,
     specs: { jarakTempuh: '55–65 km', baterai: '48V/15Ah', kecepatan: '28 km/jam', kegunaan: 'Harian & Komuter', motor: '350W', pengisian: '5–7 jam', bobot: '24 kg' },
     features: ['Motor 350W brushless', 'Baterai 48V/15Ah', 'Display LCD digital', 'Suspensi depan'],
     useCases: ['Komuter jarak menengah', 'Perjalanan kerja harian', 'Wisata kota'],
@@ -72,7 +83,7 @@ export const products: Product[] = [
     priceNum: 6800000,
     description: 'Varian tertinggi dari seri Liberty dengan performa premium dan fitur lengkap untuk pengendara yang menginginkan yang terbaik.',
     shortDesc: 'Performa premium seri Liberty',
-    image: BIKE_IMAGE_3,
+    image: IMG_LIBERTY_ULTIMATE,
     specs: { jarakTempuh: '70–80 km', baterai: '48V/20Ah', kecepatan: '32 km/jam', kegunaan: 'Harian & Jarak Jauh', motor: '500W', pengisian: '6–8 jam', bobot: '26 kg' },
     features: ['Motor 500W brushless', 'Baterai 48V/20Ah', 'Display TFT berwarna', 'Suspensi full'],
     useCases: ['Perjalanan jarak jauh', 'Komuter premium', 'Touring kota'],
@@ -88,7 +99,7 @@ export const products: Product[] = [
     priceNum: 5500000,
     description: 'Desain modern dan stylish untuk pengguna yang mengutamakan estetika tanpa mengorbankan performa.',
     shortDesc: 'Desain modern untuk gaya hidup urban',
-    image: BIKE_IMAGE,
+    image: IMG_LIBERTY_STYLISH,
     specs: { jarakTempuh: '50–60 km', baterai: '48V/14Ah', kecepatan: '28 km/jam', kegunaan: 'Lifestyle & Harian', motor: '350W', pengisian: '5–6 jam', bobot: '23 kg' },
     features: ['Desain rangka modern', 'Motor 350W', 'Warna pilihan eksklusif', 'Sadel ergonomis'],
     useCases: ['Gaya hidup urban', 'Foto-foto kota', 'Perjalanan santai'],
@@ -103,7 +114,7 @@ export const products: Product[] = [
     priceNum: 5900000,
     description: 'Sepeda listrik dengan 7 kecepatan untuk pengalaman berkendara yang lebih fleksibel di berbagai medan.',
     shortDesc: '7 kecepatan untuk berbagai medan',
-    image: BIKE_IMAGE_2,
+    image: IMG_LIBERTY_7,
     specs: { jarakTempuh: '60–70 km', baterai: '48V/16Ah', kecepatan: '30 km/jam', kegunaan: 'Harian & Tanjakan', motor: '400W', pengisian: '5–7 jam', bobot: '25 kg' },
     features: ['7 kecepatan Shimano', 'Motor 400W', 'Torsi tinggi untuk tanjakan', 'Rem hidrolik'],
     useCases: ['Area berbukit', 'Komuter dengan tanjakan', 'Perjalanan variatif'],
@@ -119,7 +130,7 @@ export const products: Product[] = [
     priceNum: 6200000,
     description: 'Sepeda listrik seri Eiffel untuk pengendara aktif yang membutuhkan kenyamanan dan ketangguhan di jalan Indonesia.',
     shortDesc: 'Tangguh untuk pengendara aktif',
-    image: BIKE_IMAGE_3,
+    image: IMG_EIFFEL_RIDER,
     specs: { jarakTempuh: '60–70 km', baterai: '48V/16Ah', kecepatan: '30 km/jam', kegunaan: 'Harian & Aktif', motor: '400W', pengisian: '5–7 jam', bobot: '25 kg' },
     features: ['Rangka aluminium alloy', 'Motor 400W', 'Suspensi depan-belakang', 'Ban lebar anti-selip'],
     useCases: ['Pengendara aktif', 'Jalan tidak rata', 'Perjalanan harian'],
@@ -134,7 +145,7 @@ export const products: Product[] = [
     priceNum: 5800000,
     description: 'Dirancang khusus untuk mobilitas perkotaan dengan desain ramping dan manuver yang mudah di kemacetan kota.',
     shortDesc: 'Lincah di kemacetan kota',
-    image: BIKE_IMAGE,
+    image: IMG_EIFFEL_CITY,
     specs: { jarakTempuh: '55–65 km', baterai: '48V/14Ah', kecepatan: '28 km/jam', kegunaan: 'Urban & Kota', motor: '350W', pengisian: '5–6 jam', bobot: '22 kg' },
     features: ['Desain ramping urban', 'Motor 350W', 'Mudah diparkir', 'Lampu kota terang'],
     useCases: ['Navigasi kemacetan', 'Parkir di area sempit', 'Mobilitas kota'],
@@ -149,7 +160,7 @@ export const products: Product[] = [
     priceNum: 6500000,
     description: 'Varian 7-kecepatan dari seri Eiffel untuk perjalanan lebih jauh dan medan yang lebih bervariasi.',
     shortDesc: 'Eiffel dengan 7 kecepatan adaptif',
-    image: BIKE_IMAGE_2,
+    image: IMG_EIFFEL_7,
     specs: { jarakTempuh: '65–75 km', baterai: '48V/18Ah', kecepatan: '32 km/jam', kegunaan: 'Harian & Jarak Jauh', motor: '450W', pengisian: '6–7 jam', bobot: '26 kg' },
     features: ['7 kecepatan adaptif', 'Motor 450W', 'Baterai kapasitas besar', 'Sistem regeneratif'],
     useCases: ['Perjalanan jarak menengah', 'Medan bervariasi', 'Komuter aktif'],
@@ -165,7 +176,7 @@ export const products: Product[] = [
     priceNum: 7500000,
     description: 'Sepeda listrik premium seri Elite untuk mobilitas kota yang elegan dan bertenaga.',
     shortDesc: 'Elegan dan bertenaga untuk kota',
-    image: BIKE_IMAGE_3,
+    image: IMG_ELITE_CITY,
     specs: { jarakTempuh: '70–80 km', baterai: '60V/16Ah', kecepatan: '35 km/jam', kegunaan: 'Urban Premium', motor: '500W', pengisian: '6–8 jam', bobot: '27 kg' },
     features: ['Motor 500W premium', 'Baterai 60V', 'Desain elegan', 'Smart display'],
     useCases: ['Profesional urban', 'Perjalanan kerja premium', 'Gaya hidup modern'],
@@ -181,7 +192,7 @@ export const products: Product[] = [
     priceNum: 7800000,
     description: 'Desain futuristik dengan performa tinggi untuk pengendara yang ingin tampil beda di jalan.',
     shortDesc: 'Desain futuristik performa tinggi',
-    image: BIKE_IMAGE,
+    image: IMG_ELITE_FANTASY,
     specs: { jarakTempuh: '75–85 km', baterai: '60V/18Ah', kecepatan: '38 km/jam', kegunaan: 'Lifestyle Premium', motor: '600W', pengisian: '7–8 jam', bobot: '28 kg' },
     features: ['Desain futuristik', 'Motor 600W', 'LED ambient lighting', 'Suspensi premium'],
     useCases: ['Lifestyle premium', 'Tampil beda', 'Perjalanan jauh'],
@@ -196,7 +207,7 @@ export const products: Product[] = [
     priceNum: 8200000,
     description: 'Sepeda listrik performa tinggi untuk pengendara serius yang menginginkan kecepatan dan ketahanan maksimal.',
     shortDesc: 'Performa tinggi untuk pengendara serius',
-    image: BIKE_IMAGE_2,
+    image: IMG_ELITE_RIDER,
     specs: { jarakTempuh: '80–90 km', baterai: '60V/20Ah', kecepatan: '40 km/jam', kegunaan: 'Sport & Jarak Jauh', motor: '750W', pengisian: '7–9 jam', bobot: '30 kg' },
     features: ['Motor 750W high-performance', 'Baterai 60V/20Ah', 'Rem hidrolik premium', 'Frame carbon fiber'],
     useCases: ['Sport riding', 'Perjalanan jarak jauh', 'Pengendara profesional'],
@@ -212,7 +223,7 @@ export const products: Product[] = [
     priceNum: 8900000,
     description: 'Versi S dari Elite Fantasi dengan upgrade performa dan fitur eksklusif untuk pengalaman berkendara terbaik.',
     shortDesc: 'Elite Fantasi dengan upgrade eksklusif',
-    image: BIKE_IMAGE_3,
+    image: IMG_ELITE_FANTASY_S,
     specs: { jarakTempuh: '85–95 km', baterai: '72V/18Ah', kecepatan: '42 km/jam', kegunaan: 'Lifestyle & Sport', motor: '800W', pengisian: '8–10 jam', bobot: '29 kg' },
     features: ['Motor 800W', 'Baterai 72V', 'GPS terintegrasi', 'App connectivity'],
     useCases: ['Lifestyle premium', 'Sport touring', 'Perjalanan panjang'],
@@ -227,7 +238,7 @@ export const products: Product[] = [
     priceNum: 9500000,
     description: 'Puncak dari seri Elite dengan teknologi terdepan dan performa tak tertandingi di kelasnya.',
     shortDesc: 'Puncak teknologi seri Elite',
-    image: BIKE_IMAGE,
+    image: IMG_ELITE_RIDER_S,
     specs: { jarakTempuh: '90–100 km', baterai: '72V/22Ah', kecepatan: '45 km/jam', kegunaan: 'Sport Premium', motor: '1000W', pengisian: '9–11 jam', bobot: '31 kg' },
     features: ['Motor 1000W flagship', 'Baterai 72V/22Ah', 'Smart AI assist', 'Premium suspension'],
     useCases: ['Pengendara profesional', 'Long distance touring', 'Sport premium'],
@@ -244,7 +255,7 @@ export const products: Product[] = [
     priceNum: 7200000,
     description: 'Generasi ketiga dari lini unggulan VOXA dengan teknologi terbaru dan desain yang telah disempurnakan.',
     shortDesc: 'Generasi terbaru lini unggulan VOXA',
-    image: BIKE_IMAGE_2,
+    image: IMG_LIBERTY_ULTIMATE,
     specs: { jarakTempuh: '75–85 km', baterai: '60V/18Ah', kecepatan: '38 km/jam', kegunaan: 'Harian & Komuter', motor: '600W', pengisian: '7–8 jam', bobot: '27 kg' },
     features: ['Teknologi generasi terbaru', 'Motor 600W', 'Desain disempurnakan', 'Baterai quick-charge'],
     useCases: ['Komuter premium', 'Perjalanan harian', 'Gaya hidup modern'],
@@ -260,7 +271,7 @@ export const products: Product[] = [
     priceNum: 6900000,
     description: 'Dirancang khusus untuk kebutuhan pengiriman dan bisnis kurir dengan kapasitas angkut yang besar dan ketahanan tinggi.',
     shortDesc: 'Dirancang untuk bisnis pengiriman',
-    image: BIKE_IMAGE_3,
+    image: IMG_LIBERTY_7,
     specs: { jarakTempuh: '70–80 km', baterai: '60V/20Ah', kecepatan: '30 km/jam', kegunaan: 'Kurir & Bisnis', motor: '500W', pengisian: '6–8 jam', bobot: '32 kg' },
     features: ['Kapasitas angkut 80 kg', 'Motor 500W torsi tinggi', 'Rak belakang besar', 'Frame heavy-duty'],
     useCases: ['Bisnis pengiriman', 'Kurir online', 'Distribusi barang'],
