@@ -129,6 +129,74 @@ export const productGalleries: Record<string, string[]> = {
   "elite-rider-s": [
     "/manus-storage/eliteriders-1-spec_1576e098.jpg",
   ],
+  // ══════════════════════════════════════════════════════════════════════════════
+  // BATRE GALLERIES
+  // ══════════════════════════════════════════════════════════════════════════════
+
+  // ── Greenlife 12KG ──────────────────────────────────────────────────────────
+  "greenlife-3kg": [
+    "/manus-storage/batre-gl12kg-1_0490c863.jpg",
+    "/manus-storage/batre-gl12kg-2_20e6200f.jpg",
+    "/manus-storage/batre-gl12kg-3_787167b6.jpg",
+    "/manus-storage/batre-gl12kg-4_c9df6ebd.jpg",
+  ],
+
+  // ── Greenlife 13.8KG ────────────────────────────────────────────────────────
+  "greenlife-345kg": [
+    "/manus-storage/batre-gl138kg-1_9fe8f125.jpg",
+    "/manus-storage/batre-gl138kg-2_4e55b353.jpg",
+    "/manus-storage/batre-gl138kg-3_95ea6285.jpg",
+    "/manus-storage/batre-gl138kg-4_e77c722f.jpg",
+  ],
+
+  // ── Tianneng 12V-15AH ───────────────────────────────────────────────────────
+  "tne-12-12": [
+    "/manus-storage/batre-tne15ah-1_94605d0f.jpg",
+    "/manus-storage/batre-tne15ah-2_02bc06df.jpg",
+    "/manus-storage/batre-tne15ah-3_cad8c773.jpg",
+  ],
+
+  // ── Tianneng 12V-25AH (fallback: same brand images as 12V-15AH) ─────────────
+  "tne-12-15": [
+    "/manus-storage/batre-tne15ah-1_94605d0f.jpg",
+    "/manus-storage/batre-tne15ah-2_02bc06df.jpg",
+    "/manus-storage/batre-tne15ah-3_cad8c773.jpg",
+  ],
+
+  // ── Chilwee Gold ────────────────────────────────────────────────────────────
+  "chilwee-gold": [
+    "/manus-storage/batre-cwgold-1_efa02948.jpg",
+    "/manus-storage/batre-cwgold-2_e7ca7a83.jpg",
+    "/manus-storage/batre-cwgold-3_637c2ea6.jpg",
+  ],
+
+  // ── Chilwee Platinum ────────────────────────────────────────────────────────
+  "chilwee-platinum": [
+    "/manus-storage/batre-cwplatinum-1_d57d93b7.jpg",
+    "/manus-storage/batre-cwplatinum-2_4cab603e.jpg",
+    "/manus-storage/batre-cwplatinum-3_852f8602.jpg",
+  ],
+
+  // ── Chilwee 12V-20AH ────────────────────────────────────────────────────────
+  "chilwee-12v-20ah": [
+    "/manus-storage/batre-cw20ah-1_c4aabb64.jpg",
+    "/manus-storage/batre-cw20ah-2_e11a448a.jpg",
+    "/manus-storage/batre-cw20ah-3_a4ef8125.jpg",
+  ],
+
+  // ── Lithium 48V-12AH ────────────────────────────────────────────────────────
+  "lithium-48v-12ah": [
+    "/manus-storage/batre-li12ah-1_8c0ba18a.jpg",
+    "/manus-storage/batre-li12ah-2_87c2ba12.jpg",
+    "/manus-storage/batre-li12ah-3_e04b347f.jpg",
+  ],
+
+  // ── Lithium 48V-21AH ────────────────────────────────────────────────────────
+  "lithium-48v-21ah": [
+    "/manus-storage/batre-li21ah-1_2a89655d.jpg",
+    "/manus-storage/batre-li21ah-2_663ae0b6.jpg",
+    "/manus-storage/batre-li21ah-3_90c356e5.jpg",
+  ],
 };
 
 /**
