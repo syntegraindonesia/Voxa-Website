@@ -64,38 +64,68 @@ export const productGalleries: Record<string, string[]> = {
     "/manus-storage/eiffel7-3-color_0951d5be.jpg",
     "/manus-storage/eiffel7-4-feat1_27c30e7a.jpg",
   ],
-
-  // ── Eiffel City ────────────────────────────────────────────────────────────
+  // ── Eiffel City ────────────────────────────────────────────────────────────────
   "eiffel-city": [
     "/manus-storage/eiffelcity-1-spec_5a126812.jpg",
+    "/manus-storage/eiffelcity-2-free_2a887951.jpg",
+    "/manus-storage/eiffelcity-3-color_6745a318.jpg",
+    "/manus-storage/eiffelcity-4-lamp_7232e19f.jpg",
+    "/manus-storage/eiffelcity-5-speed_cff934b4.jpg",
+    "/manus-storage/eiffelcity-6-strip_b314d5e9.jpg",
+    "/manus-storage/eiffelcity-7-velg_779f9027.jpg",
+    "/manus-storage/eiffelcity-8-stang_3e765308.jpg",
   ],
 
   // ── Eiffel Rider ───────────────────────────────────────────────────────────
   "eiffel-rider": [
     "/manus-storage/eiffelrider-1-spec_72cedb22.jpg",
+    "/manus-storage/eiffelrider-2-free_91674425.jpg",
+    "/manus-storage/eiffelrider-3-size_da5927de.jpg",
+    "/manus-storage/eiffelrider-4-color_2cdaec19.jpg",
+    "/manus-storage/eiffelrider-5-lamp_ec5d81b6.jpg",
+    "/manus-storage/eiffelrider-6-speed_9581463f.jpg",
+    "/manus-storage/eiffelrider-7-strip_b3ee08c1.jpg",
+    "/manus-storage/eiffelrider-8-lampv_9edd4a76.jpg",
   ],
 
   // ── Elite City ─────────────────────────────────────────────────────────────
   "elite-city": [
     "/manus-storage/elitecity-1-spec_acdcdb56.jpg",
+    "/manus-storage/elitecity-2-free_64ea3183.jpg",
+    "/manus-storage/elitecity-3-color_ed081857.jpg",
+    "/manus-storage/elitecity-4-lamp_00123ba1.jpg",
+    "/manus-storage/elitecity-5-basket_28523920.jpg",
+    "/manus-storage/elitecity-6-strip_6500200e.jpg",
+    "/manus-storage/elitecity-7-baterai_5c406a05.jpg",
+    "/manus-storage/elitecity-8-velg_b1f81dff.jpg",
   ],
 
   // ── Elite Fantasy ──────────────────────────────────────────────────────────
   "elite-fantasy": [
     "/manus-storage/elitefantasy-1-spec_51e5370f.jpg",
+    "/manus-storage/elitefantasy-2-free_ea4dff1b.jpg",
+    "/manus-storage/elitefantasy-3-color_5d5210c8.jpg",
+    "/manus-storage/elitefantasy-4-lamp_63cb38a4.jpg",
+    "/manus-storage/elitefantasy-5-strip_337499a7.jpg",
+    "/manus-storage/elitefantasy-6-velg_fbb80540.jpg",
+    "/manus-storage/elitefantasy-7-bagasi_f030c834.jpg",
   ],
 
   // ── Elite Fantasy S ────────────────────────────────────────────────────────
   "elite-fantasy-s": [
     "/manus-storage/elitefantasys-1-spec_ce2a842e.jpg",
+    "/manus-storage/elitefantasys-2-free_8c8fc80c.jpg",
+    "/manus-storage/elitefantasys-3-lamp_422333bc.jpg",
   ],
 
   // ── Elite Rider ────────────────────────────────────────────────────────────
+  // Note: Elite Rider detail shots timed out during upload; using spec image only
   "elite-rider": [
     "/manus-storage/eliterider-1-spec_56116ca8.jpg",
   ],
 
   // ── Elite Rider S ──────────────────────────────────────────────────────────
+  // Note: Elite Rider S detail shots timed out during upload; using spec image only
   "elite-rider-s": [
     "/manus-storage/eliteriders-1-spec_1576e098.jpg",
   ],
