@@ -115,7 +115,7 @@ export default function Katalog() {
       </div>
 
       {/* Filters */}
-      <div className="sticky top-[calc(4rem+2.25rem)] z-30 bg-white border-b border-gray-100 shadow-sm">
+      <div className="sticky top-[calc(2.25rem+3.5rem)] z-30 bg-white border-b border-gray-100 shadow-sm">
         <div className="container py-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             {/* Category Tabs */}

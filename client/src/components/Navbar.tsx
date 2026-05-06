@@ -108,7 +108,7 @@ export default function Navbar() {
   return (
     <>
       {/* ── Announcement Bar ─────────────────────────────── */}
-      <div className="bg-gray-100 text-gray-700 text-xs font-medium h-9 flex items-center justify-center relative overflow-hidden">
+      <div className="sticky top-0 z-50 bg-gray-100 text-gray-700 text-xs font-medium h-9 flex items-center justify-center relative overflow-hidden">
         <div className="animate-marquee whitespace-nowrap flex">
           {[0, 1].map((i) => (
             <span key={i} className="inline-flex items-center gap-8 px-8">
@@ -129,7 +129,7 @@ export default function Navbar() {
 
       {/* ── Main Header ──────────────────────────────────── */}
       <header
-        className={`sticky top-0 z-50 bg-white transition-shadow duration-200 ${scrolled ? 'shadow-sm' : ''}`}
+        className={`sticky top-9 z-50 bg-white transition-shadow duration-200 ${scrolled ? 'shadow-sm' : ''}`}
       >
         <div className="flex items-center h-14 px-6 md:px-10 border-b border-gray-100">
 
