@@ -120,12 +120,12 @@
 
 ## Global Layout & Visual Polish Fix
 
-- [ ] Remove announcement/marquee bar (sticky top strip with "Garansi Resmi | Sparepart Tersedia...")
-- [ ] Navbar sits flush at top after bar removal, sticky top-0
-- [ ] Fix sticky filter bar offsets on all catalog pages after bar removal
-- [ ] Fix product image cropping: object-fit contain on all catalog cards and carousels
-- [ ] Fix product image cropping: object-fit contain on product detail thumbnails
-- [ ] Fix navbar layout: proper 3-column flex (left nav | center logo | right actions)
-- [ ] Navbar font size 13-15px, icon 18-22px, no wrapping on desktop
-- [ ] Reduce global "zoomed in" feel: max-width 1200-1400px containers, balanced padding
-- [ ] Fix hero heading: clamp(42px, 5vw, 72px) font size
+- [x] Remove announcement/marquee bar (sticky top strip with "Garansi Resmi | Sparepart Tersedia...")
+- [x] Navbar sits flush at top after bar removal, sticky top-0
+- [x] Fix sticky filter bar offsets on all catalog pages after bar removal
+- [x] Fix product image cropping: object-fit contain on all catalog cards and carousels
+- [x] Fix product image cropping: object-fit contain on product detail thumbnails
+- [x] Fix navbar layout: proper 3-column flex (left nav | center logo | right actions)
+- [x] Navbar font size 13-15px, icon 18-22px, no wrapping on desktop
+- [x] Reduce global "zoomed in" feel: max-width 1200-1400px containers, balanced padding
+- [x] Fix hero heading: clamp(42px, 5vw, 72px) font size

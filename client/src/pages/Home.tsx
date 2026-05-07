@@ -233,7 +233,7 @@ export default function Home() {
 
         {/* Bottom-left text block */}
         <div className="absolute bottom-0 left-0" style={{ padding: 'clamp(1.5rem, 5vw, 4rem) clamp(1.5rem, 6vw, 5rem)' }}>
-          <h1 className="font-display text-white leading-none tracking-wide mb-2" style={{ fontSize: 'clamp(1.8rem, 4vw, 3.5rem)' }}>
+          <h1 className="font-display text-white leading-none tracking-wide mb-2" style={{ fontSize: 'clamp(2.625rem, 5vw, 4.5rem)' }}>
             KENDARAAN LISTRIK{' '}
             <span className="text-[#00B4D8]">UNTUK JALANAN</span>{' '}
             INDONESIA.
