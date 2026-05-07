@@ -40,7 +40,7 @@ function ProductCard({ product }: { product: (typeof sepedaListrik)[0] }) {
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
           />
           {product.badge && (
             <span className="absolute bottom-3 left-3 bg-black text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1">
@@ -212,7 +212,7 @@ export default function Home() {
       ═══════════════════════════════════════════════════════════════ */}
       <section
         className="relative w-full overflow-hidden bg-black"
-        style={{ height: 'clamp(520px, 88vh, 980px)' }}
+        style={{ height: 'clamp(480px, 75vh, 820px)' }}
       >
         <img
           src={HERO_BG}

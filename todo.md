@@ -117,3 +117,15 @@
 - [x] Update filter chips in Katalog.tsx if batre filters exist (no hardcoded batre chips — uses data from products.ts)
 - [x] Update dropdown sub-items in Navbar.tsx for Batre category
 - [x] Verify product IDs remain consistent for image mapping (IDs unchanged, only display names updated)
+
+## Global Layout & Visual Polish Fix
+
+- [ ] Remove announcement/marquee bar (sticky top strip with "Garansi Resmi | Sparepart Tersedia...")
+- [ ] Navbar sits flush at top after bar removal, sticky top-0
+- [ ] Fix sticky filter bar offsets on all catalog pages after bar removal
+- [ ] Fix product image cropping: object-fit contain on all catalog cards and carousels
+- [ ] Fix product image cropping: object-fit contain on product detail thumbnails
+- [ ] Fix navbar layout: proper 3-column flex (left nav | center logo | right actions)
+- [ ] Navbar font size 13-15px, icon 18-22px, no wrapping on desktop
+- [ ] Reduce global "zoomed in" feel: max-width 1200-1400px containers, balanced padding
+- [ ] Fix hero heading: clamp(42px, 5vw, 72px) font size

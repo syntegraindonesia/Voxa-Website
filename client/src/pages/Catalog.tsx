@@ -65,16 +65,16 @@ export default function Catalog() {
       </div>
 
       {/* Header */}
-      <div className="bg-gray-950 text-white py-16">
+      <div className="bg-gray-950 text-white py-10">
         <div className="container">
           <p className="text-[#00B4D8] text-sm font-bold tracking-widest mb-3">KATALOG PRODUK</p>
-          <h1 className="font-display text-5xl md:text-7xl tracking-wide mb-4">{config.title}</h1>
+          <h1 className="font-display text-4xl md:text-5xl tracking-wide mb-4">{config.title}</h1>
           <p className="text-gray-400 text-lg max-w-xl">{config.subtitle}</p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="sticky top-[calc(2.25rem+3.5rem)] z-30 bg-white border-b border-gray-100 shadow-sm">
+      <div className="sticky top-16 z-30 bg-white border-b border-gray-100 shadow-sm">
         <div className="container py-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             {/* Series Filter */}
@@ -148,7 +148,7 @@ function CatalogCard({ product, category }: { product: any; category: string }) 
     <Link href={href}>
       <div className="product-card group rounded-2xl overflow-hidden border border-gray-100 bg-white cursor-pointer h-full">
         <div className="relative aspect-square overflow-hidden bg-gray-50">
-          <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+          <img src={product.image} alt={product.name} className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500" />
           {product.badge && (
             <span className="absolute top-3 left-3 bg-[#00B4D8] text-white text-xs font-bold px-2.5 py-1 rounded-full">
               {product.badge}

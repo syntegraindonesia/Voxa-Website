@@ -107,31 +107,11 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ── Announcement Bar ─────────────────────────────── */}
-      <div className="sticky top-0 z-50 bg-gray-100 text-gray-700 text-xs font-medium h-9 flex items-center justify-center relative overflow-hidden">
-        <div className="animate-marquee whitespace-nowrap flex">
-          {[0, 1].map((i) => (
-            <span key={i} className="inline-flex items-center gap-8 px-8">
-              <span>Garansi Resmi | Sparepart Tersedia | Support Seluruh Indonesia</span>
-              <span className="opacity-30">•</span>
-              <span>Garansi Resmi | Sparepart Tersedia | Support Seluruh Indonesia</span>
-              <span className="opacity-30">•</span>
-            </span>
-          ))}
-        </div>
-        <button className="absolute right-4 text-gray-400 hover:text-gray-600 transition-colors" aria-label="Pause">
-          <div className="flex gap-0.5">
-            <div className="w-0.5 h-3 bg-current rounded-full" />
-            <div className="w-0.5 h-3 bg-current rounded-full" />
-          </div>
-        </button>
-      </div>
-
       {/* ── Main Header ──────────────────────────────────── */}
       <header
-        className={`sticky top-9 z-50 bg-white transition-shadow duration-200 ${scrolled ? 'shadow-sm' : ''}`}
+        className={`sticky top-0 z-50 bg-white transition-shadow duration-200 ${scrolled ? 'shadow-sm' : ''}`}
       >
-        <div className="flex items-center h-14 px-6 md:px-10 border-b border-gray-100">
+        <div className="flex items-center h-16 px-6 md:px-10 border-b border-gray-100">
 
           {/* LEFT: Nav links */}
           <nav className="hidden lg:flex items-center gap-0 flex-1">
@@ -142,7 +122,7 @@ export default function Navbar() {
               onMouseLeave={handleMouseLeaveArea}
             >
               <button
-                className={`flex items-center gap-0.5 px-3 py-4 text-sm font-medium transition-colors border-b-2 ${
+                className={`flex items-center gap-0.5 px-2.5 py-5 text-[13px] font-medium transition-colors border-b-2 ${
                   megaOpen
                     ? 'text-gray-900 border-gray-900'
                     : 'text-gray-600 border-transparent hover:text-gray-900 hover:border-gray-300'
@@ -228,7 +208,7 @@ export default function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-3 py-4 text-sm font-medium transition-colors border-b-2 ${
+                className={`px-2.5 py-5 text-[13px] font-medium transition-colors border-b-2 ${
                   location === item.href
                     ? 'text-gray-900 border-gray-900'
                     : 'text-gray-600 border-transparent hover:text-gray-900 hover:border-gray-300'
@@ -279,7 +259,7 @@ export default function Navbar() {
             </button>
             <Link
               href="/katalog"
-              className="hidden lg:inline-flex items-center ml-3 px-4 py-2 bg-[#00B4D8] text-white text-xs font-bold tracking-wider uppercase hover:bg-[#0099bb] transition-colors"
+              className="hidden lg:inline-flex items-center ml-3 px-4 py-2 bg-[#00B4D8] text-white text-[13px] font-bold tracking-wider uppercase hover:bg-[#0099bb] transition-colors whitespace-nowrap"
             >
               Temukan VOXA Anda
             </Link>

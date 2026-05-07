@@ -60,7 +60,7 @@ export default function ProductDetail() {
               <img
                 src={galleryImages[activeImg]}
                 alt={product.name}
-                className="w-full h-full object-cover transition-all duration-300"
+                className="w-full h-full object-contain object-center transition-all duration-300"
               />
             </div>
             {galleryImages.length > 1 && (
@@ -71,7 +71,7 @@ export default function ProductDetail() {
                     onClick={() => setActiveImg(i)}
                     className={`aspect-square rounded-xl overflow-hidden border-2 transition-all ${activeImg === i ? 'border-[#00B4D8] ring-2 ring-[#00B4D8]/30' : 'border-gray-100 hover:border-gray-300'}`}
                   >
-                    <img src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
+                    <img src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-contain object-center" />
                   </button>
                 ))}
               </div>
@@ -259,7 +259,7 @@ export default function ProductDetail() {
                 <Link key={p.id} href={`/products/${p.id}`}>
                   <div className="product-card group rounded-2xl overflow-hidden border border-gray-100 bg-white cursor-pointer">
                     <div className="aspect-square overflow-hidden bg-white">
-                      <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <img src={p.image} alt={p.name} className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500" />
                     </div>
                     <div className="p-4">
                       <h3 className="font-bold text-gray-900 text-sm mb-1 group-hover:text-[#00B4D8] transition-colors">{p.name}</h3>
