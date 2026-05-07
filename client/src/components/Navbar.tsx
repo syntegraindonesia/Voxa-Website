@@ -111,10 +111,10 @@ export default function Navbar() {
       <header
         className={`sticky top-0 z-50 bg-white transition-shadow duration-200 ${scrolled ? 'shadow-sm' : ''}`}
       >
-        <div className="flex items-center h-16 px-6 md:px-10 border-b border-gray-100">
+        <div className="flex items-center h-16 px-4 xl:px-8 border-b border-gray-100 flex-nowrap gap-0">
 
           {/* LEFT: Nav links */}
-          <nav className="hidden lg:flex items-center gap-0 flex-1">
+          <nav className="hidden xl:flex items-center gap-0 flex-1 flex-nowrap min-w-0 overflow-visible">
             {/* Produk Kami — hover trigger wrapper (trigger + dropdown share same parent so no gap) */}
             <div
               className="relative"
@@ -122,7 +122,7 @@ export default function Navbar() {
               onMouseLeave={handleMouseLeaveArea}
             >
               <button
-                className={`flex items-center gap-0.5 px-2.5 py-5 text-[13px] font-medium transition-colors border-b-2 ${
+                className={`flex items-center gap-0.5 px-2 py-5 text-[13px] font-medium transition-colors border-b-2 whitespace-nowrap ${
                   megaOpen
                     ? 'text-gray-900 border-gray-900'
                     : 'text-gray-600 border-transparent hover:text-gray-900 hover:border-gray-300'
@@ -208,7 +208,7 @@ export default function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-2.5 py-5 text-[13px] font-medium transition-colors border-b-2 ${
+                className={`px-2 py-5 text-[13px] font-medium transition-colors border-b-2 whitespace-nowrap ${
                   location === item.href
                     ? 'text-gray-900 border-gray-900'
                     : 'text-gray-600 border-transparent hover:text-gray-900 hover:border-gray-300'
@@ -220,7 +220,7 @@ export default function Navbar() {
           </nav>
 
           {/* CENTER: Logo */}
-          <div className="flex-1 lg:flex-none flex justify-center lg:absolute lg:left-1/2 lg:-translate-x-1/2">
+          <div className="flex-1 xl:flex-none flex justify-center xl:absolute xl:left-1/2 xl:-translate-x-1/2 flex-shrink-0">
             <Link href="/" className="flex items-center gap-2">
               <img src={LOGO_URL} alt="VOXA" className="h-8 w-8 object-contain" />
               <span className="font-display text-xl tracking-[0.25em] text-gray-900">VOXA</span>
@@ -228,7 +228,7 @@ export default function Navbar() {
           </div>
 
           {/* RIGHT: Icons + CTA */}
-          <div className="flex items-center gap-0.5 flex-1 justify-end">
+          <div className="flex items-center gap-0.5 flex-shrink-0 justify-end">
             <button
               onClick={() => toast.info('Fitur pencarian segera hadir')}
               className="p-2.5 text-gray-600 hover:text-gray-900 transition-colors"
@@ -259,13 +259,13 @@ export default function Navbar() {
             </button>
             <Link
               href="/katalog"
-              className="hidden lg:inline-flex items-center ml-3 px-4 py-2 bg-[#00B4D8] text-white text-[13px] font-bold tracking-wider uppercase hover:bg-[#0099bb] transition-colors whitespace-nowrap"
+              className="hidden xl:inline-flex items-center ml-3 px-4 py-2 bg-[#00B4D8] text-white text-[13px] font-bold tracking-wider uppercase hover:bg-[#0099bb] transition-colors whitespace-nowrap"
             >
               Temukan VOXA Anda
             </Link>
             {/* Mobile hamburger */}
             <button
-              className="lg:hidden p-2.5 text-gray-600 hover:text-gray-900 ml-1"
+              className="xl:hidden p-2.5 text-gray-600 hover:text-gray-900 ml-1"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Menu"
             >
@@ -276,7 +276,7 @@ export default function Navbar() {
 
         {/* ── Mobile Menu ───────────────────────────────── */}
         {mobileOpen && (
-          <div className="lg:hidden bg-white border-t border-gray-100 max-h-[80vh] overflow-y-auto">
+          <div className="xl:hidden bg-white border-t border-gray-100 max-h-[80vh] overflow-y-auto">
             <div className="px-4 py-3 space-y-1">
               <MobileAccordion label="Produk Kami" categories={produkKamiCategories} />
               {navLinks.map((item) => (
