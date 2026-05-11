@@ -3,17 +3,30 @@ import { Link } from 'wouter';
 import { Heart, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { sepedaListrik, batre, products } from '@/data/products';
 
-// Curated Produk Unggulan: all 5 Elite + 1 Eiffel + 1 Liberty (no duplicates)
+// Curated Produk Unggulan: all 5 Elite series only
 const produkUnggulan = (() => {
   const byId = (id: string) => products.find(p => p.id === id);
   return [
     byId('elite-rider-s'),
-    byId('elite-fantasi-s'),   // correct ID — 'fantasi' not 'fantasy'
+    byId('elite-fantasi-s'),
     byId('elite-rider'),
     byId('elite-fantasi'),
     byId('elite-city'),
-    byId('eiffel-rider'),
+  ].filter((p): p is NonNullable<typeof p> => p != null);
+})();
+
+// Curated Sepeda Listrik Terbaru: Liberty + Eiffel series (8 products with new images)
+const sepedaListrikTerbaru = (() => {
+  const byId = (id: string) => products.find(p => p.id === id);
+  return [
+    byId('liberty-7'),
+    byId('liberty'),
+    byId('liberty-star'),
+    byId('eiffel-7'),
     byId('liberty-ultimate'),
+    byId('liberty-stylish'),
+    byId('eiffel-city'),
+    byId('eiffel-rider'),
   ].filter((p): p is NonNullable<typeof p> => p != null);
 })();
 
@@ -338,7 +351,7 @@ export default function Home() {
       <ProductRow
         title="SEPEDA LISTRIK TERBARU"
         viewAllHref="/catalog/sepeda-listrik"
-        products={sepedaListrik.slice(8, 15)}
+        products={sepedaListrikTerbaru}
       />
 
       {/* ═══════════════════════════════════════════════════════════════

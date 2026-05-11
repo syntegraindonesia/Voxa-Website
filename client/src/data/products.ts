@@ -44,14 +44,14 @@ export interface Product {
 }
 
 // Product image URLs — uploaded to VOXA CDN
-const IMG_LIBERTY = '/manus-storage/liberty_863503d9.jpg';
-const IMG_LIBERTY_7 = '/manus-storage/liberty7_87615905.jpg';
-const IMG_LIBERTY_STAR = '/manus-storage/libertystar_a839a909.jpg';
-const IMG_LIBERTY_STYLISH = '/manus-storage/libertystylish_c26563ff.jpg';
-const IMG_LIBERTY_ULTIMATE = '/manus-storage/libertyultimate_cb0b8bd1.jpg';
-const IMG_EIFFEL_7 = '/manus-storage/eiffel7_87fdb467.jpg';
-const IMG_EIFFEL_CITY = '/manus-storage/eiffelcity_f685b4ee.jpg';
-const IMG_EIFFEL_RIDER = '/manus-storage/eiffelrider_33889eb7.jpg';
+const IMG_LIBERTY = '/manus-storage/Liberty_79777234.png';
+const IMG_LIBERTY_7 = '/manus-storage/Liberty7_73e8ed11.png';
+const IMG_LIBERTY_STAR = '/manus-storage/LibertyStar_8cec3088.png';
+const IMG_LIBERTY_STYLISH = '/manus-storage/LibertyStylish_395993ed.png';
+const IMG_LIBERTY_ULTIMATE = '/manus-storage/LibertyUltimate_e3671716.png';
+const IMG_EIFFEL_7 = '/manus-storage/Eiffel7_167d9416.png';
+const IMG_EIFFEL_CITY = '/manus-storage/Eiffelcity_ee121f6e.png';
+const IMG_EIFFEL_RIDER = '/manus-storage/EiffelRider_16406906.png';
 const IMG_ELITE_FANTASY = '/manus-storage/EliteFantasy_5e108b8b.png';
 const IMG_ELITE_CITY = '/manus-storage/EliteCity_9756080d.png';
 const IMG_ELITE_FANTASY_S = '/manus-storage/EliteFantasyS_19412188.png';
