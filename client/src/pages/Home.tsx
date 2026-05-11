@@ -44,16 +44,19 @@ const LIFE4 = 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&q
 const LIFE5 = 'https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?w=600&q=80';
 const LIFE6 = 'https://images.unsplash.com/photo-1620714223084-8fcacc2dbe4d?w=600&q=80';
 
-// ─── Product Card (Gymshark-style: aspect-ratio image, no box, no grey bars) ───
-function ProductCard({ product }: { product: (typeof sepedaListrik)[0] }) {
+// ─── Product Card ───────────────────────────────────────────────────────────────────
+function ProductCard({ product, cardWidth }: { product: (typeof sepedaListrik)[0]; cardWidth: string }) {
   const [wishlisted, setWishlisted] = useState(false);
   return (
-    <div className="group relative" style={{ width: 'clamp(200px, 22vw, 300px)', flexShrink: 0 }}>
+    <div
+      className="group relative flex-shrink-0"
+      style={{ width: cardWidth, scrollSnapAlign: 'start' }}
+    >
       <Link href={`/product/${product.id}`}>
-        {/* Image block — aspect-ratio drives height, no fixed height = no grey bars */}
+        {/* Image area — fixed height on desktop, scales down on smaller screens */}
         <div
           className="relative overflow-hidden bg-white"
-          style={{ aspectRatio: '1 / 1' }}
+          style={{ height: 'clamp(200px, 28vw, 480px)' }}
         >
           <img
             src={product.image}
@@ -61,47 +64,49 @@ function ProductCard({ product }: { product: (typeof sepedaListrik)[0] }) {
             className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
           />
           {product.badge && (
-            <span className="absolute bottom-2 left-2 bg-black text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5">
+            <span className="absolute bottom-3 left-3 bg-black text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5">
               {product.badge}
             </span>
           )}
         </div>
-        {/* Text block — flush under image */}
-        <div className="pt-2 pb-1">
+        {/* Text block */}
+        <div className="pt-3 pb-2">
           <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-0.5">{product.series}</p>
-          <h3 className="text-sm font-semibold text-gray-900 leading-snug mb-0.5">{product.name}</h3>
+          <h3 className="text-sm font-semibold text-gray-900 leading-snug mb-1">{product.name}</h3>
           <p className="text-sm font-bold text-gray-900">{product.price}</p>
         </div>
       </Link>
       {/* Wishlist icon */}
       <button
         onClick={() => setWishlisted(w => !w)}
-        className="absolute top-2 right-2 w-7 h-7 bg-white/90 rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
+        className="absolute top-2 right-2 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
         aria-label="Tambah ke wishlist"
       >
-        <Heart size={13} className={wishlisted ? 'fill-[#00B4D8] text-[#00B4D8]' : 'text-gray-400'} />
+        <Heart size={14} className={wishlisted ? 'fill-[#00B4D8] text-[#00B4D8]' : 'text-gray-400'} />
       </button>
     </div>
   );
 }
 
-// ─── Horizontal Product Row (Gymshark-style) ──────────────────────────────────
+// ─── Horizontal Product Row ───────────────────────────────────────────────────────
 function ProductRow({ title, viewAllHref, products }: { title: string; viewAllHref: string; products: (typeof sepedaListrik) }) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const GAP = 16; // px gap between cards
+
   const scroll = (dir: 'left' | 'right') => {
     if (!scrollRef.current) return;
-    // Scroll by exactly one card width
-    const card = scrollRef.current.firstElementChild as HTMLElement | null;
-    const amount = card ? card.offsetWidth + 4 : scrollRef.current.offsetWidth * 0.25;
-    scrollRef.current.scrollBy({ left: dir === 'right' ? amount : -amount, behavior: 'smooth' });
+    scrollRef.current.scrollBy({
+      left: dir === 'right' ? scrollRef.current.offsetWidth : -scrollRef.current.offsetWidth,
+      behavior: 'smooth',
+    });
   };
 
   return (
-    <section className="py-14 bg-white">
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem' }}>
-        {/* Section header: title left, Lihat Semua + arrows right */}
-        <div className="flex items-center justify-between mb-6">
+    <section className="py-16 bg-white">
+      <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '0 2rem' }}>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
           <h2 className="font-display text-2xl md:text-3xl text-gray-900 tracking-wide">{title}</h2>
           <div className="flex items-center gap-4">
             <Link
@@ -129,17 +134,28 @@ function ProductRow({ title, viewAllHref, products }: { title: string; viewAllHr
           </div>
         </div>
 
-        {/* Scrollable row — 4 cards visible, gap 4px */}
+        {/* Scrollable track */}
         <div
           ref={scrollRef}
           className="flex overflow-x-auto scrollbar-hide"
-          style={{ gap: '4px', scrollSnapType: 'x mandatory' }}
+          style={{
+            gap: `${GAP}px`,
+            scrollSnapType: 'x mandatory',
+            // Prevent overscroll bounce showing partial next card
+            overflowY: 'hidden',
+          }}
         >
-          {products.map(p => (
-            <div key={p.id} style={{ scrollSnapAlign: 'start' }}>
-              <ProductCard product={p} />
-            </div>
-          ))}
+          {products.map(p => {
+            // Responsive card width via inline style using CSS clamp:
+            // Mobile (<640px): 100% | Tablet (640–1023px): ~50% | Desktop (>=1024px): ~25%
+            // We use a single clamp that approximates this:
+            // min=100% of ~360px viewport, preferred=50% of ~768px, max=25% of 1440px
+            // Desktop: 4 cards (25% each minus gaps), Tablet: 2 cards, Mobile: 1 card
+            const cardWidth = `clamp(calc(100vw - 4rem), calc(50vw - 1.5rem), calc((100% - ${GAP * 3}px) / 4))`;
+            return (
+              <ProductCard key={p.id} product={p} cardWidth={cardWidth} />
+            );
+          })}
         </div>
       </div>
     </section>
