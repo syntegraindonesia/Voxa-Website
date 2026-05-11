@@ -30,13 +30,17 @@ const LIFE4 = 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&q
 const LIFE5 = 'https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?w=600&q=80';
 const LIFE6 = 'https://images.unsplash.com/photo-1620714223084-8fcacc2dbe4d?w=600&q=80';
 
-// ─── Product Card ─────────────────────────────────────────────────────────────
+// ─── Product Card (Gymshark-style: large image, no box) ──────────────────────
 function ProductCard({ product }: { product: (typeof sepedaListrik)[0] }) {
   const [wishlisted, setWishlisted] = useState(false);
   return (
-    <div className="group flex-shrink-0 w-[calc(25%-12px)] min-w-[200px] relative">
+    <div className="group relative" style={{ width: 'clamp(220px, 24vw, 340px)', flexShrink: 0 }}>
+      {/* Image block — no border, no card box */}
       <Link href={`/product/${product.id}`}>
-        <div className="relative overflow-hidden bg-gray-100 aspect-[3/4] mb-3">
+        <div
+          className="relative overflow-hidden bg-gray-50"
+          style={{ height: 'clamp(280px, 32vw, 480px)' }}
+        >
           <img
             src={product.image}
             alt={product.name}
@@ -48,41 +52,48 @@ function ProductCard({ product }: { product: (typeof sepedaListrik)[0] }) {
             </span>
           )}
         </div>
-        <div>
-          <p className="text-xs text-gray-500 mb-0.5">{product.series}</p>
-          <h3 className="text-sm font-semibold text-gray-900 leading-tight mb-1">{product.name}</h3>
+        {/* Text block — directly under image, no card wrapper */}
+        <div className="pt-3 pb-1">
+          <p className="text-xs text-gray-400 uppercase tracking-wider mb-0.5">{product.series}</p>
+          <h3 className="text-sm font-semibold text-gray-900 leading-snug mb-1">{product.name}</h3>
           <p className="text-sm font-bold text-gray-900">{product.price}</p>
         </div>
       </Link>
+      {/* Wishlist icon — floating top-right on image */}
       <button
         onClick={() => setWishlisted(w => !w)}
-        className="absolute top-3 right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
+        className="absolute top-2 right-2 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
         aria-label="Tambah ke wishlist"
       >
-        <Heart size={14} className={wishlisted ? 'fill-[#00B4D8] text-[#00B4D8]' : 'text-gray-600'} />
+        <Heart size={14} className={wishlisted ? 'fill-[#00B4D8] text-[#00B4D8]' : 'text-gray-500'} />
       </button>
     </div>
   );
 }
 
-// ─── Horizontal Product Row ───────────────────────────────────────────────────
+// ─── Horizontal Product Row (Gymshark-style) ──────────────────────────────────
 function ProductRow({ title, viewAllHref, products }: { title: string; viewAllHref: string; products: (typeof sepedaListrik) }) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (dir: 'left' | 'right') => {
     if (!scrollRef.current) return;
-    const amount = scrollRef.current.offsetWidth * 0.75;
+    // Scroll by exactly one card width
+    const card = scrollRef.current.firstElementChild as HTMLElement | null;
+    const amount = card ? card.offsetWidth + 4 : scrollRef.current.offsetWidth * 0.25;
     scrollRef.current.scrollBy({ left: dir === 'right' ? amount : -amount, behavior: 'smooth' });
   };
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-14 bg-white">
       <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem' }}>
-        {/* Row header */}
-        <div className="flex items-center justify-between mb-8">
+        {/* Section header: title left, Lihat Semua + arrows right */}
+        <div className="flex items-center justify-between mb-6">
           <h2 className="font-display text-2xl md:text-3xl text-gray-900 tracking-wide">{title}</h2>
           <div className="flex items-center gap-4">
-            <Link href={viewAllHref} className="text-sm font-semibold text-gray-900 underline underline-offset-4 hover:text-[#00B4D8] transition-colors">
+            <Link
+              href={viewAllHref}
+              className="text-sm font-semibold text-gray-900 underline underline-offset-4 hover:text-[#00B4D8] transition-colors"
+            >
               Lihat Semua
             </Link>
             <div className="flex gap-2">
@@ -104,11 +115,11 @@ function ProductRow({ title, viewAllHref, products }: { title: string; viewAllHr
           </div>
         </div>
 
-        {/* Scrollable cards */}
+        {/* Scrollable row — 4 cards visible, gap 4px */}
         <div
           ref={scrollRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide"
-          style={{ scrollSnapType: 'x mandatory' }}
+          className="flex overflow-x-auto scrollbar-hide"
+          style={{ gap: '4px', scrollSnapType: 'x mandatory' }}
         >
           {products.map(p => (
             <div key={p.id} style={{ scrollSnapAlign: 'start' }}>
