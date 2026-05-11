@@ -5,16 +5,16 @@ import { sepedaListrik, batre, products } from '@/data/products';
 
 // Curated Produk Unggulan: all 5 Elite + 1 Eiffel + 1 Liberty (no duplicates)
 const produkUnggulan = (() => {
-  const byId = (id: string) => products.find(p => p.id === id)!;
+  const byId = (id: string) => products.find(p => p.id === id);
   return [
     byId('elite-rider-s'),
-    byId('elite-fantasy-s'),
+    byId('elite-fantasi-s'),   // correct ID — 'fantasi' not 'fantasy'
     byId('elite-rider'),
     byId('elite-fantasi'),
     byId('elite-city'),
     byId('eiffel-rider'),
     byId('liberty-ultimate'),
-  ].filter(Boolean);
+  ].filter((p): p is NonNullable<typeof p> => p != null);
 })();
 
 // ─── Image constants ──────────────────────────────────────────────────────────
@@ -134,24 +134,33 @@ function ProductRow({ title, viewAllHref, products }: { title: string; viewAllHr
           </div>
         </div>
 
-        {/* Scrollable track */}
+        {/* Scrollable track
+             Card width strategy:
+             - Desktop (≥1024px): 4 cards → each = (viewport - 4rem padding - 3×16px gaps) / 4
+             - Tablet (640–1023px): 2 cards
+             - Mobile (<640px): 1 card (full width minus padding)
+             We use vw-based calc so the cards always fit the visible area exactly.
+        */}
         <div
           ref={scrollRef}
           className="flex overflow-x-auto scrollbar-hide"
           style={{
             gap: `${GAP}px`,
             scrollSnapType: 'x mandatory',
-            // Prevent overscroll bounce showing partial next card
             overflowY: 'hidden',
           }}
         >
           {products.map(p => {
-            // Responsive card width via inline style using CSS clamp:
-            // Mobile (<640px): 100% | Tablet (640–1023px): ~50% | Desktop (>=1024px): ~25%
-            // We use a single clamp that approximates this:
-            // min=100% of ~360px viewport, preferred=50% of ~768px, max=25% of 1440px
-            // Desktop: 4 cards (25% each minus gaps), Tablet: 2 cards, Mobile: 1 card
-            const cardWidth = `clamp(calc(100vw - 4rem), calc(50vw - 1.5rem), calc((100% - ${GAP * 3}px) / 4))`;
+            // Use vw units so the width is relative to the viewport, not the scroll container
+            // Desktop: 4 cards in ~1440px container with 64px padding + 3×16px gaps
+            //   card = (min(100vw, 1440px) - 64px - 48px) / 4
+            // Tablet: 2 cards
+            //   card = (100vw - 64px - 16px) / 2
+            // Mobile: 1 card
+            //   card = 100vw - 64px
+            const cardWidth = [
+              `min(calc((min(100vw, 1440px) - 4rem - ${GAP * 3}px) / 4), 340px)`,
+            ].join('');
             return (
               <ProductCard key={p.id} product={p} cardWidth={cardWidth} />
             );
