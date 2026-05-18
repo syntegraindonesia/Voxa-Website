@@ -96,7 +96,7 @@ export default function Tentang() {
           src={IMG_BANNER}
           alt="VOXA Assembly & Warehouse"
           className="w-full block"
-          style={{ display: 'block', maxHeight: '600px', objectFit: 'cover', objectPosition: 'center' }}
+          style={{ display: 'block', width: '100%', height: 'auto' }}
         />
       </section>
 
@@ -212,14 +212,14 @@ export default function Tentang() {
       <section
         className="py-24 relative overflow-hidden"
         style={{
-          background: 'linear-gradient(160deg, #071C24 0%, #0B2D3A 40%, #103848 75%, #0B2D3A 100%)',
+          background: '#50B1D4',
         }}
       >
         {/* Ambient cyan glow behind title */}
         <div className="absolute inset-0 pointer-events-none">
           <div
-            className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[400px] opacity-15 blur-3xl"
-            style={{ background: `radial-gradient(ellipse, ${CYAN} 0%, transparent 70%)` }}
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[400px] opacity-10 blur-3xl"
+            style={{ background: 'radial-gradient(ellipse, rgba(255,255,255,0.4) 0%, transparent 70%)' }}
           />
           {/* Subtle grid lines */}
           <div
@@ -239,12 +239,12 @@ export default function Tentang() {
           }`}
         >
           <div className="text-center mb-16">
-            <p className="text-xs font-bold tracking-widest mb-3 uppercase" style={{ color: CYAN }}>
+            <p className="text-xs font-bold tracking-widest mb-3 uppercase" style={{ color: 'rgba(255,255,255,0.85)' }}>
               Visi & Misi
             </p>
             <h2
-              className="font-display text-3xl md:text-5xl tracking-wide mb-10"
-              style={{ color: '#F5F7FA' }}
+            className="font-display text-3xl md:text-5xl tracking-wide mb-10"
+            style={{ color: '#ffffff' }}
             >
               Visi & Misi VOXA
             </h2>
@@ -253,13 +253,13 @@ export default function Tentang() {
             <div
               className="max-w-3xl mx-auto rounded-2xl px-8 py-7 border mb-14"
               style={{
-                background: `${CYAN_GLOW}0.08)`,
-                borderColor: `${CYAN_GLOW}0.3)`,
-                backdropFilter: 'blur(16px)',
-                boxShadow: `0 0 40px ${CYAN_GLOW}0.1)`,
+              background: 'rgba(255,255,255,0.18)',
+              borderColor: 'rgba(255,255,255,0.45)',
+              backdropFilter: 'blur(16px)',
+              boxShadow: '0 0 40px rgba(255,255,255,0.1)',
               }}
             >
-              <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: CYAN }}>
+              <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: 'rgba(255,255,255,0.85)' }}>
                 Visi
               </p>
               <p className="text-gray-100 text-base md:text-lg leading-relaxed">
@@ -267,7 +267,7 @@ export default function Tentang() {
               </p>
             </div>
 
-            <p className="text-xs font-bold tracking-widest uppercase mb-8" style={{ color: '#7dd3fc' }}>
+            <p className="text-xs font-bold tracking-widest uppercase mb-8" style={{ color: 'rgba(255,255,255,0.85)' }}>
               Misi
             </p>
           </div>
@@ -279,40 +279,40 @@ export default function Tentang() {
                 key={m.word}
                 className="group relative rounded-2xl p-6 border transition-all duration-300 hover:-translate-y-2 cursor-default"
                 style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  borderColor: `${CYAN_GLOW}0.15)`,
+                  background: 'rgba(255,255,255,0.15)',
+                  borderColor: 'rgba(255,255,255,0.3)',
                   backdropFilter: 'blur(12px)',
                   transitionDelay: `${i * 80}ms`,
                 }}
                 onMouseEnter={e => {
                   const el = e.currentTarget as HTMLDivElement;
-                  el.style.boxShadow = `0 0 40px ${CYAN_GLOW}0.25)`;
-                  el.style.borderColor = `${CYAN_GLOW}0.5)`;
-                  el.style.background = `${CYAN_GLOW}0.1)`;
+                  el.style.boxShadow = '0 0 40px rgba(255,255,255,0.25)';
+                  el.style.borderColor = 'rgba(255,255,255,0.6)';
+                  el.style.background = 'rgba(255,255,255,0.25)';
                 }}
                 onMouseLeave={e => {
                   const el = e.currentTarget as HTMLDivElement;
                   el.style.boxShadow = '';
-                  el.style.borderColor = `${CYAN_GLOW}0.15)`;
-                  el.style.background = 'rgba(255,255,255,0.05)';
+                  el.style.borderColor = 'rgba(255,255,255,0.3)';
+                  el.style.background = 'rgba(255,255,255,0.15)';
                 }}
               >
                 {/* Big letter watermark — reduced opacity */}
                 <div
-                  className="font-display text-7xl font-bold leading-none mb-4 opacity-10 group-hover:opacity-20 transition-opacity duration-300 select-none"
-                  style={{ color: m.color }}
+                  className="font-display text-7xl font-bold leading-none mb-4 opacity-30 group-hover:opacity-50 transition-opacity duration-300 select-none"
+                  style={{ color: '#ffffff' }}
                 >
                   {m.letter}
                 </div>
                 {/* Icon */}
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110"
-                  style={{ background: `${CYAN_GLOW}0.15)`, color: m.color }}
+                  style={{ background: 'rgba(255,255,255,0.2)', color: '#ffffff' }}
                 >
                   {m.icon}
                 </div>
                 <h3 className="font-bold text-white mb-3 text-base">{m.word}</h3>
-                <p className="text-gray-300 text-sm leading-relaxed">{m.text}</p>
+                <p className="text-white/80 text-sm leading-relaxed">{m.text}</p>
               </div>
             ))}
           </div>
@@ -339,7 +339,7 @@ export default function Tentang() {
           }`}
         >
           <div className="text-center mb-16">
-            <p className="text-xs font-bold tracking-widest mb-3 uppercase" style={{ color: CYAN }}>
+            <p className="text-xs font-bold tracking-widest mb-3 uppercase" style={{ color: 'rgba(255,255,255,0.85)' }}>
               Keunggulan
             </p>
             <h2 className="font-display text-3xl md:text-5xl text-gray-900 tracking-wide">
@@ -388,18 +388,18 @@ export default function Tentang() {
       <section
         className="relative py-40 overflow-hidden"
         style={{
-          background: 'linear-gradient(160deg, #071C24 0%, #0B2D3A 50%, #071C24 100%)',
+          background: '#50B1D4',
         }}
       >
         {/* Ambient glows */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[400px] opacity-15 blur-3xl"
-            style={{ background: `radial-gradient(ellipse, ${CYAN} 0%, transparent 70%)` }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[400px] opacity-10 blur-3xl"
+            style={{ background: 'radial-gradient(ellipse, rgba(255,255,255,0.5) 0%, transparent 70%)' }}
           />
           <div
-            className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[250px] opacity-10 blur-3xl animate-pulse"
-            style={{ background: `radial-gradient(ellipse, ${CYAN} 0%, transparent 70%)` }}
+            className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[250px] opacity-8 blur-3xl animate-pulse"
+            style={{ background: 'radial-gradient(ellipse, rgba(255,255,255,0.4) 0%, transparent 70%)' }}
           />
           {/* Grid lines */}
           <div
@@ -421,15 +421,15 @@ export default function Tentang() {
           <div
             className="inline-flex items-center gap-2 border text-xs font-bold px-5 py-2 rounded-full mb-8 tracking-widest"
             style={{
-              borderColor: `${CYAN_GLOW}0.4)`,
-              color: CYAN,
-              background: `${CYAN_GLOW}0.08)`,
+              borderColor: 'rgba(255,255,255,0.5)',
+              color: '#ffffff',
+              background: 'rgba(255,255,255,0.15)',
             }}
           >
             <Leaf size={11} /> Mobilitas Berkelanjutan
           </div>
 
-          <p className="text-gray-200 text-base md:text-xl max-w-2xl mx-auto leading-relaxed mb-12">
+          <p className="text-white/90 text-base md:text-xl max-w-2xl mx-auto leading-relaxed mb-12">
             VOXA hadir untuk menjadi bagian dari perubahan menuju masa depan mobilitas Indonesia yang lebih modern dan berkelanjutan.
           </p>
 
@@ -438,8 +438,9 @@ export default function Tentang() {
               href="/catalog/sepeda-listrik"
               className="inline-flex items-center gap-2 font-bold px-8 py-4 rounded-full text-sm text-white transition-all hover:scale-105 hover:brightness-110"
               style={{
-                background: `linear-gradient(135deg, ${CYAN}, #38bdf8)`,
-                boxShadow: `0 0 28px ${CYAN_GLOW}0.4)`,
+                background: 'rgba(255,255,255,0.25)',
+                boxShadow: '0 0 28px rgba(255,255,255,0.3)',
+                border: '2px solid rgba(255,255,255,0.6)',
               }}
             >
               Jelajahi Produk VOXA <ArrowRight size={16} />
@@ -447,7 +448,7 @@ export default function Tentang() {
             <Link
               href="/showroom"
               className="inline-flex items-center gap-2 font-semibold px-8 py-4 rounded-full text-sm text-white transition-all hover:bg-white/10 backdrop-blur-sm"
-              style={{ border: `1.5px solid ${CYAN_GLOW}0.45)` }}
+              style={{ border: '1.5px solid rgba(255,255,255,0.5)' }}
             >
               Kunjungi Showroom
             </Link>
