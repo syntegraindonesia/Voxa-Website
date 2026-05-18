@@ -228,23 +228,64 @@ export default function Distributor() {
               Setiap unit dirakit dengan perhatian terhadap kualitas, performa, dan detail.
             </p>
           </div>
-          {/* Fixed 4-column grid — no duplicates, no empty cells */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {GALLERY.map((src, i) => (
-              <div
-                key={i}
-                className={`overflow-hidden rounded-2xl group ${
-                  i === 0 || i === 6 ? 'col-span-2' : ''
-                }`}
-                style={{ aspectRatio: i === 0 || i === 6 ? '16/9' : '4/3' }}
-              >
-                <img
-                  src={src}
-                  alt={`VOXA produksi ${i + 1}`}
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-            ))}
+          {/*
+            Structured CSS Grid — 12-column base, 3 rows, no orphans
+
+            Row 1 (3 cells): [wide 8col] [tall 4col] [tall 4col]
+            Row 2 (3 cells): [square 4col] [square 4col] [wide 8col]
+            Row 3 (3 cells): [tall 4col] [wide 8col] [tall 4col]
+
+            Images used: 0–10 (11 total, all unique)
+          */}
+          <div
+            className="max-w-5xl mx-auto"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(12, 1fr)',
+              gridTemplateRows: 'auto',
+              gap: '10px',
+            }}
+          >
+            {/* Row 1 — wide left + 2 square right */}
+            <div className="overflow-hidden rounded-2xl group" style={{ gridColumn: '1 / 9', gridRow: '1', aspectRatio: '16/9' }}>
+              <img loading="lazy" src={GALLERY[0]} alt="VOXA produksi 1" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]" />
+            </div>
+            <div className="overflow-hidden rounded-2xl group" style={{ gridColumn: '9 / 13', gridRow: '1', aspectRatio: '4/3' }}>
+              <img loading="lazy" src={GALLERY[1]} alt="VOXA produksi 2" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]" />
+            </div>
+
+            {/* Row 2 — 3 equal columns */}
+            <div className="overflow-hidden rounded-2xl group" style={{ gridColumn: '1 / 5', gridRow: '2', aspectRatio: '4/3' }}>
+              <img loading="lazy" src={GALLERY[2]} alt="VOXA produksi 3" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]" />
+            </div>
+            <div className="overflow-hidden rounded-2xl group" style={{ gridColumn: '5 / 9', gridRow: '2', aspectRatio: '4/3' }}>
+              <img loading="lazy" src={GALLERY[3]} alt="VOXA produksi 4" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]" />
+            </div>
+            <div className="overflow-hidden rounded-2xl group" style={{ gridColumn: '9 / 13', gridRow: '2', aspectRatio: '4/3' }}>
+              <img loading="lazy" src={GALLERY[4]} alt="VOXA produksi 5" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]" />
+            </div>
+
+            {/* Row 3 — wide center + 2 square sides */}
+            <div className="overflow-hidden rounded-2xl group" style={{ gridColumn: '1 / 5', gridRow: '3', aspectRatio: '4/3' }}>
+              <img loading="lazy" src={GALLERY[5]} alt="VOXA produksi 6" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]" />
+            </div>
+            <div className="overflow-hidden rounded-2xl group" style={{ gridColumn: '5 / 9', gridRow: '3', aspectRatio: '4/3' }}>
+              <img loading="lazy" src={GALLERY[6]} alt="VOXA produksi 7" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]" />
+            </div>
+            <div className="overflow-hidden rounded-2xl group" style={{ gridColumn: '9 / 13', gridRow: '3', aspectRatio: '4/3' }}>
+              <img loading="lazy" src={GALLERY[7]} alt="VOXA produksi 8" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]" />
+            </div>
+
+            {/* Row 4 — wide left + 2 squares right */}
+            <div className="overflow-hidden rounded-2xl group" style={{ gridColumn: '1 / 9', gridRow: '4', aspectRatio: '16/9' }}>
+              <img loading="lazy" src={GALLERY[8]} alt="VOXA produksi 9" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]" />
+            </div>
+            <div className="overflow-hidden rounded-2xl group" style={{ gridColumn: '9 / 11', gridRow: '4', aspectRatio: '1/1' }}>
+              <img loading="lazy" src={GALLERY[9]} alt="VOXA produksi 10" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]" />
+            </div>
+            <div className="overflow-hidden rounded-2xl group" style={{ gridColumn: '11 / 13', gridRow: '4', aspectRatio: '1/1' }}>
+              <img loading="lazy" src={GALLERY[10]} alt="VOXA produksi 11" className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]" />
+            </div>
           </div>
         </div>
       </section>
