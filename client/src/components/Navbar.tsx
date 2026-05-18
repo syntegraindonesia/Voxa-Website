@@ -121,7 +121,8 @@ export default function Navbar() {
               onMouseEnter={handleMouseEnterTrigger}
               onMouseLeave={handleMouseLeaveArea}
             >
-              <button
+              <Link
+                href="/catalog/sepeda-listrik"
                 className={`flex items-center gap-0.5 px-2 py-5 text-[13px] font-medium transition-colors border-b-2 whitespace-nowrap ${
                   megaOpen
                     ? 'text-gray-900 border-gray-900'
@@ -129,7 +130,7 @@ export default function Navbar() {
                 }`}
               >
                 Produk Kami
-              </button>
+              </Link>
 
               {/* ── Mega Dropdown — absolute, compact, CSS visibility transition ── */}
               <div
