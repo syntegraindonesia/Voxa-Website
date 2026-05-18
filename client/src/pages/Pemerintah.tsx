@@ -7,24 +7,22 @@ import {
 
 // ─── CDN image constants ──────────────────────────────────────────────────────
 const IMG_HERO       = '/manus-storage/P1014908_5a27f79b.webp'; // wide factory floor
-const IMG_FACTORY    = '/manus-storage/P1014960_f97fdf33.webp'; // assembly line
+const IMG_FACTORY    = '/manus-storage/P1015061_fda3a73c.webp'; // assembly worker (new)
 const IMG_CTA_BG     = '/manus-storage/P1015177_e752378f.webp'; // warehouse/dark
 
-// Gallery: all 13 images
+// Gallery: 11 unique images (no duplicates with hero/factory/cta backgrounds)
 const GALLERY = [
-  '/manus-storage/P1015005_29a053b2.webp',
-  '/manus-storage/P1015061_7b0fdb62.webp',
-  '/manus-storage/P1015067_6aacd27c.webp',
-  '/manus-storage/P1015079_0389577d.webp',
-  '/manus-storage/P1015095_d9359bc1.webp',
-  '/manus-storage/P1014960_f97fdf33.webp',
-  '/manus-storage/P1014963_3bf46146.webp',
-  '/manus-storage/P1014999_94114b94.webp',
-  '/manus-storage/P1015033_108e19a9.webp',
-  '/manus-storage/P1015047_606cad4f.webp',
-  '/manus-storage/P1015177_e752378f.webp',
-  '/manus-storage/P1014908_5a27f79b.webp',
-  '/manus-storage/P1015105_831765ce.webp',
+  '/manus-storage/P1015005_29a053b2.webp',   // 0 — wide (spans 2 cols)
+  '/manus-storage/P1015061_7b0fdb62.webp',   // 1
+  '/manus-storage/P1015067_6aacd27c.webp',   // 2
+  '/manus-storage/P1015079_0389577d.webp',   // 3
+  '/manus-storage/P1015095_d9359bc1.webp',   // 4
+  '/manus-storage/P1015061_fda3a73c.webp',   // 5 — new assembly worker photo
+  '/manus-storage/P1014963_3bf46146.webp',   // 6 — wide (spans 2 cols)
+  '/manus-storage/P1014999_94114b94.webp',   // 7
+  '/manus-storage/P1015033_108e19a9.webp',   // 8
+  '/manus-storage/P1015047_606cad4f.webp',   // 9
+  '/manus-storage/P1015105_831765ce.webp',   // 10
 ];
 
 const BENEFITS = [
@@ -230,17 +228,13 @@ export default function Distributor() {
               Setiap unit dirakit dengan perhatian terhadap kualitas, performa, dan detail.
             </p>
           </div>
-
-          {/* Masonry-style grid */}
-          <div
-            className="grid gap-3"
-            style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}
-          >
+          {/* Fixed 4-column grid — no duplicates, no empty cells */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {GALLERY.map((src, i) => (
               <div
                 key={i}
                 className={`overflow-hidden rounded-2xl group ${
-                  i === 0 || i === 6 ? 'md:col-span-2 md:row-span-2' : ''
+                  i === 0 || i === 6 ? 'col-span-2' : ''
                 }`}
                 style={{ aspectRatio: i === 0 || i === 6 ? '16/9' : '4/3' }}
               >
