@@ -72,7 +72,7 @@ export default function Footer() {
             <ul className="space-y-3">
               {[
                 { label: 'Tentang VOXA', href: '/tentang' },
-                { label: 'Untuk Bisnis', href: '/bisnis' },
+                { label: 'Artikel', href: '/artikel' },
                 { label: 'Distributor VOXA', href: '/pemerintah' },
                 { label: 'Showroom', href: '/showroom' },
                 { label: 'VOXA Guide', href: '/guide' },

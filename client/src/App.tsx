@@ -11,6 +11,7 @@ import Sparepart from "./pages/Sparepart";
 import ProductDetail from "./pages/ProductDetail";
 import Compare from "./pages/Compare";
 import Bisnis from "./pages/Bisnis";
+import ArtikelDetail from "./pages/ArtikelDetail";
 import Pemerintah from "./pages/Pemerintah";
 import Showroom from "./pages/Showroom";
 import Tentang from "./pages/Tentang";
@@ -44,6 +45,8 @@ function Router() {
       <Route path="/products/:id" component={ProductDetail} />
       <Route path="/compare" component={Compare} />
       <Route path="/bisnis" component={Bisnis} />
+      <Route path="/artikel" component={Bisnis} />
+      <Route path="/artikel/:slug" component={ArtikelDetail} />
       <Route path="/pemerintah" component={Pemerintah} />
       <Route path="/showroom" component={Showroom} />
       <Route path="/tentang" component={Tentang} />
