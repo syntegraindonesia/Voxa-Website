@@ -36,13 +36,19 @@ export default function Bantuan() {
         </div>
       </div>
 
-      <div className="relative bg-gray-950 text-white py-16 overflow-hidden">
-        <img src="/manus-storage/P1015105_831765ce.webp" alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover object-center" />
-        <div className="absolute inset-0 bg-gray-950/75" />
+      <div className="relative bg-gray-950 text-white py-14 overflow-hidden">
+        <img src="/manus-storage/P1015105_831765ce.webp" alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover object-center scale-105" />
+        <div className="absolute inset-0 bg-gray-950/65" />
+        <div className="absolute inset-0 bg-[#00B4D8]/8" />
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-950/70 via-gray-950/30 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#00B4D8] via-[#00B4D8]/60 to-transparent" />
         <div className="container relative z-10">
-          <p className="text-[#00B4D8] text-sm font-bold tracking-widest mb-3">PUSAT BANTUAN</p>
-          <h1 className="font-display text-5xl md:text-7xl tracking-wide mb-4">BANTUAN</h1>
-          <p className="text-gray-400 text-lg max-w-xl">Temukan jawaban untuk pertanyaan Anda atau hubungi tim kami.</p>
+          <p className="text-[#00B4D8] text-xs font-bold tracking-[0.2em] mb-4 uppercase">PUSAT BANTUAN</p>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-1 h-12 bg-[#00B4D8] rounded-full shrink-0" />
+            <h1 className="font-display text-4xl md:text-5xl tracking-wide">BANTUAN</h1>
+          </div>
+          <p className="text-gray-300 text-base max-w-lg leading-relaxed">Temukan jawaban untuk pertanyaan Anda atau hubungi tim kami.</p>
         </div>
       </div>
 

@@ -68,15 +68,26 @@ export default function Catalog() {
       </div>
 
       {/* Header */}
-      <div className="relative bg-gray-950 text-white py-10 overflow-hidden">
+      <div className="relative bg-gray-950 text-white py-14 overflow-hidden">
+        {/* Background photo */}
         {config.headerBg && (
-          <img src={config.headerBg} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover object-center" />
+          <img src={config.headerBg} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover object-center scale-105" />
         )}
-        <div className="absolute inset-0 bg-gray-950/75" />
+        {/* Dark base overlay */}
+        <div className="absolute inset-0 bg-gray-950/65" />
+        {/* Light-blue tint */}
+        <div className="absolute inset-0 bg-[#00B4D8]/8" />
+        {/* Gradient fade left-to-right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-950/70 via-gray-950/30 to-transparent" />
+        {/* Bottom cyan line */}
+        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#00B4D8] via-[#00B4D8]/60 to-transparent" />
         <div className="container relative z-10">
-          <p className="text-[#00B4D8] text-sm font-bold tracking-widest mb-3">KATALOG PRODUK</p>
-          <h1 className="font-display text-4xl md:text-5xl tracking-wide mb-4">{config.title}</h1>
-          <p className="text-gray-400 text-lg max-w-xl">{config.subtitle}</p>
+          <p className="text-[#00B4D8] text-xs font-bold tracking-[0.2em] mb-4 uppercase">KATALOG PRODUK</p>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-1 h-12 bg-[#00B4D8] rounded-full shrink-0" />
+            <h1 className="font-display text-4xl md:text-5xl tracking-wide">{config.title}</h1>
+          </div>
+          <p className="text-gray-300 text-base max-w-lg leading-relaxed">{config.subtitle}</p>
         </div>
       </div>
 

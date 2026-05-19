@@ -59,11 +59,22 @@ export default function Showroom() {
       </div>
 
       {/* Hero */}
-      <div className="bg-gray-950 text-white py-10">
-        <div className="container">
-          <p className="text-[#00B4D8] text-sm font-bold tracking-widest mb-3">TEMUKAN KAMI</p>
-          <h1 className="font-display text-5xl tracking-wide mb-4">SHOWROOM VOXA</h1>
-          <p className="text-gray-400 text-lg max-w-xl">Kunjungi showroom terdekat untuk test ride dan konsultasi langsung dengan tim ahli kami.</p>
+      <div className="relative bg-gray-950 text-white py-14 overflow-hidden">
+        {/* Geometric dot-grid pattern */}
+        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, rgba(0,180,216,0.18) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
+        {/* Diagonal cyan accent lines */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#00B4D8]/12 via-transparent to-[#00B4D8]/6" />
+        {/* Left vignette for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-950/90 via-gray-950/50 to-transparent" />
+        {/* Bottom cyan line */}
+        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#00B4D8] via-[#00B4D8]/60 to-transparent" />
+        <div className="container relative z-10">
+          <p className="text-[#00B4D8] text-xs font-bold tracking-[0.2em] mb-4 uppercase">TEMUKAN KAMI</p>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-1 h-12 bg-[#00B4D8] rounded-full shrink-0" />
+            <h1 className="font-display text-4xl md:text-5xl tracking-wide">SHOWROOM VOXA</h1>
+          </div>
+          <p className="text-gray-300 text-base max-w-lg leading-relaxed">Kunjungi showroom terdekat untuk test ride dan konsultasi langsung dengan tim ahli kami.</p>
         </div>
       </div>
 
