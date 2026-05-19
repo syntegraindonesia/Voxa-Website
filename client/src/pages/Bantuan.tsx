@@ -36,21 +36,24 @@ export default function Bantuan() {
         </div>
       </div>
 
-      <div className="relative bg-gray-950 text-white py-14 overflow-hidden">
-        <img src="/manus-storage/P1015105_831765ce.webp" alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover object-center scale-105" />
-        <div className="absolute inset-0 bg-gray-950/65" />
-        <div className="absolute inset-0 bg-[#00B4D8]/8" />
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-950/70 via-gray-950/30 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#00B4D8] via-[#00B4D8]/60 to-transparent" />
-        <div className="container relative z-10">
-          <p className="text-[#00B4D8] text-xs font-bold tracking-[0.2em] mb-4 uppercase">PUSAT BANTUAN</p>
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-1 h-12 bg-[#00B4D8] rounded-full shrink-0" />
-            <h1 className="font-display text-4xl md:text-5xl tracking-wide">BANTUAN</h1>
+      <section
+        className="relative py-14 px-4 overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #EAF9FF 0%, #ffffff 40%, #EAF9FF 100%)' }}
+      >
+        <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full opacity-20 blur-3xl pointer-events-none" style={{ background: '#37C5FF' }} />
+        <div className="absolute bottom-0 right-1/4 w-64 h-64 rounded-full opacity-15 blur-3xl pointer-events-none" style={{ background: '#0A4A63' }} />
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#37C5FF 1px, transparent 1px), linear-gradient(90deg, #37C5FF 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        <div className="relative max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-6 border" style={{ color: '#37C5FF', borderColor: '#37C5FF', background: 'rgba(55,197,255,0.08)' }}>
+            <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: '#37C5FF' }} />
+            PUSAT BANTUAN
           </div>
-          <p className="text-gray-300 text-base max-w-lg leading-relaxed">Temukan jawaban untuk pertanyaan Anda atau hubungi tim kami.</p>
+          <h1 className="text-4xl md:text-6xl font-black text-gray-900 mb-5 tracking-tight">
+            Pusat <span style={{ color: '#37C5FF' }}>Bantuan</span>
+          </h1>
+          <p className="text-gray-500 text-lg leading-relaxed max-w-2xl mx-auto">Temukan jawaban untuk pertanyaan Anda atau hubungi tim kami.</p>
         </div>
-      </div>
+      </section>
 
       {/* Contact Options */}
       <section className="py-12 bg-[#00B4D8]">
