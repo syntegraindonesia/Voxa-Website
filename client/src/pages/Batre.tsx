@@ -75,7 +75,7 @@ export default function Batre() {
                 </button>
               ))}
             </div>
-            <div className="flex items-center gap-1 shrink-0">
+            <div className="hidden md:flex items-center gap-1 shrink-0">
               <Filter size={14} className="text-gray-400" />
               <select
                 value={sortBy}
