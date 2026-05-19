@@ -13,7 +13,7 @@ const faqs = [
   { cat: 'Perawatan', q: 'Berapa lama interval servis rutin?', a: 'Servis rutin disarankan setiap 3 bulan atau 1.000 km, mana yang lebih dulu tercapai.' },
   { cat: 'Perawatan', q: 'Apakah bisa digunakan saat hujan?', a: 'Semua produk VOXA memiliki rating tahan percikan air (IP54 atau lebih). Namun hindari genangan air yang dalam.' },
   { cat: 'Teknis', q: 'Berapa lama pengisian baterai penuh?', a: 'Tergantung kapasitas baterai dan jenis charger. Rata-rata 4–8 jam untuk pengisian penuh dengan charger standar.' },
-  { cat: 'Teknis', q: 'Apakah bisa digunakan untuk jalan berbukit?', a: 'Model tertentu seperti Liberty 7, Eiffel 7, dan seri Elite dirancang untuk medan berbukit dengan torsi tinggi.' },
+  { cat: 'Teknis', q: 'Apakah bisa digunakan untuk jalan berbukit?', a: 'Model tertentu seperti Elite Series dirancang untuk medan berbukit dengan torsi tinggi.' },
 ];
 
 const categories = ['Semua', 'Produk', 'Pembelian', 'Perawatan', 'Teknis'];
