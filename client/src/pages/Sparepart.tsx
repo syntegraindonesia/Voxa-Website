@@ -152,10 +152,14 @@ export default function Sparepart() {
       {/* Breadcrumb */}
       <div className="bg-gray-50 border-b border-gray-100">
         <div className="container py-3">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-gray-500 flex-wrap">
             <Link href="/" className="hover:text-[#00B4D8]">Beranda</Link>
             <ChevronRight size={14} />
             <span className="text-gray-900 font-medium">SPAREPART</span>
+            <span className="text-gray-300 mx-1">|</span>
+            <Link href="/sepeda-listrik" className="hover:text-[#00B4D8] text-gray-400">Sepeda Listrik</Link>
+            <ChevronRight size={14} />
+            <Link href="/batre" className="hover:text-[#00B4D8] text-gray-400">Batre</Link>
           </div>
         </div>
       </div>
