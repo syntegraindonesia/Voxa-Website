@@ -7,7 +7,7 @@ import {
 
 // ─── CDN image constants ──────────────────────────────────────────────────────
 const IMG_HERO       = '/manus-storage/P1014908_5a27f79b.webp'; // wide factory floor
-const IMG_FACTORY    = '/manus-storage/P1015061_fda3a73c.webp'; // assembly worker (new)
+const IMG_FACTORY    = '/manus-storage/P1014963_3bf46146.webp'; // bikes in warehouse (Produksi Lokal left)
 const IMG_CTA_BG     = '/manus-storage/P1015177_e752378f.webp'; // warehouse/dark
 
 // Gallery: 9 unique images — 3×3 grid (removed both P1015061 duplicates)
@@ -192,7 +192,7 @@ export default function Distributor() {
           {/* Right: text — warehouse image background with dark overlay */}
           <div className="lg:w-1/2 flex items-center px-8 py-16 lg:px-16 relative overflow-hidden">
             <img
-              src="/manus-storage/P1014963_3bf46146.webp"
+              src="/manus-storage/P1015061_fda3a73c.webp"
               alt=""
               aria-hidden="true"
               className="absolute inset-0 w-full h-full object-cover object-center"
