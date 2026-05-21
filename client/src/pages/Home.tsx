@@ -517,48 +517,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          SECTION 8: VOXA UNTUK SIAPA? — activity tiles with tabs
-      ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-16 bg-gray-50 border-t border-gray-100">
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem' }}>
-          <div className="flex items-center gap-6 mb-8">
-            <h2 className="font-display text-2xl md:text-3xl text-gray-900 tracking-wide">VOXA UNTUK SIAPA?</h2>
-            <div className="flex gap-1 border-b border-gray-200">
-              {(['HARIAN', 'BISNIS'] as const).map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setUseTab(tab)}
-                  className={`px-4 py-2 text-xs font-bold tracking-wider transition-colors border-b-2 -mb-px ${
-                    useTab === tab
-                      ? 'border-gray-900 text-gray-900'
-                      : 'border-transparent text-gray-400 hover:text-gray-600'
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {useTilesByTab[useTab].map(tile => (
-              <Link key={tile.label} href={tile.href}>
-                <div className="group relative overflow-hidden aspect-square bg-gray-100">
-                  <img
-                    src={tile.img}
-                    alt={tile.label}
-                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
-                  <div className="absolute inset-0 flex items-end p-4">
-                    <span className="font-display text-white text-sm md:text-base tracking-widest">{tile.label}</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ═══════════════════════════════════════════════════════════════
           SECTION 5B: SECOND CAMPAIGN BANNER — B2G / Pemerintah
