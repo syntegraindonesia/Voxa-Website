@@ -500,89 +500,43 @@ export default function Home() {
       />
 
       {/* ═══════════════════════════════════════════════════════════════
-          SECTION 7: CARI VOXA ANDA — premium category discovery
+          SECTION 7: POPULER SEKARANG — tabbed 4-column grid
       ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-20 bg-gray-950">
+      <section className="py-16 bg-white border-t border-gray-100">
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem' }}>
-          {/* Section header */}
-          <div className="mb-12">
-            <p className="text-[#37C5FF] text-xs font-bold tracking-[0.25em] uppercase mb-3">Temukan Model Anda</p>
-            <h2
-              className="font-display text-4xl md:text-5xl lg:text-6xl text-white tracking-tight leading-none"
-              style={{ letterSpacing: '-0.02em' }}
-            >
-              Cari VOXA
-              <span className="text-[#37C5FF]"> Anda</span>
-            </h2>
-            <p className="mt-4 text-gray-400 text-sm md:text-base max-w-xl">
-              Empat lini produk dirancang untuk setiap gaya hidup — dari mobilitas harian hingga solusi logistik profesional.
-            </p>
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-6">
+              <h2 className="font-display text-2xl md:text-3xl text-gray-900 tracking-wide">POPULER SEKARANG</h2>
+              <div className="flex gap-1 border-b border-gray-200">
+                {(['HARIAN', 'BISNIS'] as const).map(tab => (
+                  <button
+                    key={tab}
+                    onClick={() => setPopularTab(tab)}
+                    className={`px-4 py-2 text-xs font-bold tracking-wider transition-colors border-b-2 -mb-px ${
+                      popularTab === tab
+                        ? 'border-gray-900 text-gray-900'
+                        : 'border-transparent text-gray-400 hover:text-gray-600'
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-
-          {/* Premium 4-card grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              {
-                label: 'Liberty Series',
-                sub: 'Urban Commuter',
-                img: 'https://private-us-east-1.manuscdn.com/sessionFile/ITdJsUB3tuXJT4kPnDvUkw/sandbox/M9ZFiXNPv05N1UfZuoMDRb-img-1_1779343126000_na1fn_Y2FyaS12b3hhLWxpYmVydHk.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvSVRkSnNVQjN0dVhKVDRrUG5EdlVrdy9zYW5kYm94L005WkZpWE5QdjA1TjFVZlp1b01EUmItaW1nLTFfMTc3OTM0MzEyNjAwMF9uYTFmbl9ZMkZ5YVMxMmIzaGhMV3hwWW1WeWRIay5qcGc~eC1vc3MtcHJvY2Vzcz1pbWFnZS9yZXNpemUsd18xOTIwLGhfMTkyMC9mb3JtYXQsd2VicC9xdWFsaXR5LHFfODAiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3OTg3NjE2MDB9fX1dfQ__&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=Vaznqgp5S2eMX6BgKYEHR41NZNXDjEmnnvdTAM9gNfmpLtln-hbMI0EqFHm5aaO1B2Ev7bMlaEd09cFO38XC6E5BdUG8WxUyfEkMO6N5tV3QI4washd-e-j1clkrrFC1IRWG8JkNnJ3gKUkvfWnKDYzmR~zht2PCEHHV4Ltwa7E0Xbaz3SH8Yzsb09RAlEQ6ZE2KQPSK4w3lWCnvd5jfqWXyjsLwBPXyRZxdszeCAw-1DsszeHvr99s7EbGRANxlu1BQZDkGD7VrT~bD8NyItSNgtp2roRWE6MOQToRycQRQ7BDxq1YC~cY8Mvk66ANK6PXBCacNieS2VEX28Jx6Hw__',
-                href: '/catalog/sepeda-listrik',
-                desc: 'Praktis, modern, dan hemat energi untuk perjalanan harian.',
-              },
-              {
-                label: 'Eiffel Series',
-                sub: 'Elegant Mobility',
-                img: 'https://private-us-east-1.manuscdn.com/sessionFile/ITdJsUB3tuXJT4kPnDvUkw/sandbox/M9ZFiXNPv05N1UfZuoMDRb-img-2_1779343144000_na1fn_Y2FyaS12b3hhLWVpZmZlbA.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvSVRkSnNVQjN0dVhKVDRrUG5EdlVrdy9zYW5kYm94L005WkZpWE5QdjA1TjFVZlp1b01EUmItaW1nLTJfMTc3OTM0MzE0NDAwMF9uYTFmbl9ZMkZ5YVMxMmIzaGhMV1ZwWm1abGJBLmpwZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSx3XzE5MjAsaF8xOTIwL2Zvcm1hdCx3ZWJwL3F1YWxpdHkscV84MCIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5ODc2MTYwMH19fV19&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=CVO5G2-1GX0fQDf70oAyZSC7mGyoApjMcUoS4k1U68YC4Yn1NPovDPfNtd89qzYG3ZDZjJ7hwH4IqzGZO9kzcyhWajOb7nr3eNtja7ejNoajf4Bha9Rf5FZuH2LWm6bHmKbIXxXCbkFg-Nc4NaEGWJAFGzfygn3nJ8KlzzmwQ-0Rn0h~bt-jmSdX3x3Eifn6td~lPgyhwdwrroVTSekW2Kt7exSj18hq8HunCv7AtbH7dn10mRzVejCkZuaXjRn0LXJ6ENhLL~uP0CJtilLcDuTu43IE8tYoLWUsrmfi3XRXCr~Nabze0ASrW6QFbgOKMEz9dx0PtfgthoF25M2oHA__',
-                href: '/catalog/sepeda-listrik',
-                desc: 'Desain elegan dengan performa tinggi untuk gaya hidup urban.',
-              },
-              {
-                label: 'Elite Series',
-                sub: 'Flagship Performance',
-                img: 'https://private-us-east-1.manuscdn.com/sessionFile/ITdJsUB3tuXJT4kPnDvUkw/sandbox/M9ZFiXNPv05N1UfZuoMDRb-img-3_1779343143000_na1fn_Y2FyaS12b3hhLWVsaXRl.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvSVRkSnNVQjN0dVhKVDRrUG5EdlVrdy9zYW5kYm94L005WkZpWE5QdjA1TjFVZlp1b01EUmItaW1nLTNfMTc3OTM0MzE0MzAwMF9uYTFmbl9ZMkZ5YVMxMmIzaGhMV1ZzYVhSbC5qcGc~eC1vc3MtcHJvY2Vzcz1pbWFnZS9yZXNpemUsd18xOTIwLGhfMTkyMC9mb3JtYXQsd2VicC9xdWFsaXR5LHFfODAiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3OTg3NjE2MDB9fX1dfQ__&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=rK2tfqPvhb4Pxcyt~CxECFKlURjNdqNwI00Zk98z~2kSXjoWWu2-4J4VH~02R5WH8an8t-twpnKjAchhPAYyw0OtKj1SxdMggQD6l7mr1yeU3nim8akWWB3GRP06cQEULY0YTL9LJ8N~76FR54dncHfWsc2ftXwJF2Kt1cxflB2vxAslyfNfEtlFoJ~B0biu8x8uDgFWdGBPkpwD0TNTqjPkeTKDXiOQDu1sTNY~60ZAXM73dheqFPoD7vNkUKyoQE9fzDb2YxA3N4JBmoVS4xKngU3atiBZdozrSGqR45ZscHJI9qE5SeFCGq2hlAex7nYXSwOggWSvbQIKGFwgVw__',
-                href: '/catalog/sepeda-listrik',
-                desc: 'Lini flagship VOXA — performa tertinggi dengan teknologi terdepan.',
-              },
-              {
-                label: 'VOXA G3',
-                sub: 'Logistics & Fleet',
-                img: 'https://private-us-east-1.manuscdn.com/sessionFile/ITdJsUB3tuXJT4kPnDvUkw/sandbox/M9ZFiXNPv05N1UfZuoMDRb-img-4_1779343128000_na1fn_Y2FyaS12b3hhLWcz.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvSVRkSnNVQjN0dVhKVDRrUG5EdlVrdy9zYW5kYm94L005WkZpWE5QdjA1TjFVZlp1b01EUmItaW1nLTRfMTc3OTM0MzEyODAwMF9uYTFmbl9ZMkZ5YVMxMmIzaGhMV2N6LmpwZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSx3XzE5MjAsaF8xOTIwL2Zvcm1hdCx3ZWJwL3F1YWxpdHkscV84MCIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5ODc2MTYwMH19fV19&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=qxuASC0h2HY7iy0r7MZjqRPZc4n1hd1WoYItqQ2p-ZkYpHLNRy~vTd3SG06aEkN~vQP9PkSOs7pPGk32BMiuetnXKRvQLFdQ0BV4s37Tfq9Sn60M4cRUY6awfzphT6mq3BnTVl08MLBOxEYRJXtx1Xl2vzQckmQgvpoheOqnfVFllm~Uax-sYTMeigOk2LqfwpoVT5rSSMuWNbcvJMd29KeMKcQbbNofuez22N8hdZHiprTTu1TYXG820owvDxMGsThSEQzTI98~VGN8tmjUdHHvR-JyVDmwoSpWOd2EDdg~cQPBy8haWsb8x28uQTWOGHwl4jjXV1q64ljMMztKFg__',
-                href: '/bisnis',
-                desc: 'Solusi armada kendaraan listrik untuk bisnis dan logistik.',
-              },
-            ].map(item => (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {popularItemsByTab[popularTab].map(item => (
               <Link key={item.label} href={item.href}>
-                <div
-                  className="group relative overflow-hidden bg-gray-900"
-                  style={{ borderRadius: '2px', aspectRatio: '3/4' }}
-                >
-                  {/* Background image */}
+                <div className="group relative overflow-hidden aspect-[3/4] bg-gray-100">
                   <img
                     src={item.img}
                     alt={item.label}
-                    className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                   />
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10 transition-opacity duration-300 group-hover:from-black/90" />
-                  {/* Cyan glow on hover */}
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    style={{ boxShadow: 'inset 0 0 60px rgba(55,197,255,0.12)' }}
-                  />
-                  {/* Content */}
-                  <div className="absolute inset-0 flex flex-col justify-end p-5 md:p-6">
-                    <p className="text-[#37C5FF] text-[10px] font-bold tracking-[0.2em] uppercase mb-1.5 opacity-90">{item.sub}</p>
-                    <h3 className="font-display text-white text-lg md:text-xl tracking-wide leading-tight mb-2">{item.label}</h3>
-                    <p className="text-gray-400 text-xs leading-relaxed mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">{item.desc}</p>
-                    <div className="flex items-center gap-2 text-[#37C5FF] text-xs font-semibold tracking-wider">
-                      <span>Jelajahi</span>
-                      <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
-                    </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 p-4 md:p-5">
+                    <h3 className="font-display text-white text-sm md:text-base tracking-wide leading-tight mb-1">{item.label}</h3>
                   </div>
-                  {/* Top-right cyan accent line */}
-                  <div
-                    className="absolute top-0 right-0 w-px h-0 group-hover:h-full transition-all duration-500 bg-[#37C5FF]/40"
-                  />
                 </div>
               </Link>
             ))}
