@@ -427,15 +427,10 @@ export default function Home() {
           alt="VOXA — Kendaraan Listrik untuk Jalanan Indonesia"
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
-        {/* Subtle left-side overlay so text is readable against bright sky */}
+        {/* Text legibility overlay — only a narrow soft band behind the text, corners stay natural */}
         <div
           className="absolute inset-0"
-          style={{ background: 'linear-gradient(to right, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.35) 40%, transparent 70%)' }}
-        />
-        {/* Bottom fade */}
-        <div
-          className="absolute inset-0"
-          style={{ background: 'linear-gradient(to top, rgba(255,255,255,0.25) 0%, transparent 30%)' }}
+          style={{ background: 'radial-gradient(ellipse 55% 70% at 22% 52%, rgba(255,255,255,0.38) 0%, transparent 100%)' }}
         />
 
         {/* Left-side text block — positioned in the open sky area to the left of the bike */}
