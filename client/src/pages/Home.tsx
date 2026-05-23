@@ -32,6 +32,7 @@ const sepedaListrikTerbaru = (() => {
 
 // ─── Image constants ──────────────────────────────────────────────────────────
 const HERO_BG = '/manus-storage/hero-banner-v2_0bbd7a2c.png';
+const HERO_BG_MOBILE = '/manus-storage/hero-mobile-portrait_15cfbb52.png';
 
 // Campaign banner images (3-panel mosaic)
 const BANNER1 = '/manus-storage/campaign1_3919f523.png';
@@ -416,10 +417,85 @@ export default function Home() {
     <div className="min-h-screen bg-white">
 
       {/* ═══════════════════════════════════════════════════════════════
-          SECTION 3: HERO — 85–90vh, full-width, bottom-left text
+          SECTION 3: HERO — mobile portrait / desktop landscape
       ═══════════════════════════════════════════════════════════════ */}
+
+      {/* ── MOBILE hero (< sm): full portrait image, text pinned to bottom ── */}
       <section
-        className="relative w-full overflow-hidden bg-sky-100"
+        className="sm:hidden relative w-full overflow-hidden"
+        style={{ height: '100svh', minHeight: '600px', maxHeight: '900px' }}
+      >
+        <img
+          src={HERO_BG_MOBILE}
+          alt="VOXA — Kendaraan Listrik untuk Jalanan Indonesia"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: 'center top' }}
+        />
+        {/* Strong bottom-up dark gradient so text is always legible */}
+        <div
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(to top, rgba(5,20,40,0.88) 0%, rgba(5,20,40,0.55) 32%, rgba(5,20,40,0.0) 62%)' }}
+        />
+        {/* Text block — pinned to bottom of image */}
+        <div
+          className="absolute bottom-0 left-0 right-0"
+          style={{ padding: '0 1.75rem 2.5rem' }}
+        >
+          <p
+            className="font-bold uppercase mb-3"
+            style={{ fontSize: '0.62rem', color: '#4DD9F5', letterSpacing: '0.26em' }}
+          >
+            Kendaraan Listrik Indonesia
+          </p>
+          <h1
+            className="font-display leading-[1.0] tracking-tight mb-3"
+            style={{ fontSize: 'clamp(2.6rem, 10vw, 3.4rem)', color: '#ffffff', letterSpacing: '-0.025em', textShadow: '0 2px 12px rgba(0,0,0,0.4)' }}
+          >
+            BEBAS,<br />
+            <span style={{ color: '#4DD9F5' }}>HEMAT,</span><br />
+            TANPA BATAS.
+          </h1>
+          <p
+            className="leading-relaxed mb-6"
+            style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.88)', maxWidth: '22rem' }}
+          >
+            Sepeda listrik VOXA — desain elegan, performa tangguh,
+            dan hemat energi untuk setiap perjalanan Anda.
+          </p>
+          <div className="flex flex-row gap-3">
+            <Link
+              href="/catalog/sepeda-listrik"
+              className="inline-flex items-center justify-center font-bold text-white rounded-full transition-all duration-200 active:scale-[0.97] flex-1"
+              style={{
+                background: 'linear-gradient(135deg, #11B5E4 0%, #0078A8 100%)',
+                padding: '0.8rem 1.25rem',
+                fontSize: '0.85rem',
+                boxShadow: '0 6px 24px rgba(17,181,228,0.45)',
+              }}
+            >
+              Temukan Produk
+            </Link>
+            <Link
+              href="/compare"
+              className="inline-flex items-center justify-center font-semibold rounded-full border-2 transition-all duration-200 active:scale-[0.97] flex-1"
+              style={{
+                borderColor: 'rgba(255,255,255,0.7)',
+                color: '#ffffff',
+                padding: '0.78rem 1.25rem',
+                fontSize: '0.85rem',
+                background: 'rgba(255,255,255,0.12)',
+                backdropFilter: 'blur(8px)',
+              }}
+            >
+              Bandingkan Model
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── DESKTOP hero (sm+): landscape image, left text overlay ── */}
+      <section
+        className="hidden sm:block relative w-full overflow-hidden bg-sky-100"
         style={{ height: 'clamp(480px, 75vh, 820px)' }}
       >
         <img
@@ -427,24 +503,18 @@ export default function Home() {
           alt="VOXA — Kendaraan Listrik untuk Jalanan Indonesia"
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
-        {/* Text legibility overlay — only a narrow soft band behind the text, corners stay natural */}
+        {/* Soft radial glow behind text only */}
         <div
           className="absolute inset-0"
           style={{ background: 'radial-gradient(ellipse 55% 70% at 22% 52%, rgba(255,255,255,0.38) 0%, transparent 100%)' }}
         />
-
-        {/* Left-side text block — positioned in the open sky area to the left of the bike */}
         <div className="absolute top-1/2 left-0 -translate-y-1/2" style={{ padding: '0 clamp(1.5rem, 6vw, 5rem)', maxWidth: '42rem' }}>
           <p className="text-[#0090B8] font-bold tracking-[0.22em] uppercase mb-3" style={{ fontSize: 'clamp(0.65rem, 0.9vw, 0.8rem)' }}>
             Kendaraan Listrik Indonesia
           </p>
           <h1
             className="font-display leading-none tracking-tight mb-4"
-            style={{
-              fontSize: 'clamp(2.4rem, 4.8vw, 4.2rem)',
-              color: '#0a2540',
-              letterSpacing: '-0.02em',
-            }}
+            style={{ fontSize: 'clamp(2.4rem, 4.8vw, 4.2rem)', color: '#0a2540', letterSpacing: '-0.02em' }}
           >
             BEBAS,{' '}
             <span style={{ color: '#00B4D8' }}>HEMAT,</span>
