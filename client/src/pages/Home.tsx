@@ -31,7 +31,7 @@ const sepedaListrikTerbaru = (() => {
 })();
 
 // ─── Image constants ──────────────────────────────────────────────────────────
-const HERO_BG = '/manus-storage/hero-portrait-v1_3d57a087.png';
+const HERO_BG = '/manus-storage/hero-banner-v2_0bbd7a2c.png';
 
 // Campaign banner images (3-panel mosaic)
 const BANNER1 = '/manus-storage/campaign1_3919f523.png';
@@ -416,153 +416,65 @@ export default function Home() {
     <div className="min-h-screen bg-white">
 
       {/* ═══════════════════════════════════════════════════════════════
-          SECTION 3: HERO — split on mobile, full-bleed on desktop
+          SECTION 3: HERO — 85–90vh, full-width, bottom-left text
       ═══════════════════════════════════════════════════════════════ */}
-
-      {/* ── MOBILE hero (< sm): text block on top, image on bottom ── */}
-      <div className="sm:hidden flex flex-col" style={{ background: '#f0f8fc' }}>
-        {/* Text zone — clean white/light background, no image behind it */}
-        <div
-          className="flex flex-col justify-end"
-          style={{ padding: '5rem 1.75rem 2rem', background: 'linear-gradient(160deg, #e8f5fb 0%, #f5fbfe 100%)' }}
-        >
-          <p
-            className="font-bold uppercase mb-3"
-            style={{ fontSize: '0.62rem', color: '#0090B8', letterSpacing: '0.24em' }}
-          >
-            Kendaraan Listrik Indonesia
-          </p>
-          <h1
-            className="font-display leading-[1.02] tracking-tight mb-4"
-            style={{ fontSize: 'clamp(2.4rem, 10vw, 3.2rem)', color: '#0a2540', letterSpacing: '-0.025em' }}
-          >
-            BEBAS,<br />
-            <span style={{ color: '#11B5E4' }}>HEMAT,</span><br />
-            TANPA BATAS.
-          </h1>
-          <p
-            className="leading-relaxed mb-6"
-            style={{ fontSize: '0.875rem', color: '#334e68', opacity: 0.85, maxWidth: '22rem' }}
-          >
-            Sepeda listrik VOXA — desain elegan, performa tangguh,
-            dan hemat energi untuk setiap perjalanan Anda.
-          </p>
-          <div className="flex flex-row gap-3">
-            <Link
-              href="/catalog/sepeda-listrik"
-              className="inline-flex items-center justify-center font-bold text-white rounded-full transition-all duration-200 active:scale-[0.97] flex-1"
-              style={{
-                background: 'linear-gradient(135deg, #11B5E4 0%, #0090B8 100%)',
-                padding: '0.75rem 1.25rem',
-                fontSize: '0.82rem',
-                boxShadow: '0 6px 20px rgba(17,181,228,0.35)',
-              }}
-            >
-              Temukan Produk
-            </Link>
-            <Link
-              href="/compare"
-              className="inline-flex items-center justify-center font-semibold rounded-full border-2 transition-all duration-200 active:scale-[0.97] flex-1"
-              style={{
-                borderColor: '#11B5E4',
-                color: '#0090B8',
-                padding: '0.72rem 1.25rem',
-                fontSize: '0.82rem',
-                background: 'white',
-              }}
-            >
-              Bandingkan Model
-            </Link>
-          </div>
-        </div>
-
-        {/* Image zone — full-width portrait, scooter fills bottom half */}
-        <div className="w-full overflow-hidden" style={{ height: '56vw', minHeight: '220px', maxHeight: '340px' }}>
-          <img
-            src={HERO_BG}
-            alt="VOXA — Kendaraan Listrik untuk Jalanan Indonesia"
-            className="w-full h-full object-cover"
-            style={{ objectPosition: 'center 62%' }}
-          />
-        </div>
-      </div>
-
-      {/* ── DESKTOP hero (sm+): full-bleed image with left text overlay ── */}
       <section
-        className="relative w-full overflow-hidden hidden sm:block"
-        style={{ height: 'clamp(520px, 80vh, 900px)', background: '#e8f4f8' }}
+        className="relative w-full overflow-hidden bg-sky-100"
+        style={{ height: 'clamp(480px, 75vh, 820px)' }}
       >
         <img
           src={HERO_BG}
           alt="VOXA — Kendaraan Listrik untuk Jalanan Indonesia"
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: 'center 15%' }}
+          className="absolute inset-0 w-full h-full object-cover object-center"
         />
-        {/* Left text-column soft glow */}
+        {/* Text legibility overlay — only a narrow soft band behind the text, corners stay natural */}
         <div
           className="absolute inset-0"
-          style={{ background: 'linear-gradient(to right, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.2) 40%, transparent 62%)' }}
-        />
-        {/* Bottom fade */}
-        <div
-          className="absolute inset-0"
-          style={{ background: 'linear-gradient(to top, rgba(232,244,248,0.4) 0%, transparent 35%)' }}
+          style={{ background: 'radial-gradient(ellipse 55% 70% at 22% 52%, rgba(255,255,255,0.38) 0%, transparent 100%)' }}
         />
 
-        <div
-          className="absolute left-0 top-0 flex flex-col justify-center"
-          style={{
-            height: '100%',
-            padding: 'clamp(2rem, 6vw, 4.5rem)',
-            paddingTop: 'clamp(5rem, 10vw, 7rem)',
-            maxWidth: 'clamp(300px, 46%, 520px)',
-          }}
-        >
-          <p
-            className="font-bold uppercase mb-4"
-            style={{ fontSize: 'clamp(0.6rem, 1vw, 0.72rem)', color: '#0090B8', letterSpacing: '0.24em' }}
-          >
+        {/* Left-side text block — positioned in the open sky area to the left of the bike */}
+        <div className="absolute top-1/2 left-0 -translate-y-1/2" style={{ padding: '0 clamp(1.5rem, 6vw, 5rem)', maxWidth: '42rem' }}>
+          <p className="text-[#0090B8] font-bold tracking-[0.22em] uppercase mb-3" style={{ fontSize: 'clamp(0.65rem, 0.9vw, 0.8rem)' }}>
             Kendaraan Listrik Indonesia
           </p>
           <h1
-            className="font-display leading-[1.0] tracking-tight mb-5"
-            style={{ fontSize: 'clamp(2.6rem, 5.5vw, 4.4rem)', color: '#0a2540', letterSpacing: '-0.025em' }}
+            className="font-display leading-none tracking-tight mb-4"
+            style={{
+              fontSize: 'clamp(2.4rem, 4.8vw, 4.2rem)',
+              color: '#0a2540',
+              letterSpacing: '-0.02em',
+            }}
           >
-            BEBAS,<br />
-            <span style={{ color: '#11B5E4' }}>HEMAT,</span><br />
+            BEBAS,{' '}
+            <span style={{ color: '#00B4D8' }}>HEMAT,</span>
+            <br />
             TANPA BATAS.
           </h1>
-          <p
-            className="leading-relaxed mb-8"
-            style={{ fontSize: 'clamp(0.8rem, 1.1vw, 0.92rem)', color: '#334e68', maxWidth: '24rem', opacity: 0.88 }}
-          >
-            Sepeda listrik VOXA — desain elegan, performa tangguh,
-            dan hemat energi untuk setiap perjalanan Anda.
+          <p className="mb-6 leading-relaxed" style={{ fontSize: 'clamp(0.8rem, 1.05vw, 0.95rem)', color: '#334e68', maxWidth: '26rem' }}>
+            Sepeda listrik VOXA — desain elegan, performa tangguh, dan hemat energi untuk setiap perjalanan Anda.
           </p>
-          <div className="flex flex-row items-center gap-3">
+          <div className="flex items-center gap-4 flex-wrap">
             <Link
               href="/catalog/sepeda-listrik"
-              className="inline-flex items-center justify-center font-bold text-white rounded-full transition-all duration-200 hover:brightness-110 active:scale-[0.97]"
+              className="inline-flex items-center gap-2 font-bold text-white rounded-full transition-all hover:brightness-110 active:scale-95"
               style={{
-                background: 'linear-gradient(135deg, #11B5E4 0%, #0090B8 100%)',
-                padding: '0.75rem 2rem',
-                fontSize: 'clamp(0.78rem, 1vw, 0.875rem)',
-                boxShadow: '0 6px 22px rgba(17,181,228,0.38)',
-                minWidth: '10rem',
+                background: 'linear-gradient(135deg, #00B4D8 0%, #0090B8 100%)',
+                padding: 'clamp(0.55rem, 1vw, 0.75rem) clamp(1.2rem, 2vw, 1.8rem)',
+                fontSize: 'clamp(0.75rem, 0.9vw, 0.875rem)',
+                boxShadow: '0 4px 18px rgba(0,180,216,0.35)',
               }}
             >
               Temukan Produk
             </Link>
             <Link
               href="/compare"
-              className="inline-flex items-center justify-center font-semibold rounded-full border-2 transition-all duration-200 hover:bg-[#11B5E4]/10 active:scale-[0.97]"
+              className="inline-flex items-center gap-2 font-semibold rounded-full border-2 transition-all hover:bg-[#00B4D8]/10"
               style={{
-                borderColor: '#11B5E4',
+                borderColor: '#00B4D8',
                 color: '#0090B8',
-                padding: '0.72rem 2rem',
-                fontSize: 'clamp(0.78rem, 1vw, 0.875rem)',
-                minWidth: '10rem',
-                background: 'rgba(255,255,255,0.55)',
+                padding: 'clamp(0.5rem, 1vw, 0.7rem) clamp(1.2rem, 2vw, 1.8rem)',
+                fontSize: 'clamp(0.75rem, 0.9vw, 0.875rem)',
               }}
             >
               Bandingkan Model
