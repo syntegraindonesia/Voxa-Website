@@ -572,21 +572,21 @@ export default function Home() {
       />
 
       {/* ═══════════════════════════════════════════════════════════════
-          SECTION 6: PRODUCT ROW — SEPEDA LISTRIK TERBARU
+          SECTION 6: PRODUCT ROW — POPULER SEKARANG
       ═══════════════════════════════════════════════════════════════ */}
       <ProductRow
-        title="SEPEDA LISTRIK TERBARU"
+        title="POPULER SEKARANG"
         viewAllHref="/catalog/sepeda-listrik"
         products={sepedaListrikTerbaru}
       />
 
       {/* ═══════════════════════════════════════════════════════════════
-          SECTION 7: POPULER SEKARANG — tabbed 4-column grid
+          SECTION 7: CARI VOXA ANDA — 4-column series grid
       ═══════════════════════════════════════════════════════════════ */}
       <section className="py-16 bg-white border-t border-gray-100">
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem' }}>
           <div className="flex items-center justify-between mb-8">
-            <h2 className="font-display text-2xl md:text-3xl text-gray-900 tracking-wide">POPULER SEKARANG</h2>
+            <h2 className="font-display text-2xl md:text-3xl text-gray-900 tracking-wide">CARI VOXA ANDA</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {popularItems.map(item => (
@@ -610,12 +610,12 @@ export default function Home() {
 
 
       {/* ═══════════════════════════════════════════════════════════════
-          SECTION 9: KOMUNITAS VOXA — horizontal scrollable photo strip
+          SECTION 9: CERIA BARENG VOXA — horizontal scrollable photo strip
       ═══════════════════════════════════════════════════════════════ */}
       <section className="py-16 bg-white border-t border-gray-100">
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem' }}>
           <div className="flex items-center justify-between mb-8">
-            <h2 className="font-display text-2xl md:text-3xl text-gray-900 tracking-wide">KOMUNITAS VOXA</h2>
+            <h2 className="font-display text-2xl md:text-3xl text-gray-900 tracking-wide">CERIA BARENG VOXA</h2>
           </div>
           {/* Horizontal scrollable strip */}
           <div
