@@ -219,17 +219,16 @@ export default function Tentang() {
           {/* ════════════════════════════════════════════════════════
           3. VISI & MISI — white bg
       ════════════════════════════════════════════════════════ */}
-      <section className="py-24 bg-white relative overflow-hidden">
-
+      <section className="py-10 bg-white relative overflow-hidden">
         <div
           ref={missionReveal.ref}
           className={`container relative transition-all duration-700 ${
             missionReveal.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <div className="text-center mb-16">
+          <div className="text-center mb-6">
             <h2
-            className="font-display text-3xl md:text-5xl tracking-wide mb-10"
+            className="font-display text-3xl md:text-5xl tracking-wide mb-8"
             style={{ color: '#50B1D4' }}
             >
               VISI &amp; MISI VOXA
@@ -237,11 +236,11 @@ export default function Tentang() {
 
             {/* Vision card */}
             <div
-              className="max-w-3xl mx-auto rounded-2xl px-8 py-7 border mb-8"
+              className="max-w-3xl mx-auto rounded-2xl px-8 py-7 border mb-5"
               style={{
-              background: '#ffffff',
+              background: 'rgba(80,177,212,0.08)',
               borderColor: '#50B1D4',
-              boxShadow: '0 4px 24px rgba(80,177,212,0.12)',
+              boxShadow: '0 4px 24px rgba(80,177,212,0.10)',
               }}
             >
               <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#50B1D4' }}>
@@ -254,11 +253,11 @@ export default function Tentang() {
 
             {/* Mission card */}
             <div
-              className="max-w-3xl mx-auto rounded-2xl px-8 py-7 border mb-8"
+              className="max-w-3xl mx-auto rounded-2xl px-8 py-7 border"
               style={{
-              background: '#ffffff',
+              background: 'rgba(80,177,212,0.08)',
               borderColor: '#50B1D4',
-              boxShadow: '0 4px 24px rgba(80,177,212,0.12)',
+              boxShadow: '0 4px 24px rgba(80,177,212,0.10)',
               }}
             >
               <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#50B1D4' }}>
@@ -268,7 +267,6 @@ export default function Tentang() {
                 Menghadirkan kendaraan listrik berkualitas tinggi dengan desain inovatif, teknologi terkini, dan layanan purna jual terbaik — agar setiap perjalanan menjadi lebih efisien, hemat, dan menyenangkan bagi seluruh masyarakat Indonesia.
               </p>
             </div>
-
           </div>
         </div>
       </section>
