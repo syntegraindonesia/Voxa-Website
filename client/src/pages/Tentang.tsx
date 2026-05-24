@@ -277,8 +277,26 @@ export default function Tentang() {
               </p>
             </div>
 
+            {/* Mission card — same format as Vision card */}
+            <div
+              className="max-w-3xl mx-auto rounded-2xl px-8 py-7 border mb-14"
+              style={{
+              background: 'rgba(255,255,255,0.18)',
+              borderColor: 'rgba(255,255,255,0.45)',
+              backdropFilter: 'blur(16px)',
+              boxShadow: '0 0 40px rgba(255,255,255,0.1)',
+              }}
+            >
+              <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: 'rgba(255,255,255,0.85)' }}>
+                Misi
+              </p>
+              <p className="text-gray-100 text-base md:text-lg leading-relaxed">
+                Menghadirkan kendaraan listrik berkualitas tinggi dengan desain inovatif, teknologi terkini, dan layanan purna jual terbaik — agar setiap perjalanan menjadi lebih efisien, hemat, dan menyenangkan bagi seluruh masyarakat Indonesia.
+              </p>
+            </div>
+
             <p className="text-xs font-bold tracking-widest uppercase mb-8" style={{ color: 'rgba(255,255,255,0.85)' }}>
-              Misi
+              Pilar Misi
             </p>
           </div>
 
