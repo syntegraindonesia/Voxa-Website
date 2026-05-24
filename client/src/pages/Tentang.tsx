@@ -113,7 +113,7 @@ export default function Tentang() {
       {/* ══════════════════════════════════════════════════════════
           2. COMPANY STORY — editorial split, white bg
       ══════════════════════════════════════════════════════════ */}
-      <section className="bg-white py-24">
+      <section className="bg-white" style={{ paddingTop: '96px', paddingBottom: '35px' }}>
         <div
           ref={storyReveal.ref}
           className={`container transition-all duration-900 ${
@@ -219,7 +219,7 @@ export default function Tentang() {
           {/* ════════════════════════════════════════════════════════
           3. VISI & MISI — white bg
       ════════════════════════════════════════════════════════ */}
-      <section className="py-10 bg-white relative overflow-hidden">
+      <section className="bg-white relative overflow-hidden" style={{ paddingTop: '25px', paddingBottom: '10px' }}>
         <div
           ref={missionReveal.ref}
           className={`container relative transition-all duration-700 ${
@@ -274,7 +274,7 @@ export default function Tentang() {
       {/* ══════════════════════════════════════════════════════════
           4. MENGAPA VOXA — clean trust grid, white bg
       ══════════════════════════════════════════════════════════ */}
-      <section className="py-24 bg-white relative overflow-hidden">
+      <section className="bg-white relative overflow-hidden" style={{ paddingTop: '5px', paddingBottom: '40px' }}>
         {/* Subtle dot grid */}
         <div
           className="absolute inset-0 opacity-[0.04] pointer-events-none"
@@ -338,9 +338,11 @@ export default function Tentang() {
           5. CINEMATIC CLOSING — deep cyan-blue, minimal
       ══════════════════════════════════════════════════════════ */}
       <section
-        className="relative py-40 overflow-hidden"
+        className="relative overflow-hidden"
         style={{
           background: '#50B1D4',
+          paddingTop: '60px',
+          paddingBottom: '60px',
         }}
       >
         {/* Ambient glows */}
