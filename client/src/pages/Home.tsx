@@ -32,7 +32,7 @@ const sepedaListrikTerbaru = (() => {
 
 // ─── Image constants ──────────────────────────────────────────────────────────
 const HERO_BG = '/manus-storage/hero-banner-v2_0bbd7a2c.png';
-const HERO_BG_MOBILE = '/manus-storage/hero-mobile-portrait_15cfbb52.png';
+const HERO_BG_MOBILE = '/manus-storage/hero-mobile-v2_bc4d430d.png';
 
 // Campaign banner images (3-panel mosaic)
 const BANNER1 = '/manus-storage/campaign1_3919f523.png';
@@ -430,7 +430,7 @@ export default function Home() {
         {/* Strong bottom-up dark gradient so text is always legible */}
         <div
           className="absolute inset-0"
-          style={{ background: 'linear-gradient(to top, rgba(5,20,40,0.88) 0%, rgba(5,20,40,0.55) 32%, rgba(5,20,40,0.0) 62%)' }}
+          style={{ background: 'linear-gradient(to top, rgba(3,15,30,0.94) 0%, rgba(3,15,30,0.70) 38%, rgba(3,15,30,0.10) 65%, transparent 80%)' }}
         />
         {/* Text block — pinned to bottom of image */}
         <div
