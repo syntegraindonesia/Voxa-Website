@@ -216,31 +216,10 @@ export default function Tentang() {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════
-          3. VISI & MISI — deep cyan-blue gradient bg
-      ══════════════════════════════════════════════════════════ */}
-      <section
-        className="py-24 relative overflow-hidden"
-        style={{
-          background: '#50B1D4',
-        }}
-      >
-        {/* Ambient cyan glow behind title */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div
-            className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[400px] opacity-10 blur-3xl"
-            style={{ background: 'radial-gradient(ellipse, rgba(255,255,255,0.4) 0%, transparent 70%)' }}
-          />
-          {/* Subtle grid lines */}
-          <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage:
-                'linear-gradient(rgba(80,177,212,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(80,177,212,0.6) 1px, transparent 1px)',
-              backgroundSize: '60px 60px',
-            }}
-          />
-        </div>
+          {/* ════════════════════════════════════════════════════════
+          3. VISI & MISI — white bg
+      ════════════════════════════════════════════════════════ */}
+      <section className="py-24 bg-white relative overflow-hidden">
 
         <div
           ref={missionReveal.ref}
@@ -249,100 +228,47 @@ export default function Tentang() {
           }`}
         >
           <div className="text-center mb-16">
-            <p className="text-xs font-bold tracking-widest mb-3 uppercase" style={{ color: 'rgba(255,255,255,0.85)' }}>
-              Visi & Misi
-            </p>
             <h2
             className="font-display text-3xl md:text-5xl tracking-wide mb-10"
-            style={{ color: '#ffffff' }}
+            style={{ color: '#50B1D4' }}
             >
-              Visi & Misi VOXA
+              VISI &amp; MISI VOXA
             </h2>
 
             {/* Vision card */}
             <div
-              className="max-w-3xl mx-auto rounded-2xl px-8 py-7 border mb-14"
+              className="max-w-3xl mx-auto rounded-2xl px-8 py-7 border mb-8"
               style={{
-              background: 'rgba(255,255,255,0.18)',
-              borderColor: 'rgba(255,255,255,0.45)',
-              backdropFilter: 'blur(16px)',
-              boxShadow: '0 0 40px rgba(255,255,255,0.1)',
+              background: '#ffffff',
+              borderColor: '#50B1D4',
+              boxShadow: '0 4px 24px rgba(80,177,212,0.12)',
               }}
             >
-              <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: 'rgba(255,255,255,0.85)' }}>
+              <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#50B1D4' }}>
                 Visi
               </p>
-              <p className="text-gray-100 text-base md:text-lg leading-relaxed">
+              <p className="text-gray-700 text-base md:text-lg leading-relaxed">
                 Menjadi brand kendaraan listrik terpercaya di Indonesia yang menghadirkan mobilitas modern, ramah lingkungan, dan dapat diakses oleh semua kalangan.
               </p>
             </div>
 
-            {/* Mission card — same format as Vision card */}
+            {/* Mission card */}
             <div
-              className="max-w-3xl mx-auto rounded-2xl px-8 py-7 border mb-14"
+              className="max-w-3xl mx-auto rounded-2xl px-8 py-7 border mb-8"
               style={{
-              background: 'rgba(255,255,255,0.18)',
-              borderColor: 'rgba(255,255,255,0.45)',
-              backdropFilter: 'blur(16px)',
-              boxShadow: '0 0 40px rgba(255,255,255,0.1)',
+              background: '#ffffff',
+              borderColor: '#50B1D4',
+              boxShadow: '0 4px 24px rgba(80,177,212,0.12)',
               }}
             >
-              <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: 'rgba(255,255,255,0.85)' }}>
+              <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: '#50B1D4' }}>
                 Misi
               </p>
-              <p className="text-gray-100 text-base md:text-lg leading-relaxed">
+              <p className="text-gray-700 text-base md:text-lg leading-relaxed">
                 Menghadirkan kendaraan listrik berkualitas tinggi dengan desain inovatif, teknologi terkini, dan layanan purna jual terbaik — agar setiap perjalanan menjadi lebih efisien, hemat, dan menyenangkan bagi seluruh masyarakat Indonesia.
               </p>
             </div>
 
-            <p className="text-xs font-bold tracking-widest uppercase mb-8" style={{ color: 'rgba(255,255,255,0.85)' }}>
-              Pilar Misi
-            </p>
-          </div>
-
-          {/* Mission cards — VOXA acronym */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {MISSIONS.map((m, i) => (
-              <div
-                key={m.word}
-                className="group relative rounded-2xl p-6 border transition-all duration-300 hover:-translate-y-2 cursor-default"
-                style={{
-                  background: 'rgba(255,255,255,0.15)',
-                  borderColor: 'rgba(255,255,255,0.3)',
-                  backdropFilter: 'blur(12px)',
-                  transitionDelay: `${i * 80}ms`,
-                }}
-                onMouseEnter={e => {
-                  const el = e.currentTarget as HTMLDivElement;
-                  el.style.boxShadow = '0 0 40px rgba(255,255,255,0.25)';
-                  el.style.borderColor = 'rgba(255,255,255,0.6)';
-                  el.style.background = 'rgba(255,255,255,0.25)';
-                }}
-                onMouseLeave={e => {
-                  const el = e.currentTarget as HTMLDivElement;
-                  el.style.boxShadow = '';
-                  el.style.borderColor = 'rgba(255,255,255,0.3)';
-                  el.style.background = 'rgba(255,255,255,0.15)';
-                }}
-              >
-                {/* Big letter watermark — reduced opacity */}
-                <div
-                  className="font-display text-7xl font-bold leading-none mb-4 opacity-30 group-hover:opacity-50 transition-opacity duration-300 select-none"
-                  style={{ color: '#ffffff' }}
-                >
-                  {m.letter}
-                </div>
-                {/* Icon */}
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110"
-                  style={{ background: 'rgba(255,255,255,0.2)', color: '#ffffff' }}
-                >
-                  {m.icon}
-                </div>
-                <h3 className="font-bold text-white mb-3 text-base">{m.word}</h3>
-                <p className="text-white/80 text-sm leading-relaxed">{m.text}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
