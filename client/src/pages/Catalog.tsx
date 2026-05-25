@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useParams } from 'wouter';
-import { ArrowRight, ChevronRight, Filter, SlidersHorizontal } from 'lucide-react';
-import { products, sepedaListrik, batre, type Product } from '@/data/products';
+import { ArrowRight, ChevronRight, ChevronLeft, Filter, MessageCircle, Shield, SlidersHorizontal, Wrench, X, Zap } from 'lucide-react';
+import { sepedaListrik, batre, type Product } from '@/data/products';
+import { getProductGallery } from '@/data/productGalleries';
 
 const categoryConfig = {
   'sepeda-listrik': {
@@ -42,6 +43,7 @@ export default function Catalog() {
   const config = categoryConfig[category] || categoryConfig['sepeda-listrik'];
   const [selectedSeries, setSelectedSeries] = useState('Semua');
   const [sortBy, setSortBy] = useState('default');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const allProducts: any[] = category === 'sparepart'
     ? sparepartItems
@@ -53,6 +55,8 @@ export default function Catalog() {
 
   if (sortBy === 'price-asc') filtered = [...filtered].sort((a: any, b: any) => (a.priceNum || 0) - (b.priceNum || 0));
   if (sortBy === 'price-desc') filtered = [...filtered].sort((a: any, b: any) => (b.priceNum || 0) - (a.priceNum || 0));
+
+  const isProductCatalog = category === 'sepeda-listrik' || category === 'batre';
 
   return (
     <div className="min-h-screen bg-white">
@@ -88,10 +92,8 @@ export default function Catalog() {
         className="relative py-4 md:py-14 px-4 overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #EAF9FF 0%, #ffffff 40%, #EAF9FF 100%)' }}
       >
-        {/* Ambient glow orbs */}
         <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full opacity-20 blur-3xl pointer-events-none" style={{ background: '#37C5FF' }} />
         <div className="absolute bottom-0 right-1/4 w-64 h-64 rounded-full opacity-15 blur-3xl pointer-events-none" style={{ background: '#0A4A63' }} />
-        {/* Subtle grid texture */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#37C5FF 1px, transparent 1px), linear-gradient(90deg, #37C5FF 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
         <div className="relative max-w-4xl mx-auto text-center">
           <div className="hidden md:inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-6 border" style={{ color: '#37C5FF', borderColor: '#37C5FF', background: 'rgba(55,197,255,0.08)' }}>
@@ -112,7 +114,6 @@ export default function Catalog() {
       <div className="sticky top-16 z-30 bg-white border-b border-gray-100 shadow-sm">
         <div className="container py-4">
           <div className="flex items-center gap-2">
-            {/* Series Filter — horizontally scrollable on mobile */}
             <SlidersHorizontal size={16} className="text-gray-400 shrink-0" />
             <div className="flex items-center gap-2 overflow-x-auto scrollbar-none flex-1 min-w-0 pb-0.5">
               {config.series.map(s => (
@@ -125,7 +126,6 @@ export default function Catalog() {
                 </button>
               ))}
             </div>
-            {/* Sort — hidden on mobile, visible on md+ */}
             <div className="hidden md:flex items-center gap-1 shrink-0">
               <Filter size={14} className="text-gray-400" />
               <select
@@ -152,7 +152,12 @@ export default function Catalog() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {filtered.map((product: any) => (
-              <CatalogCard key={product.id} product={product} category={category} />
+              <CatalogCard
+                key={product.id}
+                product={product}
+                category={category}
+                onSelect={isProductCatalog ? setSelectedProduct : undefined}
+              />
             ))}
           </div>
         )}
@@ -164,7 +169,7 @@ export default function Catalog() {
           <h2 className="font-display text-4xl md:text-5xl tracking-wide mb-4">TIDAK MENEMUKAN YANG ANDA CARI?</h2>
           <p className="text-white/80 text-lg mb-8">Hubungi tim kami untuk konsultasi produk yang tepat untuk kebutuhan Anda.</p>
           <a
-            href="https://wa.me/6281234567890"
+            href="https://wa.me/628156161071"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-white text-[#00B4D8] font-bold px-8 py-4 rounded-full hover:bg-gray-100 transition-all"
@@ -173,35 +178,230 @@ export default function Catalog() {
           </a>
         </div>
       </div>
+
+      {/* Product Detail Modal */}
+      {selectedProduct && (
+        <ProductModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
     </div>
   );
 }
 
-function CatalogCard({ product, category }: { product: any; category: string }) {
-  const href = category === 'sparepart' ? `/catalog/sparepart` : `/products/${product.id}`;
-  return (
-    <Link href={href}>
-      <div className="product-card group rounded-2xl overflow-hidden border border-gray-100 bg-white cursor-pointer h-full">
-        <div className="relative aspect-square overflow-hidden bg-gray-50">
-          <img src={product.image} alt={product.name} className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500" />
-          {product.badge && (
-            <span className="absolute top-3 left-3 bg-[#00B4D8] text-white text-xs font-bold px-2.5 py-1 rounded-full">
-              {product.badge}
+// ─── Card Component ───────────────────────────────────────────────────────────
+
+function CatalogCard({ product, category, onSelect }: { product: any; category: string; onSelect?: (p: Product) => void }) {
+  const cardContent = (
+    <div className="product-card group rounded-2xl overflow-hidden border border-gray-100 bg-white cursor-pointer h-full">
+      <div className="relative aspect-square overflow-hidden bg-gray-50">
+        <img src={product.image} alt={product.name} className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500" />
+        {product.badge && (
+          <span className="absolute top-3 left-3 bg-[#00B4D8] text-white text-xs font-bold px-2.5 py-1 rounded-full">
+            {product.badge}
+          </span>
+        )}
+        {/* Gallery count hint */}
+        {(category === 'sepeda-listrik' || category === 'batre') && (() => {
+          const gallery = getProductGallery(product.id, product.image);
+          return gallery.length > 1 ? (
+            <span className="absolute bottom-2 right-2 bg-black/40 text-white text-xs px-2 py-0.5 rounded-full">
+              +{gallery.length - 1} foto
             </span>
-          )}
+          ) : null;
+        })()}
+      </div>
+      <div className="p-4">
+        <p className="text-xs text-gray-400 mb-1">{product.series}</p>
+        <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#00B4D8] transition-colors leading-snug">{product.name}</h3>
+        <p className="text-xs text-gray-500 mb-3 line-clamp-2">{product.shortDesc}</p>
+        <div className="flex items-center justify-between">
+          <span className="font-bold text-[#00B4D8] text-sm">{product.price}</span>
+          <span className="text-xs text-gray-400 group-hover:text-[#00B4D8] transition-colors flex items-center gap-1">
+            Detail <ChevronRight size={12} />
+          </span>
         </div>
-        <div className="p-4">
-          <p className="text-xs text-gray-400 mb-1">{product.series}</p>
-          <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#00B4D8] transition-colors leading-snug">{product.name}</h3>
-          <p className="text-xs text-gray-500 mb-3 line-clamp-2">{product.shortDesc}</p>
-          <div className="flex items-center justify-between">
-            <span className="font-bold text-[#00B4D8] text-sm">{product.price}</span>
-            <span className="text-xs text-gray-400 group-hover:text-[#00B4D8] transition-colors flex items-center gap-1">
-              Detail <ChevronRight size={12} />
-            </span>
+      </div>
+    </div>
+  );
+
+  // Sepeda listrik & batre → open modal
+  if (onSelect) {
+    return (
+      <div onClick={() => onSelect(product as Product)}>
+        {cardContent}
+      </div>
+    );
+  }
+
+  // Sparepart → link to sparepart page
+  return (
+    <Link href="/sparepart">
+      {cardContent}
+    </Link>
+  );
+}
+
+// ─── Product Detail Modal ─────────────────────────────────────────────────────
+
+function ProductModal({ product, onClose }: { product: Product; onClose: () => void }) {
+  const [activeImg, setActiveImg] = useState(0);
+  const galleryImages = getProductGallery(product.id, product.image);
+
+  const prev = () => setActiveImg(i => (i - 1 + galleryImages.length) % galleryImages.length);
+  const next = () => setActiveImg(i => (i + 1) % galleryImages.length);
+
+  const waMessage = encodeURIComponent(`Halo VOXA, saya tertarik dengan produk ${product.name}. Bisa tolong informasi lebih lanjut?`);
+  const waUrl = `https://wa.me/628156161071?text=${waMessage}`;
+
+  // Build specs array from the product.specs object
+  const specLabels: Record<string, string> = {
+    jarakTempuh: 'Jarak Tempuh',
+    baterai: 'Baterai',
+    kecepatan: 'Kecepatan Maks',
+    motor: 'Motor',
+    pengisian: 'Waktu Pengisian',
+    bobot: 'Bobot',
+    dayaAngkut: 'Daya Angkut',
+    dimensi: 'Dimensi',
+    pengereman: 'Pengereman',
+    ban: 'Ban',
+    keamanan: 'Keamanan',
+    kegunaan: 'Kegunaan',
+    // Batre
+    voltase: 'Voltase',
+    kapasitas: 'Kapasitas',
+    tipe: 'Tipe',
+    merk: 'Merek',
+    model: 'Model',
+    daya: 'Daya',
+    arusPelepasan: 'Arus Pelepasan',
+    arusPengisian: 'Arus Pengisian',
+    arusPengisianMaks: 'Arus Pengisian Maks',
+    teganganPengisian: 'Tegangan Pengisian',
+    isiKemasan: 'Isi Kemasan',
+    rekomendasiMotor: 'Rekomendasi Motor',
+    waktuPenggunaan: 'Waktu Penggunaan',
+  };
+
+  const specEntries = Object.entries(product.specs)
+    .filter(([, v]) => v !== undefined && v !== '')
+    .map(([k, v]) => ({ label: specLabels[k] || k, value: v as string }));
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-5 border-b border-gray-100">
+          <span className="text-xs font-semibold text-[#00B4D8] uppercase tracking-wider">{product.series}</span>
+          <button onClick={onClose} className="p-1.5 rounded-full hover:bg-gray-100 transition-colors">
+            <X size={20} className="text-gray-500" />
+          </button>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-0">
+          {/* Image Gallery */}
+          <div className="p-5">
+            <div className="relative aspect-square bg-gray-50 rounded-2xl overflow-hidden mb-3">
+              <img
+                src={galleryImages[activeImg]}
+                alt={`${product.name} ${activeImg + 1}`}
+                className="w-full h-full object-contain"
+              />
+              {galleryImages.length > 1 && (
+                <>
+                  <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-1.5 rounded-full shadow transition-all">
+                    <ChevronLeft size={18} className="text-gray-700" />
+                  </button>
+                  <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-1.5 rounded-full shadow transition-all">
+                    <ChevronRight size={18} className="text-gray-700" />
+                  </button>
+                  <span className="absolute bottom-2 right-3 text-xs text-gray-500 bg-white/80 px-2 py-0.5 rounded-full">
+                    {activeImg + 1}/{galleryImages.length}
+                  </span>
+                </>
+              )}
+            </div>
+            {/* Thumbnails */}
+            {galleryImages.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto scrollbar-none">
+                {galleryImages.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImg(i)}
+                    className={`shrink-0 w-14 h-14 rounded-xl overflow-hidden border-2 transition-all ${
+                      activeImg === i ? 'border-[#00B4D8]' : 'border-transparent'
+                    }`}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-contain bg-gray-50" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Info */}
+          <div className="p-5 flex flex-col gap-4">
+            <div>
+              {product.badge && (
+                <span className="inline-block bg-[#00B4D8] text-white text-xs font-bold px-2.5 py-1 rounded-full mb-2">
+                  {product.badge}
+                </span>
+              )}
+              <h2 className="text-xl font-black text-gray-900 mb-1">{product.name}</h2>
+              <p className="text-lg font-bold text-[#00B4D8] mb-2">{product.price}</p>
+              <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
+            </div>
+
+            {/* Specs */}
+            {specEntries.length > 0 && (
+              <div>
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Spesifikasi</h3>
+                <div className="rounded-xl border border-gray-100 overflow-hidden">
+                  {specEntries.map((spec, i) => (
+                    <div key={i} className={`flex text-sm ${i % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+                      <span className="w-2/5 px-3 py-2 text-gray-500 font-medium shrink-0">{spec.label}</span>
+                      <span className="w-3/5 px-3 py-2 text-gray-800">{spec.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Trust badges */}
+            <div className="flex items-center gap-4 flex-wrap">
+              {[
+                { icon: <Shield size={14} />, text: 'Garansi 2 Tahun' },
+                { icon: <Wrench size={14} />, text: 'Sparepart Tersedia' },
+                { icon: <Zap size={14} />, text: 'Produk Original' },
+              ].map(badge => (
+                <div key={badge.text} className="flex items-center gap-1.5 text-gray-500 text-xs">
+                  <span className="text-[#00B4D8]">{badge.icon}</span>
+                  {badge.text}
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-auto inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-full transition-all"
+            >
+              <MessageCircle size={18} />
+              Chat WhatsApp — Tanya Harga
+            </a>
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
