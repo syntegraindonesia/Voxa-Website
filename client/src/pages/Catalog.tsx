@@ -197,11 +197,6 @@ function CatalogCard({ product, category, onSelect }: { product: any; category: 
     <div className="product-card group rounded-2xl overflow-hidden border border-gray-100 bg-white cursor-pointer h-full">
       <div className="relative aspect-square overflow-hidden bg-gray-50">
         <img src={product.image} alt={product.name} className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500" />
-        {product.badge && (
-          <span className="absolute top-3 left-3 bg-[#00B4D8] text-white text-xs font-bold px-2.5 py-1 rounded-full">
-            {product.badge}
-          </span>
-        )}
         {/* Gallery count hint */}
         {(category === 'sepeda-listrik' || category === 'batre') && (() => {
           const gallery = getProductGallery(product.id, product.image);
@@ -309,7 +304,7 @@ function ProductModal({ product, onClose }: { product: Product; onClose: () => v
         <div className="grid md:grid-cols-2 gap-0">
           {/* Image Gallery */}
           <div className="p-5">
-            <div className="relative aspect-square bg-gray-50 rounded-2xl overflow-hidden mb-3">
+            <div className="relative bg-gray-50 rounded-2xl overflow-hidden mb-3" style={{ height: 'min(50vw, 320px)' }}>
               <img
                 src={galleryImages[activeImg]}
                 alt={`${product.name} ${activeImg + 1}`}
@@ -350,11 +345,6 @@ function ProductModal({ product, onClose }: { product: Product; onClose: () => v
           {/* Info */}
           <div className="p-5 flex flex-col gap-4">
             <div>
-              {product.badge && (
-                <span className="inline-block bg-[#00B4D8] text-white text-xs font-bold px-2.5 py-1 rounded-full mb-2">
-                  {product.badge}
-                </span>
-              )}
               <h2 className="text-xl font-black text-gray-900 mb-1">{product.name}</h2>
               <p className="text-lg font-bold text-[#00B4D8] mb-2">{product.price}</p>
               <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>

@@ -109,11 +109,7 @@ function ProductCard({ product, cardWidth }: { product: (typeof sepedaListrik)[0
             alt={product.name}
             className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
           />
-          {product.badge && (
-            <span className="absolute bottom-3 left-3 bg-black text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5">
-              {product.badge}
-            </span>
-          )}
+
         </div>
         {/* Text block */}
         <div className="pt-3 pb-2">
@@ -268,11 +264,7 @@ function MobileProductCard({ product }: { product: (typeof sepedaListrik)[0] }) 
             alt={product.name}
             className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
           />
-          {product.badge && (
-            <span className="absolute bottom-2 left-2 bg-black text-white text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5">
-              {product.badge}
-            </span>
-          )}
+
         </div>
         {/* Text */}
         <div className="pt-2 pb-1">

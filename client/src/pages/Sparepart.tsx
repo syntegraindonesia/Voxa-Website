@@ -875,11 +875,6 @@ function SparepartCard({ product, onSelect }: { product: SparepartItem; onSelect
           alt={product.name}
           className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
         />
-        {product.badge && (
-          <span className="absolute top-3 left-3 bg-[#00B4D8] text-white text-xs font-bold px-2.5 py-1 rounded-full">
-            {product.badge}
-          </span>
-        )}
         {product.images.length > 1 && (
           <span className="absolute bottom-2 right-2 bg-black/40 text-white text-xs px-2 py-0.5 rounded-full">
             +{product.images.length - 1} foto
@@ -928,7 +923,7 @@ function ProductModal({ product, onClose }: { product: SparepartItem; onClose: (
         <div className="grid md:grid-cols-2 gap-0">
           {/* Image Gallery */}
           <div className="p-5">
-            <div className="relative aspect-square bg-gray-50 rounded-2xl overflow-hidden mb-3">
+            <div className="relative bg-gray-50 rounded-2xl overflow-hidden mb-3" style={{ height: 'min(50vw, 320px)' }}>
               <img
                 src={product.images[activeImg]}
                 alt={`${product.name} ${activeImg + 1}`}
@@ -969,11 +964,6 @@ function ProductModal({ product, onClose }: { product: SparepartItem; onClose: (
           {/* Info */}
           <div className="p-5 flex flex-col gap-4">
             <div>
-              {product.badge && (
-                <span className="inline-block bg-[#00B4D8] text-white text-xs font-bold px-2.5 py-1 rounded-full mb-2">
-                  {product.badge}
-                </span>
-              )}
               <h2 className="text-xl font-black text-gray-900 mb-2">{product.name}</h2>
               <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
             </div>

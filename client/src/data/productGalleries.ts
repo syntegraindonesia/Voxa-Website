@@ -101,7 +101,7 @@ export const productGalleries: Record<string, string[]> = {
   ],
 
   // ── Elite Fantasy ──────────────────────────────────────────────────────────
-  "elite-fantasy": [
+  "elite-fantasi": [
     "/manus-storage/elitefantasy-1-spec_51e5370f.jpg",
     "/manus-storage/elitefantasy-2-free_ea4dff1b.jpg",
     "/manus-storage/elitefantasy-3-color_5d5210c8.jpg",
@@ -112,7 +112,7 @@ export const productGalleries: Record<string, string[]> = {
   ],
 
   // ── Elite Fantasy S ────────────────────────────────────────────────────────
-  "elite-fantasy-s": [
+  "elite-fantasi-s": [
     "/manus-storage/elitefantasys-1-spec_ce2a842e.jpg",
     "/manus-storage/elitefantasys-2-free_8c8fc80c.jpg",
     "/manus-storage/elitefantasys-3-lamp_422333bc.jpg",

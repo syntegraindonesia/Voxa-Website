@@ -201,11 +201,6 @@ function KatalogCard({ product }: { product: UnifiedProduct }) {
           alt={product.name}
           className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
         />
-        {product.badge && (
-          <span className="absolute top-3 left-3 bg-[#00B4D8] text-white text-xs font-bold px-2.5 py-1 rounded-full">
-            {product.badge}
-          </span>
-        )}
       </div>
       <div className="p-4">
         <p className="text-xs text-gray-400 mb-1">{product.series}</p>
