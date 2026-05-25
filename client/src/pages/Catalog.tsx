@@ -201,8 +201,8 @@ function CatalogCard({ product, category, onSelect }: { product: any; category: 
         {(category === 'sepeda-listrik' || category === 'batre') && (() => {
           const gallery = getProductGallery(product.id, product.image);
           return gallery.length > 1 ? (
-            <span className="absolute bottom-2 right-2 bg-black/40 text-white text-xs px-2 py-0.5 rounded-full">
-              +{gallery.length - 1} foto
+            <span className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+              1/{gallery.length}
             </span>
           ) : null;
         })()}
@@ -303,11 +303,11 @@ function ProductModal({ product, onClose }: { product: Product; onClose: () => v
 
         <div className="flex flex-col">
           {/* Image Gallery — full width, no padding, no grey bars */}
-          <div className="relative w-full bg-gray-50 overflow-hidden" style={{ height: '280px' }}>
+          <div className="relative w-full bg-white overflow-hidden" style={{ height: '300px' }}>
             <img
               src={galleryImages[activeImg]}
               alt={`${product.name} ${activeImg + 1}`}
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-contain object-center"
             />
             {galleryImages.length > 1 && (
               <>
@@ -334,7 +334,7 @@ function ProductModal({ product, onClose }: { product: Product; onClose: () => v
                     activeImg === i ? 'border-[#00B4D8]' : 'border-gray-200'
                   }`}
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover bg-gray-50" />
+                  <img src={img} alt="" className="w-full h-full object-contain bg-white" />
                 </button>
               ))}
             </div>
