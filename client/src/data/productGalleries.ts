@@ -113,25 +113,42 @@ export const productGalleries: Record<string, string[]> = {
 
   // ── Elite Fantasy S ────────────────────────────────────────────────────────
   "elite-fantasi-s": [
-    "/manus-storage/elitefantasys-1-spec_ce2a842e.jpg",
-    "/manus-storage/elitefantasys-2-free_8c8fc80c.jpg",
-    "/manus-storage/elitefantasys-3-lamp_422333bc.jpg",
-    "/manus-storage/elite-fantasy-s-v2_1be18aba.jpg",
-    "/manus-storage/elitefantasys_70376f35.jpg",
+    "/manus-storage/elitefantasys-1-spec_389c54b2.jpg",
+    "/manus-storage/elitefantasys-2-free_2aa5f96b.jpg",
+    "/manus-storage/elitefantasys-3-color_66ee73fb.jpg",
+    "/manus-storage/elitefantasys-4-lamp_71746859.jpg",
+    "/manus-storage/elitefantasys-5-lamprem_679155e6.jpg",
+    "/manus-storage/elitefantasys-6-mcb_e6d8f002.jpg",
+    "/manus-storage/elitefantasys-7-strip_a7ca20cb.jpg",
+    "/manus-storage/elitefantasys-8-velg_ce93415f.jpg",
+    "/manus-storage/elitefantasys-9-bagasi_45edd9f6.jpg",
+    "/manus-storage/elitefantasys-10-speed_ffd2d0e4.jpg",
   ],
 
   // ── Elite Rider ────────────────────────────────────────────────────────────
   "elite-rider": [
-    "/manus-storage/eliterider-1-spec_56116ca8.jpg",
-    "/manus-storage/elite-rider_88d4f4ff.jpg",
-    "/manus-storage/eliterider_2e0948bb.jpg",
+    "/manus-storage/eliterider-1-spec_792fe6ad.jpg",
+    "/manus-storage/eliterider-2-free_b87b4e45.jpg",
+    "/manus-storage/eliterider-3-color_3e1beb80.jpg",
+    "/manus-storage/eliterider-4-velg_b952b6e6.jpg",
+    "/manus-storage/eliterider-5-bagasi_db2644a2.jpg",
+    "/manus-storage/eliterider-6-speed_f21b9e3d.jpg",
+    "/manus-storage/eliterider-7-lamp_fafb10fe.jpg",
+    "/manus-storage/eliterider-8-mcb_1058522e.jpg",
+    "/manus-storage/eliterider-9-strip_9f64d083.jpg",
   ],
 
   // ── Elite Rider S ──────────────────────────────────────────────────────────
   "elite-rider-s": [
     "/manus-storage/eliteriders-1-spec_1576e098.jpg",
-    "/manus-storage/elite-rider-s_4882ce65.jpg",
-    "/manus-storage/eliteriders_0bf14cd1.jpg",
+    "/manus-storage/eliterider-2-free_b87b4e45.jpg",
+    "/manus-storage/eliterider-3-color_3e1beb80.jpg",
+    "/manus-storage/eliterider-4-velg_b952b6e6.jpg",
+    "/manus-storage/eliterider-5-bagasi_db2644a2.jpg",
+    "/manus-storage/eliterider-6-speed_f21b9e3d.jpg",
+    "/manus-storage/eliterider-7-lamp_fafb10fe.jpg",
+    "/manus-storage/eliterider-8-mcb_1058522e.jpg",
+    "/manus-storage/eliterider-9-strip_9f64d083.jpg",
   ],
   // ══════════════════════════════════════════════════════════════════════════════
   // VOXA SERIES GALLERIES
