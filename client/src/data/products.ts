@@ -451,7 +451,7 @@ export const products: Product[] = [
       baterai: '48V 12Ah',
       motor: '600 watt',
       jarakTempuh: 'Hingga ±40 km',
-      kecepatan: '±25 km/jam',
+      kecepatan: '±40 km/jam',
       dayaAngkut: 'Hingga 150 kg',
       bobot: 'Sekitar 60 kg',
       pengereman: 'Drum Brake',
@@ -470,7 +470,7 @@ export const products: Product[] = [
     ],
     useCases: ['Penggunaan intensif', 'Pengguna dengan beban besar', 'Perjalanan harian bertenaga'],
     faqs: [
-      { q: 'Berapa kecepatan maksimal Elite Rider?', a: 'Kecepatan maksimal Elite Rider adalah ±25 km/jam.' },
+      { q: 'Berapa kecepatan maksimal Elite Rider?', a: 'Kecepatan maksimal Elite Rider adalah ±40 km/jam.' },
       { q: 'Berapa daya angkut Elite Rider?', a: 'Elite Rider mampu mengangkut hingga 150 kg.' },
     ],
     badge: 'Sport',
