@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'wouter';
-import { Heart, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
-import { sepedaListrik, batre, products } from '@/data/products';
+import { Heart, ChevronLeft, ChevronRight, ArrowRight, MessageCircle, Shield, Wrench, X, Zap } from 'lucide-react';
+import { sepedaListrik, batre, products, type Product } from '@/data/products';
+import { getProductGallery } from '@/data/productGalleries';
 
 // Curated Produk Unggulan: all 5 Elite series only
 const produkUnggulan = (() => {
@@ -91,36 +92,40 @@ const COMMUNITY_PHOTOS: string[] = [
 ];
 
 // ─── Product Card ───────────────────────────────────────────────────────────────────
-function ProductCard({ product, cardWidth }: { product: (typeof sepedaListrik)[0]; cardWidth: string }) {
+function ProductCard({ product, cardWidth, onSelect }: { product: (typeof sepedaListrik)[0]; cardWidth: string; onSelect: (p: Product) => void }) {
   const [wishlisted, setWishlisted] = useState(false);
+  const gallery = getProductGallery(product.id, product.image);
   return (
     <div
-      className="group relative flex-shrink-0"
+      className="group relative flex-shrink-0 cursor-pointer"
       style={{ width: cardWidth, scrollSnapAlign: 'start' }}
+      onClick={() => onSelect(product as Product)}
     >
-      <Link href={`/product/${product.id}`}>
-        {/* Image area — fixed height on desktop, scales down on smaller screens */}
-        <div
-          className="relative overflow-hidden bg-white"
-          style={{ height: 'clamp(200px, 28vw, 480px)' }}
-        >
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
-          />
-
-        </div>
-        {/* Text block */}
-        <div className="pt-3 pb-2">
-          <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-0.5">{product.series}</p>
-          <h3 className="text-sm font-semibold text-gray-900 leading-snug mb-1">{product.name}</h3>
-          <p className="text-sm font-bold text-gray-900">{product.price}</p>
-        </div>
-      </Link>
+      {/* Image area — fixed height on desktop, scales down on smaller screens */}
+      <div
+        className="relative overflow-hidden bg-white"
+        style={{ height: 'clamp(200px, 28vw, 480px)' }}
+      >
+        <img
+          src={product.image}
+          alt={product.name}
+          className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
+        />
+        {gallery.length > 1 && (
+          <span className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full font-medium">
+            1/{gallery.length}
+          </span>
+        )}
+      </div>
+      {/* Text block */}
+      <div className="pt-3 pb-2">
+        <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-0.5">{product.series}</p>
+        <h3 className="text-sm font-semibold text-gray-900 leading-snug mb-1">{product.name}</h3>
+        <p className="text-sm font-bold text-gray-900">{product.price}</p>
+      </div>
       {/* Wishlist icon */}
       <button
-        onClick={() => setWishlisted(w => !w)}
+        onClick={e => { e.stopPropagation(); setWishlisted(w => !w); }}
         className="absolute top-2 right-2 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
         aria-label="Tambah ke wishlist"
       >
@@ -131,7 +136,7 @@ function ProductCard({ product, cardWidth }: { product: (typeof sepedaListrik)[0
 }
 
 // ─── Horizontal Product Row ───────────────────────────────────────────────────────
-function ProductRow({ title, viewAllHref, products }: { title: string; viewAllHref: string; products: (typeof sepedaListrik) }) {
+function ProductRow({ title, viewAllHref, products, onSelect }: { title: string; viewAllHref: string; products: (typeof sepedaListrik); onSelect: (p: Product) => void }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [mobilePage, setMobilePage] = useState(0);
@@ -208,7 +213,7 @@ function ProductRow({ title, viewAllHref, products }: { title: string; viewAllHr
               style={{ gridTemplateColumns: '1fr 1fr', gap: '10px' }}
             >
               {(mobilePages[mobilePage] ?? []).map(p => (
-                <MobileProductCard key={p.id} product={p} />
+                <MobileProductCard key={p.id} product={p} onSelect={onSelect} />
               ))}
             </div>
             {/* Dot indicators */}
@@ -241,7 +246,7 @@ function ProductRow({ title, viewAllHref, products }: { title: string; viewAllHr
             {products.map(p => {
               const cardWidth = `min(calc((min(100vw, 1440px) - 4rem - ${GAP * 3}px) / 4), 340px)`;
               return (
-                <ProductCard key={p.id} product={p} cardWidth={cardWidth} />
+                <ProductCard key={p.id} product={p} cardWidth={cardWidth} onSelect={onSelect} />
               );
             })}
           </div>
@@ -252,30 +257,33 @@ function ProductRow({ title, viewAllHref, products }: { title: string; viewAllHr
 }
 
 // ─── Mobile Product Card (2×2 grid item) ─────────────────────────────────────
-function MobileProductCard({ product }: { product: (typeof sepedaListrik)[0] }) {
+function MobileProductCard({ product, onSelect }: { product: (typeof sepedaListrik)[0]; onSelect: (p: Product) => void }) {
   const [wishlisted, setWishlisted] = useState(false);
+  const gallery = getProductGallery(product.id, product.image);
   return (
-    <div className="group relative">
-      <Link href={`/product/${product.id}`}>
-        {/* Square image area */}
-        <div className="relative overflow-hidden bg-white" style={{ aspectRatio: '1/1' }}>
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
-          />
-
-        </div>
-        {/* Text */}
-        <div className="pt-2 pb-1">
-          <p className="text-[9px] text-gray-400 uppercase tracking-widest mb-0.5 truncate">{product.series}</p>
-          <h3 className="text-xs font-semibold text-gray-900 leading-snug mb-0.5 line-clamp-2">{product.name}</h3>
-          <p className="text-xs font-bold text-gray-900">{product.price}</p>
-        </div>
-      </Link>
+    <div className="group relative cursor-pointer" onClick={() => onSelect(product as Product)}>
+      {/* Square image area */}
+      <div className="relative overflow-hidden bg-white" style={{ aspectRatio: '1/1' }}>
+        <img
+          src={product.image}
+          alt={product.name}
+          className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
+        />
+        {gallery.length > 1 && (
+          <span className="absolute bottom-1.5 right-1.5 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-full font-medium">
+            1/{gallery.length}
+          </span>
+        )}
+      </div>
+      {/* Text */}
+      <div className="pt-2 pb-1">
+        <p className="text-[9px] text-gray-400 uppercase tracking-widest mb-0.5 truncate">{product.series}</p>
+        <h3 className="text-xs font-semibold text-gray-900 leading-snug mb-0.5 line-clamp-2">{product.name}</h3>
+        <p className="text-xs font-bold text-gray-900">{product.price}</p>
+      </div>
       {/* Wishlist */}
       <button
-        onClick={() => setWishlisted(w => !w)}
+        onClick={e => { e.stopPropagation(); setWishlisted(w => !w); }}
         className="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 rounded-full flex items-center justify-center shadow-sm"
         aria-label="Tambah ke wishlist"
       >
@@ -397,9 +405,100 @@ const useTilesByTab: Record<'HARIAN' | 'BISNIS', typeof useTiles> = {
   ],
 };
 
+// ─── Home Product Modal ──────────────────────────────────────────────────────
+function HomeProductModal({ product, onClose }: { product: Product; onClose: () => void }) {
+  const [activeImg, setActiveImg] = useState(0);
+  const galleryImages = getProductGallery(product.id, product.image);
+
+  const prev = () => setActiveImg(i => (i - 1 + galleryImages.length) % galleryImages.length);
+  const next = () => setActiveImg(i => (i + 1) % galleryImages.length);
+
+  const waMessage = encodeURIComponent(`Halo VOXA, saya tertarik dengan produk ${product.name}. Bisa tolong informasi lebih lanjut?`);
+  const waUrl = `https://wa.me/628156161071?text=${waMessage}`;
+
+  const specLabels: Record<string, string> = {
+    jarakTempuh: 'Jarak Tempuh', baterai: 'Baterai', kecepatan: 'Kecepatan Maks', motor: 'Motor',
+    pengisian: 'Waktu Pengisian', bobot: 'Bobot', dayaAngkut: 'Daya Angkut', dimensi: 'Dimensi',
+    pengereman: 'Pengereman', ban: 'Ban', keamanan: 'Keamanan', kegunaan: 'Kegunaan',
+    voltase: 'Voltase', kapasitas: 'Kapasitas', tipe: 'Tipe', merk: 'Merek', model: 'Model',
+    daya: 'Daya', arusPelepasan: 'Arus Pelepasan', arusPengisian: 'Arus Pengisian',
+    arusPengisianMaks: 'Arus Pengisian Maks', teganganPengisian: 'Tegangan Pengisian',
+    isiKemasan: 'Isi Kemasan', rekomendasiMotor: 'Rekomendasi Motor', waktuPenggunaan: 'Waktu Penggunaan',
+  };
+
+  const specEntries = Object.entries(product.specs)
+    .filter(([, v]) => v !== undefined && v !== '')
+    .map(([k, v]) => ({ label: specLabels[k] || k, value: v as string }));
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 pt-5 pb-4">
+          <span className="text-xs font-semibold text-[#00B4D8] uppercase tracking-wider">{product.series}</span>
+          <button onClick={onClose} className="p-1.5 rounded-full hover:bg-gray-100 transition-colors">
+            <X size={20} className="text-gray-500" />
+          </button>
+        </div>
+        <div className="flex flex-col">
+          <div className="relative w-full bg-white overflow-hidden" style={{ height: '300px' }}>
+            <img src={galleryImages[activeImg]} alt={`${product.name} ${activeImg + 1}`} className="w-full h-full object-contain object-center" />
+            {galleryImages.length > 1 && (
+              <>
+                <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-1.5 rounded-full shadow transition-all"><ChevronLeft size={18} className="text-gray-700" /></button>
+                <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-1.5 rounded-full shadow transition-all"><ChevronRight size={18} className="text-gray-700" /></button>
+                <span className="absolute bottom-2 right-3 text-xs text-gray-500 bg-white/80 px-2 py-0.5 rounded-full">{activeImg + 1}/{galleryImages.length}</span>
+              </>
+            )}
+          </div>
+          {galleryImages.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto scrollbar-none px-5 py-3 border-b border-gray-100">
+              {galleryImages.map((img, i) => (
+                <button key={i} onClick={() => setActiveImg(i)} className={`shrink-0 w-14 h-14 rounded-xl overflow-hidden border-2 transition-all ${activeImg === i ? 'border-[#00B4D8]' : 'border-gray-200'}`}>
+                  <img src={img} alt="" className="w-full h-full object-contain bg-white" />
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="p-5 flex flex-col gap-4">
+            <div>
+              <h2 className="text-xl font-black text-gray-900 mb-1">{product.name}</h2>
+              <p className="text-lg font-bold text-[#00B4D8] mb-2">{product.price}</p>
+              <p className="text-sm text-gray-600 leading-relaxed">{product.description}</p>
+            </div>
+            {specEntries.length > 0 && (
+              <div>
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Spesifikasi</h3>
+                <div className="rounded-xl border border-gray-100 overflow-hidden">
+                  {specEntries.map((spec, i) => (
+                    <div key={i} className={`flex text-sm ${i % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+                      <span className="w-2/5 px-3 py-2 text-gray-500 font-medium shrink-0">{spec.label}</span>
+                      <span className="w-3/5 px-3 py-2 text-gray-800">{spec.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="flex items-center gap-4 flex-wrap">
+              {[{ icon: <Shield size={14} />, text: 'Garansi 2 Tahun' }, { icon: <Wrench size={14} />, text: 'Sparepart Tersedia' }, { icon: <Zap size={14} />, text: 'Produk Original' }].map(badge => (
+                <div key={badge.text} className="flex items-center gap-1.5 text-gray-500 text-xs">
+                  <span className="text-[#00B4D8]">{badge.icon}</span>{badge.text}
+                </div>
+              ))}
+            </div>
+            <a href={waUrl} target="_blank" rel="noopener noreferrer" className="mt-auto inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-full transition-all">
+              <MessageCircle size={18} />Chat WhatsApp — Tanya Harga
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function Home() {
   const [useTab, setUseTab] = useState<'HARIAN' | 'BISNIS'>('HARIAN');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   return (
     <div className="min-h-screen bg-white">
@@ -540,6 +639,7 @@ export default function Home() {
         title="PRODUK UNGGULAN"
         viewAllHref="/catalog/sepeda-listrik"
         products={produkUnggulan}
+        onSelect={setSelectedProduct}
       />
 
       {/* ═══════════════════════════════════════════════════════════════
@@ -591,6 +691,7 @@ export default function Home() {
         title="POPULER SEKARANG"
         viewAllHref="/batre"
         products={batre}
+        onSelect={setSelectedProduct}
       />
 
       {/* ═══════════════════════════════════════════════════════════════
@@ -623,6 +724,9 @@ export default function Home() {
         </div>
       </section>
 
+      {selectedProduct && (
+        <HomeProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
+      )}
     </div>
   );
 }
