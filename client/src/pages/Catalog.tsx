@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useParams } from 'wouter';
+import { useState, useEffect } from 'react';
+import { Link, useParams, useSearch } from 'wouter';
 import { ArrowRight, ChevronRight, ChevronLeft, Filter, MessageCircle, Shield, SlidersHorizontal, Wrench, X, Zap } from 'lucide-react';
 import { sepedaListrik, batre, type Product } from '@/data/products';
 import { getProductGallery } from '@/data/productGalleries';
@@ -41,9 +41,28 @@ export default function Catalog() {
   const params = useParams<{ category: string }>();
   const category = (params.category || 'sepeda-listrik') as keyof typeof categoryConfig;
   const config = categoryConfig[category] || categoryConfig['sepeda-listrik'];
-  const [selectedSeries, setSelectedSeries] = useState('Semua');
+  const search = useSearch();
+  const [selectedSeries, setSelectedSeries] = useState(() => {
+    const params = new URLSearchParams(search);
+    const s = params.get('series');
+    if (!s) return 'Semua';
+    // Match case-insensitively against available series
+    const available = categoryConfig[(params.get('category') as keyof typeof categoryConfig) || 'sepeda-listrik']?.series || [];
+    const match = available.find(a => a.toLowerCase().includes(s.toLowerCase()));
+    return match || 'Semua';
+  });
   const [sortBy, setSortBy] = useState('default');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // Re-sync when URL changes (e.g. navigating from Home)
+  useEffect(() => {
+    const params = new URLSearchParams(search);
+    const s = params.get('series');
+    if (!s) { setSelectedSeries('Semua'); return; }
+    const available = config.series;
+    const match = available.find(a => a.toLowerCase().includes(s.toLowerCase()));
+    setSelectedSeries(match || 'Semua');
+  }, [search]);
 
   const allProducts: any[] = category === 'sparepart'
     ? sparepartItems

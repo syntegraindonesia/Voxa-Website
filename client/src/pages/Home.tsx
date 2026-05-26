@@ -368,10 +368,10 @@ function CampaignBanner({
 
 // ─── Popular Grid ─────────────────────────────────────────────────────────────
 const popularItems = [
-  { label: 'LIBERTY SERIES', img: POP_IMG_LIBERTY, href: '/catalog/sepeda-listrik?series=liberty' },
-  { label: 'EIFFEL SERIES',  img: POP_IMG_EIFFEL,  href: '/catalog/sepeda-listrik?series=eiffel' },
-  { label: 'ELITE SERIES',   img: POP_IMG_ELITE,   href: '/catalog/sepeda-listrik?series=elite' },
-  { label: 'VOXA SERIES',    img: POP_IMG_VOXA,    href: '/catalog/voxa-g3' },
+  { label: 'LIBERTY SERIES', img: POP_IMG_LIBERTY, href: '/sepeda-listrik?series=Liberty+Series' },
+  { label: 'EIFFEL SERIES',  img: POP_IMG_EIFFEL,  href: '/sepeda-listrik?series=Eiffel+Series' },
+  { label: 'ELITE SERIES',   img: POP_IMG_ELITE,   href: '/sepeda-listrik?series=Elite+Series' },
+  { label: 'VOXA SERIES',    img: POP_IMG_VOXA,    href: '/sepeda-listrik?series=Voxa+Series' },
 ];
 
 // ─── Lifestyle use tiles ──────────────────────────────────────────────────────
@@ -556,15 +556,6 @@ export default function Home() {
       />
 
       {/* ═══════════════════════════════════════════════════════════════
-          SECTION 6: PRODUCT ROW — POPULER SEKARANG
-      ═══════════════════════════════════════════════════════════════ */}
-      <ProductRow
-        title="POPULER SEKARANG"
-        viewAllHref="/catalog/sepeda-listrik"
-        products={sepedaListrikTerbaru}
-      />
-
-      {/* ═══════════════════════════════════════════════════════════════
           SECTION 7: CARI VOXA ANDA — 4-column series grid
       ═══════════════════════════════════════════════════════════════ */}
       <section className="py-16 bg-white border-t border-gray-100">
@@ -592,6 +583,15 @@ export default function Home() {
         </div>
       </section>
 
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SECTION 8: PRODUCT ROW — POPULER SEKARANG (Batre)
+      ═══════════════════════════════════════════════════════════════ */}
+      <ProductRow
+        title="POPULER SEKARANG"
+        viewAllHref="/batre"
+        products={batre}
+      />
 
       {/* ═══════════════════════════════════════════════════════════════
           SECTION 9: CERIA BARENG VOXA — horizontal scrollable photo strip
