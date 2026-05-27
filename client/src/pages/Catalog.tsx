@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useSearch } from 'wouter';
-import { ArrowRight, ChevronRight, ChevronLeft, Filter, MessageCircle, Shield, SlidersHorizontal, Wrench, X, Zap } from 'lucide-react';
+import { ArrowRight, ChevronRight, ChevronLeft, Filter, Heart, MessageCircle, Shield, SlidersHorizontal, Wrench, X, Zap } from 'lucide-react';
 import { sepedaListrik, batre, type Product } from '@/data/products';
 import { getProductGallery } from '@/data/productGalleries';
+import { useWishlist } from '@/contexts/WishlistContext';
 
 const categoryConfig = {
   'sepeda-listrik': {
@@ -213,10 +214,21 @@ export default function Catalog() {
 // ─── Card Component ───────────────────────────────────────────────────────────
 
 function CatalogCard({ product, category, onSelect }: { product: any; category: string; onSelect?: (p: Product) => void }) {
+  const { isSaved, toggle } = useWishlist();
+  const saved = isSaved(product.id);
+
   const cardContent = (
     <div className="product-card group rounded-2xl overflow-hidden border border-gray-100 bg-white cursor-pointer h-full">
       <div className="relative aspect-square overflow-hidden bg-gray-50">
         <img src={product.image} alt={product.name} className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500" />
+        {/* Heart button */}
+        <button
+          onClick={e => { e.stopPropagation(); toggle(product.id); }}
+          className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 hover:bg-white shadow transition-all"
+          aria-label={saved ? 'Hapus dari wishlist' : 'Tambah ke wishlist'}
+        >
+          <Heart size={14} className={saved ? 'fill-red-500 text-red-500' : 'text-gray-400'} />
+        </button>
         {/* Gallery count hint */}
         {(category === 'sepeda-listrik' || category === 'batre') && (() => {
           const gallery = getProductGallery(product.id, product.image);

@@ -4,6 +4,8 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { WishlistProvider } from "./contexts/WishlistContext";
+import { CartProvider } from "./contexts/CartContext";
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import Batre from "./pages/Batre";
@@ -18,8 +20,10 @@ import Tentang from "./pages/Tentang";
 import Bantuan from "./pages/Bantuan";
 import Guide from "./pages/Guide";
 import Katalog from "./pages/Katalog";
+import Wishlist from "./pages/Wishlist";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import CartSidebar from "./components/CartSidebar";
 
 // Wrapper so /sepeda-listrik renders the Catalog page with the correct category
 function SepedaListrikCatalog() {
@@ -52,6 +56,7 @@ function Router() {
       <Route path="/tentang" component={Tentang} />
       <Route path="/bantuan" component={Bantuan} />
       <Route path="/guide" component={Guide} />
+      <Route path="/wishlist" component={Wishlist} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
@@ -93,17 +98,22 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
-        <TooltipProvider>
-          <Toaster />
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-1">
-              <Router />
-            </main>
-            <Footer />
-          </div>
-          <FloatingWhatsApp />
-        </TooltipProvider>
+        <WishlistProvider>
+          <CartProvider>
+            <TooltipProvider>
+              <Toaster />
+              <div className="flex flex-col min-h-screen">
+                <Navbar />
+                <main className="flex-1">
+                  <Router />
+                </main>
+                <Footer />
+              </div>
+              <CartSidebar />
+              <FloatingWhatsApp />
+            </TooltipProvider>
+          </CartProvider>
+        </WishlistProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

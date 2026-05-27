@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
-import { ArrowRight, ChevronRight, ChevronLeft, Filter, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowRight, ChevronRight, ChevronLeft, Filter, Heart, SlidersHorizontal, X } from 'lucide-react';
+import { useWishlist } from '@/contexts/WishlistContext';
 
 // ─── Sparepart product data ───────────────────────────────────────────────────
 
@@ -864,6 +865,8 @@ export default function Sparepart() {
 // ─── Card Component ───────────────────────────────────────────────────────────
 
 function SparepartCard({ product, onSelect }: { product: SparepartItem; onSelect: (p: SparepartItem) => void }) {
+  const { isSaved, toggle } = useWishlist();
+  const saved = isSaved(product.id);
   return (
     <div
       className="product-card group rounded-2xl overflow-hidden border border-gray-100 bg-white cursor-pointer h-full"
@@ -875,6 +878,14 @@ function SparepartCard({ product, onSelect }: { product: SparepartItem; onSelect
           alt={product.name}
           className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
         />
+        {/* Heart button */}
+        <button
+          onClick={e => { e.stopPropagation(); toggle(product.id); }}
+          className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 hover:bg-white shadow transition-all"
+          aria-label={saved ? 'Hapus dari wishlist' : 'Tambah ke wishlist'}
+        >
+          <Heart size={14} className={saved ? 'fill-red-500 text-red-500' : 'text-gray-400'} />
+        </button>
         {product.images.length > 1 && (
           <span className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full font-medium">
             1/{product.images.length}

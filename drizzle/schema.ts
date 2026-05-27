@@ -25,4 +25,27 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+// Wishlist: one row per (userId, productId) pair
+export const wishlists = mysqlTable('wishlists', {
+  id: int('id').autoincrement().primaryKey(),
+  userId: int('userId').notNull(),
+  productId: varchar('productId', { length: 128 }).notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+});
+
+export type Wishlist = typeof wishlists.$inferSelect;
+export type InsertWishlist = typeof wishlists.$inferInsert;
+
+// Cart items: one row per (userId, productId, color) combination
+export const cartItems = mysqlTable('cartItems', {
+  id: int('id').autoincrement().primaryKey(),
+  userId: int('userId').notNull(),
+  productId: varchar('productId', { length: 128 }).notNull(),
+  color: varchar('color', { length: 64 }).default('Default').notNull(),
+  quantity: int('quantity').default(1).notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow().notNull(),
+});
+
+export type CartItem = typeof cartItems.$inferSelect;
+export type InsertCartItem = typeof cartItems.$inferInsert;

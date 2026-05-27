@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE `cartItems` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`userId` int NOT NULL,\n\t`productId` varchar(128) NOT NULL,\n\t`color` varchar(64) NOT NULL DEFAULT 'Default',\n\t`quantity` int NOT NULL DEFAULT 1,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `cartItems_id` PRIMARY KEY(`id`)\n);\nCREATE TABLE `wishlists` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`userId` int NOT NULL,\n\t`productId` varchar(128) NOT NULL,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `wishlists_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 33YvZur2hkG9Nof.0e76b8c902a9 --database 4sqHUsbGrVj8sgaCaL4hAC --execute CREATE TABLE `cartItems` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`userId` int NOT NULL,\n\t`productId` varchar(128) NOT NULL,\n\t`color` varchar(64) NOT NULL DEFAULT 'Default',\n\t`quantity` int NOT NULL DEFAULT 1,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `cartItems_id` PRIMARY KEY(`id`)\n);\nCREATE TABLE `wishlists` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`userId` int NOT NULL,\n\t`productId` varchar(128) NOT NULL,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `wishlists_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3915
+}

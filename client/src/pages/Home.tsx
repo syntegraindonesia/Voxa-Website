@@ -3,6 +3,7 @@ import { Link } from 'wouter';
 import { Heart, ChevronLeft, ChevronRight, ArrowRight, MessageCircle, Shield, Wrench, X, Zap } from 'lucide-react';
 import { sepedaListrik, batre, products, type Product } from '@/data/products';
 import { getProductGallery } from '@/data/productGalleries';
+import { useWishlist } from '@/contexts/WishlistContext';
 
 // Curated Produk Unggulan: all 5 Elite series only
 const produkUnggulan = (() => {
@@ -93,7 +94,8 @@ const COMMUNITY_PHOTOS: string[] = [
 
 // ─── Product Card ───────────────────────────────────────────────────────────────────
 function ProductCard({ product, cardWidth, onSelect }: { product: (typeof sepedaListrik)[0]; cardWidth: string; onSelect: (p: Product) => void }) {
-  const [wishlisted, setWishlisted] = useState(false);
+  const { isSaved, toggle } = useWishlist();
+  const wishlisted = isSaved(product.id);
   const gallery = getProductGallery(product.id, product.image);
   return (
     <div
@@ -125,7 +127,7 @@ function ProductCard({ product, cardWidth, onSelect }: { product: (typeof sepeda
       </div>
       {/* Wishlist icon */}
       <button
-        onClick={e => { e.stopPropagation(); setWishlisted(w => !w); }}
+        onClick={e => { e.stopPropagation(); toggle(product.id); }}
         className="absolute top-2 right-2 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform"
         aria-label="Tambah ke wishlist"
       >
@@ -258,7 +260,8 @@ function ProductRow({ title, viewAllHref, products, onSelect }: { title: string;
 
 // ─── Mobile Product Card (2×2 grid item) ─────────────────────────────────────
 function MobileProductCard({ product, onSelect }: { product: (typeof sepedaListrik)[0]; onSelect: (p: Product) => void }) {
-  const [wishlisted, setWishlisted] = useState(false);
+  const { isSaved, toggle } = useWishlist();
+  const wishlisted = isSaved(product.id);
   const gallery = getProductGallery(product.id, product.image);
   return (
     <div className="group relative cursor-pointer" onClick={() => onSelect(product as Product)}>
@@ -283,7 +286,7 @@ function MobileProductCard({ product, onSelect }: { product: (typeof sepedaListr
       </div>
       {/* Wishlist */}
       <button
-        onClick={e => { e.stopPropagation(); setWishlisted(w => !w); }}
+        onClick={e => { e.stopPropagation(); toggle(product.id); }}
         className="absolute top-1.5 right-1.5 w-6 h-6 bg-white/90 rounded-full flex items-center justify-center shadow-sm"
         aria-label="Tambah ke wishlist"
       >

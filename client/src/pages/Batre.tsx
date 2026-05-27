@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
-import { ArrowRight, ChevronRight, ChevronLeft, Filter, MessageCircle, Shield, SlidersHorizontal, Wrench, X, Zap } from 'lucide-react';
+import { ArrowRight, ChevronRight, ChevronLeft, Filter, Heart, MessageCircle, Shield, SlidersHorizontal, Wrench, X, Zap } from 'lucide-react';
 import { batre, type Product } from '@/data/products';
 import { getProductGallery } from '@/data/productGalleries';
+import { useWishlist } from '@/contexts/WishlistContext';
 
 const SERIES_FILTERS = ['Semua', 'Greenlife Series', 'Tianneng Series', 'Chilwee Series', 'Lithium Series'];
 
@@ -141,6 +142,8 @@ export default function Batre() {
 
 function BatreCard({ product, onSelect }: { product: Product; onSelect: (p: Product) => void }) {
   const gallery = getProductGallery(product.id, product.image);
+  const { isSaved, toggle } = useWishlist();
+  const saved = isSaved(product.id);
   return (
     <div
       className="product-card group rounded-2xl overflow-hidden border border-gray-100 bg-white cursor-pointer h-full"
@@ -152,6 +155,14 @@ function BatreCard({ product, onSelect }: { product: Product; onSelect: (p: Prod
           alt={product.name}
           className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
         />
+        {/* Heart button */}
+        <button
+          onClick={e => { e.stopPropagation(); toggle(product.id); }}
+          className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 hover:bg-white shadow transition-all"
+          aria-label={saved ? 'Hapus dari wishlist' : 'Tambah ke wishlist'}
+        >
+          <Heart size={14} className={saved ? 'fill-red-500 text-red-500' : 'text-gray-400'} />
+        </button>
         {gallery.length > 1 && (
           <span className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full font-medium">
             1/{gallery.length}
