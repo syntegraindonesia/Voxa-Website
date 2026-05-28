@@ -339,13 +339,6 @@ export default function Navbar() {
               )}
             </button>
 
-            {/* CTA button — desktop only */}
-            <Link
-              href="/katalog"
-              className="hidden xl:inline-flex items-center ml-3 px-4 py-2 bg-[#00B4D8] text-white text-[13px] font-bold tracking-wider uppercase hover:bg-[#0099bb] transition-colors whitespace-nowrap"
-            >
-              Temukan VOXA Anda
-            </Link>
 
             {/* Mobile hamburger */}
             <button
@@ -392,14 +385,6 @@ export default function Navbar() {
                     Masuk / Daftar
                   </a>
                 )}
-              </div>
-              <div className="pt-2">
-                <Link
-                  href="/katalog"
-                  className="block w-full text-center py-3 bg-[#00B4D8] text-white text-sm font-bold tracking-wider uppercase"
-                >
-                  Temukan VOXA Anda
-                </Link>
               </div>
             </div>
           </div>

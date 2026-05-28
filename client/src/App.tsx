@@ -19,7 +19,6 @@ import Showroom from "./pages/Showroom";
 import Tentang from "./pages/Tentang";
 import Bantuan from "./pages/Bantuan";
 import Guide from "./pages/Guide";
-import Katalog from "./pages/Katalog";
 import Wishlist from "./pages/Wishlist";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -36,7 +35,6 @@ function Router() {
       <Route path="/" component={Home} />
 
       {/* Unified discovery page */}
-      <Route path="/katalog" component={Katalog} />
 
       {/* Clean top-level catalog routes (used by navbar dropdown) */}
       <Route path="/sepeda-listrik" component={SepedaListrikCatalog} />
