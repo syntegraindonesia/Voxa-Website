@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, name, email, loginMethod, role FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway05.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 33YvZur2hkG9Nof.0e76b8c902a9 --database 4sqHUsbGrVj8sgaCaL4hAC --execute SELECT id, name, email, loginMethod, role FROM users;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Seag",
+      "email": "jlseagull715@gmail.com",
+      "loginMethod": "google",
+      "role": "admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tloginMethod\trole\n1\tSeag\tjlseagull715@gmail.com\tgoogle\tadmin\n",
+  "stderr": "",
+  "execution_time_ms": 2511
+}

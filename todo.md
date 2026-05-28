@@ -161,3 +161,11 @@
 - [x] Update Bisnis.tsx to merge DB published articles with static articles
 - [x] Update ArtikelDetail.tsx to try DB lookup first, fall back to static data
 - [x] Write vitest tests for articles router
+
+## AI Article Generator — Enhancements
+- [x] Add articles.suggestTopics tRPC procedure (returns 5-8 topic phrases/sentences)
+- [x] Add articles.suggestKeywords tRPC procedure (returns 10-15 SEO keyword words)
+- [x] Add articles.generateHeroImage tRPC procedure (reads article content, generates image via generateImage, saves to S3, updates imageUrl in DB)
+- [x] Update AdminArticles.tsx: Topic Suggester panel with clickable suggestions that fill the topic input
+- [x] Update AdminArticles.tsx: Keyword Suggester panel with clickable chips that fill the keywords input
+- [x] Update AdminArticles.tsx: "Buat Gambar" button on each draft card that calls generateHeroImage and shows the result

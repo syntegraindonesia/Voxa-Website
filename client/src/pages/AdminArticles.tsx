@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -63,11 +63,15 @@ function DraftCard({
   onPublish,
   onDelete,
   onEdit,
+  onGenerateImage,
+  imageGenerating,
 }: {
   draft: ArticleRow;
   onPublish: (id: number) => void;
   onDelete: (id: number) => void;
   onEdit: (draft: ArticleRow) => void;
+  onGenerateImage: (id: number) => void;
+  imageGenerating: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -110,6 +114,20 @@ function DraftCard({
           )}
         </div>
       </div>
+
+      {/* Hero image preview */}
+      {draft.imageUrl && (
+        <div className="relative w-full overflow-hidden" style={{ maxHeight: 180 }}>
+          <img
+            src={draft.imageUrl}
+            alt={draft.title}
+            className="w-full object-cover"
+            style={{ maxHeight: 180 }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+          <span className="absolute bottom-2 left-3 text-white text-xs font-semibold opacity-80">Hero Image</span>
+        </div>
+      )}
 
       {/* Preview toggle */}
       <div className="px-5 py-3 bg-gray-50 border-b border-gray-100">
@@ -188,6 +206,29 @@ function DraftCard({
           className="text-xs font-semibold"
         >
           Edit
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => onGenerateImage(draft.id)}
+          disabled={imageGenerating}
+          className="text-xs font-semibold"
+          style={{ borderColor: '#a855f7', color: '#a855f7' }}
+          title="Buat hero image AI berdasarkan konten artikel"
+        >
+          {imageGenerating ? (
+            <span className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin inline-block" style={{ borderColor: '#a855f7', borderTopColor: 'transparent' }} />
+              Membuat...
+            </span>
+          ) : (
+            <span className="flex items-center gap-1">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {draft.imageUrl ? 'Buat Ulang Gambar' : 'Buat Gambar'}
+            </span>
+          )}
         </Button>
         <Button
           size="sm"
@@ -421,6 +462,43 @@ export default function AdminArticles() {
     onError: (err) => toast.error(err.message),
   });
 
+  // ── Topic & Keyword Suggestions ─────────────────────────────────────────────
+  const [suggestedTopics, setSuggestedTopics] = useState<string[]>([]);
+  const [suggestedKeywords, setSuggestedKeywords] = useState<string[]>([]);
+
+  const suggestTopicsMutation = trpc.articles.suggestTopics.useMutation({
+    onSuccess: (data) => setSuggestedTopics(data.topics),
+    onError: (err) => toast.error(`Gagal mendapatkan saran topik: ${err.message}`),
+  });
+
+  const suggestKeywordsMutation = trpc.articles.suggestKeywords.useMutation({
+    onSuccess: (data) => setSuggestedKeywords(data.keywords),
+    onError: (err) => toast.error(`Gagal mendapatkan saran kata kunci: ${err.message}`),
+  });
+
+  // ── Hero Image Generation ───────────────────────────────────────────────────
+  const [generatingImageId, setGeneratingImageId] = useState<number | null>(null);
+
+  const generateHeroImageMutation = trpc.articles.generateHeroImage.useMutation({
+    onSuccess: (data) => {
+      toast.success("Hero image berhasil dibuat!");
+      utils.articles.list.invalidate();
+      setGeneratingImageId(null);
+    },
+    onError: (err) => {
+      toast.error(`Gagal membuat gambar: ${err.message}`);
+      setGeneratingImageId(null);
+    },
+  });
+
+  const handleGenerateHeroImage = useCallback(
+    (id: number) => {
+      setGeneratingImageId(id);
+      generateHeroImageMutation.mutate({ id });
+    },
+    [generateHeroImageMutation]
+  );
+
   const handlePublishToggle = useCallback(
     (id: number) => {
       const article = articlesData?.articles.find((a) => a.id === id);
@@ -585,9 +663,27 @@ export default function AdminArticles() {
             <div className="p-6 space-y-5">
               {/* Topic */}
               <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">
-                  Topik Artikel <span className="text-red-400">*</span>
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Topik Artikel <span className="text-red-400">*</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => suggestTopicsMutation.mutate({ category, articleType, count: 6 })}
+                    disabled={suggestTopicsMutation.isPending}
+                    className="text-xs font-semibold flex items-center gap-1 px-2 py-1 rounded-lg transition-all"
+                    style={{ color: '#37C5FF', background: 'rgba(55,197,255,0.08)' }}
+                  >
+                    {suggestTopicsMutation.isPending ? (
+                      <span className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin inline-block" style={{ borderColor: '#37C5FF', borderTopColor: 'transparent' }} />
+                    ) : (
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.347.347a3.5 3.5 0 01-4.95 0l-.347-.347z" />
+                      </svg>
+                    )}
+                    Saran Topik
+                  </button>
+                </div>
                 <textarea
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
@@ -599,6 +695,21 @@ export default function AdminArticles() {
                     boxShadow: topic ? "0 0 0 3px rgba(55,197,255,0.12)" : "none",
                   }}
                 />
+                {suggestedTopics.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    <p className="text-xs text-gray-400 font-medium">Klik untuk pilih topik:</p>
+                    {suggestedTopics.map((t, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => { setTopic(t); setSuggestedTopics([]); }}
+                        className="w-full text-left text-xs px-3 py-2 rounded-lg border border-gray-100 hover:border-[#37C5FF] hover:bg-[#37C5FF]/5 transition-all text-gray-700 leading-snug"
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Category */}
@@ -642,9 +753,30 @@ export default function AdminArticles() {
 
               {/* Extra Keywords */}
               <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">
-                  Kata Kunci Tambahan
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Kata Kunci Tambahan
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!topic.trim()) { toast.error('Masukkan topik dulu untuk saran kata kunci'); return; }
+                      suggestKeywordsMutation.mutate({ topic, category, count: 12 });
+                    }}
+                    disabled={suggestKeywordsMutation.isPending}
+                    className="text-xs font-semibold flex items-center gap-1 px-2 py-1 rounded-lg transition-all"
+                    style={{ color: '#0A4A63', background: 'rgba(10,74,99,0.08)' }}
+                  >
+                    {suggestKeywordsMutation.isPending ? (
+                      <span className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin inline-block" style={{ borderColor: '#0A4A63', borderTopColor: 'transparent' }} />
+                    ) : (
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                      </svg>
+                    )}
+                    Saran Kata Kunci
+                  </button>
+                </div>
                 <input
                   type="text"
                   value={keywords}
@@ -652,6 +784,34 @@ export default function AdminArticles() {
                   placeholder="baterai, motor listrik, ..."
                   className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 outline-none focus:border-[#37C5FF] transition-colors"
                 />
+                {suggestedKeywords.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-400 font-medium mb-1.5">Klik untuk menambahkan:</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {suggestedKeywords.map((kw, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => {
+                            setKeywords((prev) => {
+                              const existing = prev.split(',').map(k => k.trim()).filter(Boolean);
+                              if (existing.includes(kw)) return prev;
+                              return existing.length ? `${prev}, ${kw}` : kw;
+                            });
+                          }}
+                          className="text-xs px-2.5 py-1 rounded-full border transition-all"
+                          style={{
+                            borderColor: keywords.includes(kw) ? '#0A4A63' : '#e5e7eb',
+                            background: keywords.includes(kw) ? 'rgba(10,74,99,0.1)' : 'transparent',
+                            color: keywords.includes(kw) ? '#0A4A63' : '#6b7280',
+                          }}
+                        >
+                          {kw}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Count */}
@@ -765,6 +925,8 @@ export default function AdminArticles() {
                           onPublish={handlePublishToggle}
                           onDelete={handleDelete}
                           onEdit={setEditingArticle}
+                          onGenerateImage={handleGenerateHeroImage}
+                          imageGenerating={generatingImageId === a.id}
                         />
                       ))}
                     </div>
@@ -783,6 +945,8 @@ export default function AdminArticles() {
                           onPublish={handlePublishToggle}
                           onDelete={handleDelete}
                           onEdit={setEditingArticle}
+                          onGenerateImage={handleGenerateHeroImage}
+                          imageGenerating={generatingImageId === a.id}
                         />
                       ))}
                     </div>
@@ -801,6 +965,8 @@ export default function AdminArticles() {
                           onPublish={handlePublishToggle}
                           onDelete={handleDelete}
                           onEdit={setEditingArticle}
+                          onGenerateImage={handleGenerateHeroImage}
+                          imageGenerating={generatingImageId === a.id}
                         />
                       ))}
                     </div>

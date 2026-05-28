@@ -85,6 +85,7 @@ vi.mock("./db", () => ({
 }));
 
 import { getDb } from "./db";
+import { invokeLLM } from "./_core/llm";
 
 // ── Context helpers ───────────────────────────────────────────────────────────
 
@@ -254,5 +255,122 @@ describe("articles.delete", () => {
 
     const caller = appRouter.createCaller(createUserCtx());
     await expect(caller.articles.delete({ id: 1 })).rejects.toThrow(TRPCError);
+  });
+});
+
+// ── suggestTopics ─────────────────────────────────────────────────────────────
+
+describe("articles.suggestTopics", () => {
+  beforeEach(() => {
+    vi.mocked(invokeLLM).mockResolvedValue({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({ topics: ["Topik 1", "Topik 2", "Topik 3"] }),
+          },
+        },
+      ],
+    } as any);
+  });
+
+  it("returns topic suggestions for admin", async () => {
+    const caller = appRouter.createCaller(createAdminCtx());
+    const result = await caller.articles.suggestTopics({
+      category: "Berita VOXA",
+      articleType: "educational",
+      count: 3,
+    });
+    expect(result.topics).toHaveLength(3);
+    expect(result.topics[0]).toBe("Topik 1");
+  });
+
+  it("throws FORBIDDEN for non-admin", async () => {
+    const caller = appRouter.createCaller(createUserCtx());
+    await expect(
+      caller.articles.suggestTopics({ category: "Berita VOXA", articleType: "educational", count: 3 })
+    ).rejects.toThrow(TRPCError);
+  });
+});
+
+// ── suggestKeywords ───────────────────────────────────────────────────────────
+
+describe("articles.suggestKeywords", () => {
+  beforeEach(() => {
+    vi.mocked(invokeLLM).mockResolvedValue({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({ keywords: ["voxa", "sepeda listrik", "kendaraan listrik"] }),
+          },
+        },
+      ],
+    } as any);
+  });
+
+  it("returns keyword suggestions for admin", async () => {
+    const caller = appRouter.createCaller(createAdminCtx());
+    const result = await caller.articles.suggestKeywords({
+      topic: "Manfaat sepeda listrik VOXA",
+      category: "Berita VOXA",
+      count: 5,
+    });
+    expect(result.keywords).toHaveLength(3);
+    expect(result.keywords).toContain("voxa");
+  });
+
+  it("throws FORBIDDEN for non-admin", async () => {
+    const caller = appRouter.createCaller(createUserCtx());
+    await expect(
+      caller.articles.suggestKeywords({ topic: "test", category: "Berita VOXA", count: 5 })
+    ).rejects.toThrow(TRPCError);
+  });
+});
+
+// ── generateHeroImage ─────────────────────────────────────────────────────────
+
+vi.mock("./_core/imageGeneration", () => ({
+  generateImage: vi.fn().mockResolvedValue({ url: "/manus-storage/generated/test-image.png" }),
+}));
+
+import { generateImage } from "./_core/imageGeneration";
+
+describe("articles.generateHeroImage", () => {
+  beforeEach(() => {
+    vi.mocked(invokeLLM).mockResolvedValue({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({ prompt: "A modern electric scooter in urban Jakarta" }),
+          },
+        },
+      ],
+    } as any);
+    vi.mocked(generateImage).mockResolvedValue({ url: "/manus-storage/generated/test-image.png" });
+  });
+
+  it("generates a hero image and updates the article for admin", async () => {
+    const db = makeDb([sampleRow]);
+    vi.mocked(getDb).mockResolvedValue(db as any);
+
+    const caller = appRouter.createCaller(createAdminCtx());
+    const result = await caller.articles.generateHeroImage({ id: 1 });
+
+    expect(result.imageUrl).toBe("/manus-storage/generated/test-image.png");
+    expect(result.prompt).toBe("A modern electric scooter in urban Jakarta");
+    expect(db.update).toHaveBeenCalled();
+  });
+
+  it("throws NOT_FOUND when article does not exist", async () => {
+    vi.mocked(getDb).mockResolvedValue(makeDb([]) as any);
+
+    const caller = appRouter.createCaller(createAdminCtx());
+    await expect(caller.articles.generateHeroImage({ id: 999 })).rejects.toThrow(TRPCError);
+  });
+
+  it("throws FORBIDDEN for non-admin", async () => {
+    vi.mocked(getDb).mockResolvedValue(makeDb([sampleRow]) as any);
+
+    const caller = appRouter.createCaller(createUserCtx());
+    await expect(caller.articles.generateHeroImage({ id: 1 })).rejects.toThrow(TRPCError);
   });
 });

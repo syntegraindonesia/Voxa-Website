@@ -5,7 +5,7 @@ import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 import { articlesTable } from "../../drizzle/schema";
 import { invokeLLM } from "../_core/llm";
-
+import { generateImage } from "../_core/imageGeneration";
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function slugify(title: string): string {
@@ -295,5 +295,207 @@ Pastikan artikel relevan dengan produk VOXA dan pasar Indonesia.`;
 
       await db.delete(articlesTable).where(eq(articlesTable.id, input.id));
       return { success: true };
+    }),
+
+  // Suggest article topics (admin only)
+  suggestTopics: protectedProcedure
+    .input(
+      z.object({
+        category: z.string().default("Berita VOXA"),
+        articleType: z.enum(["educational", "trend", "soft-sell", "hard-sell"]).default("educational"),
+        count: z.number().min(3).max(10).default(6),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin only" });
+      }
+
+      const typeLabel: Record<string, string> = {
+        educational: "edukatif",
+        trend: "tren industri",
+        "soft-sell": "soft sell",
+        "hard-sell": "hard sell promosi",
+      };
+
+      const response = await invokeLLM({
+        messages: [
+          {
+            role: "system",
+            content:
+              "Kamu adalah editor konten ahli untuk brand sepeda listrik VOXA di Indonesia. " +
+              "Tugasmu adalah menyarankan topik artikel yang relevan, menarik, dan SEO-friendly.",
+          },
+          {
+            role: "user",
+            content:
+              `Sarankan ${input.count} topik artikel ${typeLabel[input.articleType]} untuk kategori "${input.category}" ` +
+              `tentang sepeda listrik VOXA dan industri kendaraan listrik Indonesia. \n` +
+              `Setiap topik harus berupa kalimat atau frasa lengkap yang spesifik dan menarik. ` +
+              `Sertakan kata 'VOXA' atau konteks kendaraan listrik Indonesia di beberapa topik. \n` +
+              `Kembalikan HANYA array JSON berisi string topik, tanpa penjelasan tambahan. \n` +
+              `Contoh format: ["Topik 1", "Topik 2", "Topik 3"]`,
+          },
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "topic_suggestions",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                topics: {
+                  type: "array",
+                  items: { type: "string" },
+                  description: "List of suggested article topics",
+                },
+              },
+              required: ["topics"],
+              additionalProperties: false,
+            },
+          },
+        },
+      });
+
+      const content = response.choices[0]?.message?.content ?? "{}";
+      const parsed = JSON.parse(typeof content === "string" ? content : JSON.stringify(content));
+      return { topics: (parsed.topics ?? []) as string[] };
+    }),
+
+  // Suggest SEO keywords (admin only)
+  suggestKeywords: protectedProcedure
+    .input(
+      z.object({
+        topic: z.string().min(3).max(300),
+        category: z.string().default("Berita VOXA"),
+        count: z.number().min(5).max(20).default(12),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin only" });
+      }
+
+      const response = await invokeLLM({
+        messages: [
+          {
+            role: "system",
+            content:
+              "Kamu adalah pakar SEO untuk brand sepeda listrik VOXA di Indonesia. " +
+              "Tugasmu adalah menyarankan kata kunci SEO yang relevan dan memiliki volume pencarian tinggi.",
+          },
+          {
+            role: "user",
+            content:
+              `Sarankan ${input.count} kata kunci SEO untuk artikel dengan topik: "${input.topic}" ` +
+              `dalam kategori "${input.category}". \n` +
+              `Kata kunci harus: singkat (1-3 kata), relevan dengan topik, ` +
+              `mencakup variasi long-tail dan short-tail, dan cocok untuk pasar Indonesia. ` +
+              `Selalu sertakan 'voxa' sebagai salah satu kata kunci. \n` +
+              `Kembalikan HANYA array JSON berisi string kata kunci, tanpa penjelasan. \n` +
+              `Contoh: ["voxa", "sepeda listrik", "kendaraan listrik indonesia"]`,
+          },
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "keyword_suggestions",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                keywords: {
+                  type: "array",
+                  items: { type: "string" },
+                  description: "List of suggested SEO keywords",
+                },
+              },
+              required: ["keywords"],
+              additionalProperties: false,
+            },
+          },
+        },
+      });
+
+      const content = response.choices[0]?.message?.content ?? "{}";
+      const parsed = JSON.parse(typeof content === "string" ? content : JSON.stringify(content));
+      return { keywords: (parsed.keywords ?? []) as string[] };
+    }),
+
+  // Generate a hero image for an article using its content (admin only)
+  generateHeroImage: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Admin only" });
+      }
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      // Fetch the article
+      const [article] = await db
+        .select()
+        .from(articlesTable)
+        .where(eq(articlesTable.id, input.id))
+        .limit(1);
+
+      if (!article) throw new TRPCError({ code: "NOT_FOUND", message: "Artikel tidak ditemukan" });
+
+      // Ask LLM to craft an image prompt from the article context
+      const promptResponse = await invokeLLM({
+        messages: [
+          {
+            role: "system",
+            content:
+              "Kamu adalah direktur seni untuk brand sepeda listrik VOXA Indonesia. " +
+              "Tugasmu adalah membuat prompt gambar yang vivid dan spesifik untuk hero image artikel.",
+          },
+          {
+            role: "user",
+            content:
+              `Buatkan satu prompt bahasa Inggris untuk menghasilkan hero image artikel berikut:\n` +
+              `Judul: ${article.title}\n` +
+              `Kategori: ${article.category}\n` +
+              `Ringkasan: ${article.excerpt}\n` +
+              `Konten (ringkasan): ${article.content.slice(0, 600)}\n\n` +
+              `Syarat prompt:\n` +
+              `- Bahasa Inggris, deskriptif dan vivid\n` +
+              `- Menampilkan sepeda listrik modern atau suasana urban Indonesia\n` +
+              `- Gaya fotografi profesional, pencahayaan natural, resolusi tinggi\n` +
+              `- Cocok sebagai hero image artikel blog (landscape 16:9)\n` +
+              `- JANGAN sertakan teks atau tulisan dalam gambar\n` +
+              `Kembalikan HANYA string prompt, tanpa penjelasan.`,
+          },
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "image_prompt",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                prompt: { type: "string", description: "The image generation prompt" },
+              },
+              required: ["prompt"],
+              additionalProperties: false,
+            },
+          },
+        },
+      });
+
+      const promptContent = promptResponse.choices[0]?.message?.content ?? "{}";
+      const { prompt } = JSON.parse(typeof promptContent === "string" ? promptContent : JSON.stringify(promptContent));
+
+      // Generate the image
+      const { url: imageUrl } = await generateImage({ prompt });
+
+      if (!imageUrl) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Gagal menghasilkan gambar" });
+
+      // Save imageUrl back to the article
+      await db.update(articlesTable).set({ imageUrl }).where(eq(articlesTable.id, input.id));
+
+      return { imageUrl, prompt };
     }),
 });
