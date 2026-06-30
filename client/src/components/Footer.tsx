@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'wouter';
 import { Instagram, Youtube, Facebook, Twitter } from 'lucide-react';
 
-const LOGO_URL = '/manus-storage/voxa-logo_923e0d6b.png';
+const LOGO_URL = '/voxa-logo.jpg';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -175,7 +175,7 @@ export default function Footer() {
 
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <img src={LOGO_URL} alt="VOXA" className="h-7 w-7 object-contain opacity-70" />
+            <img src={LOGO_URL} alt="VOXA" className="h-7 w-auto object-contain opacity-70" />
             <span className="font-display text-lg tracking-widest text-gray-400">VOXA</span>
           </div>
         </div>

@@ -9,7 +9,7 @@ import { getLoginUrl } from '@/const';
 import SearchOverlay from './SearchOverlay';
 import { Product } from '@/data/products';
 
-const LOGO_URL = '/manus-storage/voxa-logo_923e0d6b.png';
+const LOGO_URL = '/voxa-logo.jpg';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -155,7 +155,7 @@ export default function Navbar() {
           {/* LEFT: Logo */}
           <div className="flex-shrink-0 mr-4">
             <Link href="/" className="flex items-center gap-2">
-              <img src={LOGO_URL} alt="VOXA" className="h-8 w-8 object-contain" />
+              <img src={LOGO_URL} alt="VOXA" className="h-8 w-auto object-contain" />
               <span className="font-display text-xl tracking-[0.25em] text-gray-900">VOXA</span>
             </Link>
           </div>
