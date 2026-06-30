@@ -1,9 +1,4 @@
 import "dotenv/config";
-import { webcrypto } from "crypto";
-// Polyfill globalThis.crypto for Node 18 (required by jose)
-if (!globalThis.crypto) {
-  (globalThis as any).crypto = webcrypto;
-}
 import express from "express";
 import { createServer } from "http";
 import net from "net";
