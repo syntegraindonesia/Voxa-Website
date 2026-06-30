@@ -120,11 +120,13 @@ export function registerGoogleAuthRoutes(app: Express) {
       });
 
       const cookieOptions = getSessionCookieOptions(req);
+      console.log("[GoogleAuth] Setting cookie for", googleUser.email, "options:", JSON.stringify(cookieOptions));
       res.cookie(COOKIE_NAME, sessionToken, {
         ...cookieOptions,
         maxAge: ONE_YEAR_MS,
       });
 
+      console.log("[GoogleAuth] Login successful for", googleUser.email, "isAdmin:", isAdmin);
       res.redirect("/");
     } catch (err) {
       console.error("[GoogleAuth] Callback failed:", err);
