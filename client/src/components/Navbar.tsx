@@ -156,7 +156,6 @@ export default function Navbar() {
           <div className="flex-shrink-0 mr-4">
             <Link href="/" className="flex items-center gap-2">
               <img src={LOGO_URL} alt="VOXA" className="h-8 w-auto object-contain" />
-              <span className="font-display text-xl tracking-[0.25em] text-gray-900">VOXA</span>
             </Link>
           </div>
 
