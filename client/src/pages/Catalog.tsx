@@ -38,18 +38,23 @@ const sparepartItems = [
   { id: 'sp-ban', name: 'Ban Luar 20x2.0', series: 'Ban & Velg', price: 'Rp 145.000', image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80', shortDesc: 'Ban luar anti-selip ukuran 20x2.0', badge: undefined },
 ];
 
-// Convert series name to URL slug e.g. "Liberty Series" → "liberty-series"
-function seriesToSlug(series: string) {
-  return series.toLowerCase().replace(/ /g, '-');
+// Convert series/product name to URL slug e.g. "Liberty Series" → "liberty-series"
+function toSlug(name: string) {
+  return name.toLowerCase().replace(/ /g, '-');
 }
 
-// Convert URL slug back to series name e.g. "liberty-series" → "Liberty Series"
+// Convert URL slug back to series name
 function slugToSeries(slug: string, available: string[]) {
-  return available.find(s => seriesToSlug(s) === slug) || 'Semua';
+  return available.find(s => toSlug(s) === slug) || 'Semua';
+}
+
+// Convert URL slug back to product
+function slugToProduct(slug: string, products: any[]): any | null {
+  return products.find(p => toSlug(p.name) === slug) || null;
 }
 
 export default function Catalog() {
-  const params = useParams<{ category: string; series: string }>();
+  const params = useParams<{ category: string; series: string; product: string }>();
   const category = (params.category || 'sepeda-listrik') as keyof typeof categoryConfig;
   const config = categoryConfig[category] || categoryConfig['sepeda-listrik'];
   const [, navigate] = useLocation();
@@ -64,23 +69,49 @@ export default function Catalog() {
     ? slugToSeries(params.series, config.series)
     : 'Semua';
 
+  const allProducts: any[] = category === 'sparepart' ? sparepartItems : config.products;
+
+  // Open product popup if product slug is in URL
+  useEffect(() => {
+    if (params.product && allProducts.length > 0) {
+      const found = slugToProduct(params.product, allProducts);
+      if (found) setSelectedProduct(found);
+    }
+  }, [params.product]);
+
   // Navigate to series URL on tab click
   const handleSeriesClick = (series: string) => {
+    setSelectedProduct(null);
     if (series === 'Semua') {
       navigate(basePath);
     } else {
-      navigate(`${basePath}/${seriesToSlug(series)}`);
+      navigate(`${basePath}/${toSlug(series)}`);
     }
   };
 
-  // Scroll to top when URL changes
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [params.series]);
+  // When product popup opens, update URL
+  const handleProductSelect = (product: Product) => {
+    setSelectedProduct(product);
+    const seriesSlug = toSlug(product.series);
+    navigate(`${basePath}/${seriesSlug}/${toSlug(product.name)}`);
+  };
 
-  const allProducts: any[] = category === 'sparepart'
-    ? sparepartItems
-    : config.products;
+  // When product popup closes, go back to series URL
+  const handleProductClose = () => {
+    setSelectedProduct(null);
+    if (params.series) {
+      navigate(`${basePath}/${params.series}`);
+    } else {
+      navigate(basePath);
+    }
+  };
+
+  // Scroll to top when series changes (not when product opens)
+  useEffect(() => {
+    if (!params.product) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [params.series]);
 
   let filtered = selectedSeries === 'Semua'
     ? allProducts
@@ -189,7 +220,7 @@ export default function Catalog() {
                 key={product.id}
                 product={product}
                 category={category}
-                onSelect={isProductCatalog ? setSelectedProduct : undefined}
+                onSelect={isProductCatalog ? handleProductSelect : undefined}
               />
             ))}
           </div>
@@ -216,7 +247,7 @@ export default function Catalog() {
       {selectedProduct && (
         <ProductModal
           product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
+          onClose={handleProductClose}
         />
       )}
     </div>
