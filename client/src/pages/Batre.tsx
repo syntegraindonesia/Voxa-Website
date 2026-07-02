@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'wouter';
+import { useState, useEffect } from 'react';
+import { Link, useParams, useLocation } from 'wouter';
 import { ArrowRight, ChevronRight, ChevronLeft, Filter, Heart, MessageCircle, Shield, SlidersHorizontal, Wrench, X, Zap } from 'lucide-react';
 import { batre, type Product } from '@/data/products';
 import { getProductGallery } from '@/data/productGalleries';
@@ -13,14 +13,32 @@ const SORT_OPTIONS = [
   { value: 'price-desc', label: 'Harga: Tertinggi' },
 ];
 
+function seriesToSlug(series: string) {
+  return series.toLowerCase().replace(/ /g, '-');
+}
+function slugToSeries(slug: string) {
+  return SERIES_FILTERS.find(s => seriesToSlug(s) === slug) || 'Semua';
+}
+
 export default function Batre() {
-  const [selectedSeries, setSelectedSeries] = useState('Semua');
+  const params = useParams<{ series: string }>();
+  const [, navigate] = useLocation();
+  const selectedSeries = params.series ? slugToSeries(params.series) : 'Semua';
   const [sortBy, setSortBy] = useState('default');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
+  const handleSeriesClick = (series: string) => {
+    if (series === 'Semua') navigate('/batre');
+    else navigate(`/batre/${seriesToSlug(series)}`);
+  };
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [params.series]);
+
   let filtered = selectedSeries === 'Semua'
     ? batre
-    : batre.filter(p => p.series.startsWith(selectedSeries));
+    : batre.filter(p => p.series === selectedSeries);
 
   if (sortBy === 'price-asc') filtered = [...filtered].sort((a, b) => a.priceNum - b.priceNum);
   if (sortBy === 'price-desc') filtered = [...filtered].sort((a, b) => b.priceNum - a.priceNum);
@@ -71,7 +89,7 @@ export default function Batre() {
               {SERIES_FILTERS.map(s => (
                 <button
                   key={s}
-                  onClick={() => setSelectedSeries(s)}
+                  onClick={() => handleSeriesClick(s)}
                   className={`px-3 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
                     selectedSeries === s
                       ? 'bg-[#00B4D8] text-white'
