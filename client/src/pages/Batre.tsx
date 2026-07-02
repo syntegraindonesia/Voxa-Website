@@ -13,27 +13,47 @@ const SORT_OPTIONS = [
   { value: 'price-desc', label: 'Harga: Tertinggi' },
 ];
 
-function seriesToSlug(series: string) {
-  return series.toLowerCase().replace(/ /g, '-');
+function toSlug(name: string) {
+  return name.toLowerCase().replace(/ /g, '-');
 }
 function slugToSeries(slug: string) {
-  return SERIES_FILTERS.find(s => seriesToSlug(s) === slug) || 'Semua';
+  return SERIES_FILTERS.find(s => toSlug(s) === slug) || 'Semua';
 }
 
 export default function Batre() {
-  const params = useParams<{ series: string }>();
+  const params = useParams<{ series: string; product: string }>();
   const [, navigate] = useLocation();
   const selectedSeries = params.series ? slugToSeries(params.series) : 'Semua';
   const [sortBy, setSortBy] = useState('default');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
+  // Open product popup if product slug is in URL
+  useEffect(() => {
+    if (params.product) {
+      const found = batre.find(p => toSlug(p.name) === params.product);
+      if (found) setSelectedProduct(found);
+    }
+  }, [params.product]);
+
   const handleSeriesClick = (series: string) => {
+    setSelectedProduct(null);
     if (series === 'Semua') navigate('/batre');
-    else navigate(`/batre/${seriesToSlug(series)}`);
+    else navigate(`/batre/${toSlug(series)}`);
+  };
+
+  const handleProductSelect = (product: Product) => {
+    setSelectedProduct(product);
+    navigate(`/batre/${toSlug(product.series)}/${toSlug(product.name)}`);
+  };
+
+  const handleProductClose = () => {
+    setSelectedProduct(null);
+    if (params.series) navigate(`/batre/${params.series}`);
+    else navigate('/batre');
   };
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    if (!params.product) window.scrollTo({ top: 0, behavior: 'instant' });
   }, [params.series]);
 
   let filtered = selectedSeries === 'Semua'
@@ -126,7 +146,7 @@ export default function Batre() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {filtered.map(product => (
-              <BatreCard key={product.id} product={product} onSelect={setSelectedProduct} />
+              <BatreCard key={product.id} product={product} onSelect={handleProductSelect} />
             ))}
           </div>
         )}
@@ -150,7 +170,7 @@ export default function Batre() {
 
       {/* Product Detail Modal */}
       {selectedProduct && (
-        <BatreModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
+        <BatreModal product={selectedProduct} onClose={handleProductClose} />
       )}
     </div>
   );

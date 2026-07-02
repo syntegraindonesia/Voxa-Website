@@ -48,6 +48,8 @@ function Router() {
       <Route path="/batre/:series" component={Batre} />
       <Route path="/batre/:series/:product" component={Batre} />
       <Route path="/sparepart" component={Sparepart} />
+      <Route path="/sparepart/:series" component={Sparepart} />
+      <Route path="/sparepart/:series/:product" component={Sparepart} />
 
       {/* Legacy /catalog/:category routes (keep for backward compat) */}
       <Route path="/catalog/:category" component={Catalog} />

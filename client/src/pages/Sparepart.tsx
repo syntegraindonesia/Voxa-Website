@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'wouter';
+import { useState, useEffect } from 'react';
+import { Link, useParams, useLocation } from 'wouter';
 import { ArrowRight, ChevronRight, ChevronLeft, Filter, Heart, SlidersHorizontal, X } from 'lucide-react';
 import { useWishlist } from '@/contexts/WishlistContext';
 
@@ -749,9 +749,46 @@ const SERIES_FILTERS = [
 
 // ─── Page Component ───────────────────────────────────────────────────────────
 
+function toSlug(name: string) {
+  return name.toLowerCase().replace(/ /g, '-').replace(/[&]/g, 'dan');
+}
+function slugToSeries(slug: string) {
+  return SERIES_FILTERS.find(s => toSlug(s) === slug) || 'Semua';
+}
+
 export default function Sparepart() {
-  const [selectedSeries, setSelectedSeries] = useState('Semua');
+  const params = useParams<{ series: string; product: string }>();
+  const [, navigate] = useLocation();
+  const selectedSeries = params.series ? slugToSeries(params.series) : 'Semua';
   const [selectedProduct, setSelectedProduct] = useState<SparepartItem | null>(null);
+
+  useEffect(() => {
+    if (params.product) {
+      const found = ALL_SPAREPART_PRODUCTS.find(p => toSlug(p.name) === params.product);
+      if (found) setSelectedProduct(found);
+    }
+  }, [params.product]);
+
+  const handleSeriesClick = (series: string) => {
+    setSelectedProduct(null);
+    if (series === 'Semua') navigate('/sparepart');
+    else navigate(`/sparepart/${toSlug(series)}`);
+  };
+
+  const handleProductSelect = (product: SparepartItem) => {
+    setSelectedProduct(product);
+    navigate(`/sparepart/${toSlug(product.series)}/${toSlug(product.name)}`);
+  };
+
+  const handleProductClose = () => {
+    setSelectedProduct(null);
+    if (params.series) navigate(`/sparepart/${params.series}`);
+    else navigate('/sparepart');
+  };
+
+  useEffect(() => {
+    if (!params.product) window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [params.series]);
 
   const filtered = selectedSeries === 'Semua'
     ? ALL_SPAREPART_PRODUCTS
@@ -803,7 +840,7 @@ export default function Sparepart() {
               {SERIES_FILTERS.map(s => (
                 <button
                   key={s}
-                  onClick={() => setSelectedSeries(s)}
+                  onClick={() => handleSeriesClick(s)}
                   className={`px-3 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${
                     selectedSeries === s
                       ? 'bg-[#00B4D8] text-white'
@@ -832,7 +869,7 @@ export default function Sparepart() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {filtered.map(product => (
-              <SparepartCard key={product.id} product={product} onSelect={setSelectedProduct} />
+              <SparepartCard key={product.id} product={product} onSelect={handleProductSelect} />
             ))}
           </div>
         )}
@@ -856,7 +893,7 @@ export default function Sparepart() {
 
       {/* Product Detail Modal */}
       {selectedProduct && (
-        <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
+        <ProductModal product={selectedProduct} onClose={handleProductClose} />
       )}
     </div>
   );
