@@ -42,7 +42,9 @@ function Router() {
 
       {/* Clean top-level catalog routes (used by navbar dropdown) */}
       <Route path="/sepeda-listrik" component={SepedaListrikCatalog} />
+      <Route path="/sepeda-listrik/:series" component={SepedaListrikCatalog} />
       <Route path="/batre" component={Batre} />
+      <Route path="/batre/:series" component={Batre} />
       <Route path="/sparepart" component={Sparepart} />
 
       {/* Legacy /catalog/:category routes (keep for backward compat) */}

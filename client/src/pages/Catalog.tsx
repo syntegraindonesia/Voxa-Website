@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useParams, useSearch } from 'wouter';
+import { Link, useParams, useSearch, useLocation } from 'wouter';
 import { ArrowRight, ChevronRight, ChevronLeft, Filter, Heart, MessageCircle, Shield, SlidersHorizontal, Wrench, X, Zap } from 'lucide-react';
 import { sepedaListrik, batre, type Product } from '@/data/products';
 import { getProductGallery } from '@/data/productGalleries';
@@ -38,33 +38,45 @@ const sparepartItems = [
   { id: 'sp-ban', name: 'Ban Luar 20x2.0', series: 'Ban & Velg', price: 'Rp 145.000', image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80', shortDesc: 'Ban luar anti-selip ukuran 20x2.0', badge: undefined },
 ];
 
+// Convert series name to URL slug e.g. "Liberty Series" → "liberty-series"
+function seriesToSlug(series: string) {
+  return series.toLowerCase().replace(/ /g, '-');
+}
+
+// Convert URL slug back to series name e.g. "liberty-series" → "Liberty Series"
+function slugToSeries(slug: string, available: string[]) {
+  return available.find(s => seriesToSlug(s) === slug) || 'Semua';
+}
+
 export default function Catalog() {
-  const params = useParams<{ category: string }>();
+  const params = useParams<{ category: string; series: string }>();
   const category = (params.category || 'sepeda-listrik') as keyof typeof categoryConfig;
   const config = categoryConfig[category] || categoryConfig['sepeda-listrik'];
-  const search = useSearch();
-  const [selectedSeries, setSelectedSeries] = useState(() => {
-    const params = new URLSearchParams(search);
-    const s = params.get('series');
-    if (!s) return 'Semua';
-    // Match case-insensitively against available series
-    const available = categoryConfig[(params.get('category') as keyof typeof categoryConfig) || 'sepeda-listrik']?.series || [];
-    const match = available.find(a => a.toLowerCase().includes(s.toLowerCase()));
-    return match || 'Semua';
-  });
+  const [, navigate] = useLocation();
   const [sortBy, setSortBy] = useState('default');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  // Re-sync series filter + scroll to top when URL changes (e.g. navigating from Home)
+  // Derive base path from category
+  const basePath = params.category ? `/catalog/${params.category}` : `/${category}`;
+
+  // Derive selected series from URL param
+  const selectedSeries = params.series
+    ? slugToSeries(params.series, config.series)
+    : 'Semua';
+
+  // Navigate to series URL on tab click
+  const handleSeriesClick = (series: string) => {
+    if (series === 'Semua') {
+      navigate(basePath);
+    } else {
+      navigate(`${basePath}/${seriesToSlug(series)}`);
+    }
+  };
+
+  // Scroll to top when URL changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
-    const params = new URLSearchParams(search);
-    const s = params.get('series');
-    if (!s) { setSelectedSeries('Semua'); return; }
-    const available = config.series;
-    const match = available.find(a => a.toLowerCase().includes(s.toLowerCase()));
-    setSelectedSeries(match || 'Semua');
-  }, [search]);
+  }, [params.series]);
 
   const allProducts: any[] = category === 'sparepart'
     ? sparepartItems
@@ -140,7 +152,7 @@ export default function Catalog() {
               {config.series.map(s => (
                 <button
                   key={s}
-                  onClick={() => setSelectedSeries(s)}
+                  onClick={() => handleSeriesClick(s)}
                   className={`px-3 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all whitespace-nowrap shrink-0 ${selectedSeries === s ? 'bg-[#00B4D8] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                 >
                   {s}
