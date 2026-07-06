@@ -71,7 +71,7 @@ export default function Batre() {
           <div className="flex items-center gap-2 text-sm text-gray-500 overflow-x-auto whitespace-nowrap scrollbar-none">
             <Link href="/" className="hover:text-[#00B4D8]">Beranda</Link>
             <ChevronRight size={14} />
-            <span className="text-gray-900 font-medium">BATRE</span>
+            <span className="text-gray-900 font-medium">BATERAI</span>
             <span className="text-gray-300 mx-1">|</span>
             <Link href="/sepeda-listrik" className="hover:text-[#00B4D8] text-gray-400">Sepeda Listrik</Link>
             <ChevronRight size={14} />
@@ -94,9 +94,9 @@ export default function Batre() {
             KATALOG PRODUK
           </div>
           <h1 className="text-2xl md:text-6xl font-black text-gray-900 mb-2 md:mb-5 tracking-tight">
-            <span className="text-gray-900">BATRE</span>
+            <span className="text-gray-900">BATERAI</span>
           </h1>
-          <p className="hidden md:block text-gray-500 text-lg leading-relaxed max-w-2xl mx-auto">Temukan batre VOXA yang sesuai untuk kendaraan Anda</p>
+          <p className="hidden md:block text-gray-500 text-lg leading-relaxed max-w-2xl mx-auto">Temukan baterai VOXA yang sesuai untuk kendaraan Anda</p>
         </div>
       </section>
 

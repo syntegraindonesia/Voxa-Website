@@ -14,8 +14,8 @@ const categoryConfig = {
     headerBg: '/manus-storage/P1015067_6aacd27c.webp',
   },
   'batre': {
-    title: 'BATRE',
-    subtitle: 'Temukan batre VOXA yang sesuai untuk kendaraan Anda',
+    title: 'BATERAI',
+    subtitle: 'Temukan baterai VOXA yang sesuai untuk kendaraan Anda',
     products: batre,
     series: ['Semua', 'Greenlife Series', 'Tianneng Series', 'Chilwee Series', 'Lithium Series'],
     headerBg: '/manus-storage/P1015047_606cad4f.webp',
@@ -139,7 +139,7 @@ export default function Catalog() {
               <ChevronRight size={14} />
             )}
             {category !== 'batre' && (
-              <Link href="/batre" className="hover:text-[#00B4D8] text-gray-400">Batre</Link>
+              <Link href="/batre" className="hover:text-[#00B4D8] text-gray-400">Baterai</Link>
             )}
             {category !== 'batre' && category !== 'sparepart' && (
               <ChevronRight size={14} />

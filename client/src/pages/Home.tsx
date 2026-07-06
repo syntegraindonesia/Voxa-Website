@@ -668,7 +668,7 @@ export default function Home() {
 
 
       {/* ═══════════════════════════════════════════════════════════════
-          SECTION 8: PRODUCT ROW — POPULER SEKARANG (Batre)
+          SECTION 8: PRODUCT ROW — POPULER SEKARANG (Baterai)
       ═══════════════════════════════════════════════════════════════ */}
       <ProductRow
         title="POPULER SEKARANG"
