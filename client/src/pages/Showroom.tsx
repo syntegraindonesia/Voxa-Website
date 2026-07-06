@@ -42,6 +42,38 @@ const showrooms = [
     mapsLink: 'https://www.google.com/search?q=voxa+meruya',
     img: '/manus-storage/MERUYA_035cd224.jpg',
   },
+  {
+    name: 'VOXA PAKUHAJI',
+    address: 'Jl. Kh. Sa\'adullah KM 5 Kp. Rawa Kepuh, RT 001/RW 009, Desa Pakualam, Kecamatan Pakuhaji, Kota Tangerang, Provinsi Banten 15570',
+    phone: '081119279328',
+    waLink: 'https://wa.me/6281119279328',
+    mapsLink: 'https://www.google.com/search?q=voxa+pakuhaji+tangerang',
+    img: '/showroom-pakuhaji.jpg',
+  },
+  {
+    name: 'VOXA TIGARAKSA',
+    address: 'Kp. Ranca Gede (Pertigaan Lengsir) Munjul RT004/RW006, Solear, Kab. Tangerang, Banten 15730',
+    phone: '081119279328',
+    waLink: 'https://wa.me/6281119279328',
+    mapsLink: 'https://www.google.com/search?q=voxa+tigaraksa+tangerang',
+    img: '/showroom-tigaraksa.jpg',
+  },
+  {
+    name: 'VOXA JASINGA',
+    address: 'Kp. Kebon Anggrek RT.3/RW.3, Desa Pamagersari, Jasinga, Kab. Bogor, Jawa Barat 16670',
+    phone: '081119279328',
+    waLink: 'https://wa.me/6281119279328',
+    mapsLink: 'https://www.google.com/search?q=voxa+jasinga+bogor',
+    img: '/showroom-jasinga.jpg',
+  },
+  {
+    name: 'VOXA CITAYAM',
+    address: 'Jln. Raya Pabuaran Pintu Air RT.02/13, Kel. Pabuaran, Bojong Gede, Bogor',
+    phone: '081119279328',
+    waLink: 'https://wa.me/6281119279328',
+    mapsLink: 'https://www.google.com/search?q=voxa+citayam+bogor',
+    img: '/showroom-citayam.jpg',
+  },
 ];
 
 export default function Showroom() {
