@@ -44,9 +44,12 @@ function Router() {
       <Route path="/sepeda-listrik" component={SepedaListrikCatalog} />
       <Route path="/sepeda-listrik/:series" component={SepedaListrikCatalog} />
       <Route path="/sepeda-listrik/:series/:product" component={SepedaListrikCatalog} />
-      <Route path="/batre" component={Batre} />
-      <Route path="/batre/:series" component={Batre} />
-      <Route path="/batre/:series/:product" component={Batre} />
+      <Route path="/baterai" component={Batre} />
+      <Route path="/baterai/:series" component={Batre} />
+      <Route path="/baterai/:series/:product" component={Batre} />
+      {/* Redirect old /batre URLs to /baterai */}
+      <Route path="/batre" component={() => { window.location.replace('/baterai'); return null; }} />
+      <Route path="/batre/:rest*" component={() => { window.location.replace('/baterai' + window.location.pathname.slice(6)); return null; }} />
       <Route path="/sparepart" component={Sparepart} />
       <Route path="/sparepart/:series" component={Sparepart} />
       <Route path="/sparepart/:series/:product" component={Sparepart} />
@@ -78,7 +81,7 @@ const WA_MESSAGE = encodeURIComponent(
 );
 
 // Product pages where the button stays bottom-right
-const PRODUCT_PATHS = ['/sepeda-listrik', '/batre', '/sparepart', '/catalog', '/products'];
+const PRODUCT_PATHS = ['/sepeda-listrik', '/baterai', '/sparepart', '/catalog', '/products'];
 
 // Pages where the button is hidden entirely
 const HIDDEN_PATHS = ['/wishlist'];

@@ -60,7 +60,7 @@ export default function Footer() {
             <ul className="space-y-3">
               {[
                 { label: 'Sepeda Listrik', href: '/catalog/sepeda-listrik' },
-                { label: 'Baterai', href: '/catalog/batre' },
+                { label: 'Baterai', href: '/catalog/baterai' },
                 { label: 'Sparepart', href: '/catalog/sparepart' },
                 { label: 'Bandingkan Model', href: '/compare' },
                 { label: 'Produk Terbaru', href: '/catalog/sepeda-listrik' },

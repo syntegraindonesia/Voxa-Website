@@ -672,7 +672,7 @@ export default function Home() {
       ═══════════════════════════════════════════════════════════════ */}
       <ProductRow
         title="POPULER SEKARANG"
-        viewAllHref="/batre"
+        viewAllHref="/baterai"
         products={batre}
         onSelect={setSelectedProduct}
       />

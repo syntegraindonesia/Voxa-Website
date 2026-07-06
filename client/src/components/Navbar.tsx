@@ -39,17 +39,17 @@ const produkKamiCategories: Category[] = [
   },
   {
     name: 'Baterai',
-    href: '/batre',
+    href: '/baterai',
     subItems: [
-      { name: 'Greenlife 12KG', href: '/batre/greenlife-series/greenlife-12kg' },
-      { name: 'Greenlife 13.8KG', href: '/batre/greenlife-series/greenlife-13.8kg' },
-      { name: 'Tianneng 12V-15AH', href: '/batre/tianneng-series/tianneng-12v-15ah' },
-      { name: 'Tianneng 12V-25AH', href: '/batre/tianneng-series/tianneng-12v-25ah' },
-      { name: 'Chilwee Gold', href: '/batre/chilwee-series/chilwee-gold' },
-      { name: 'Chilwee Platinum', href: '/batre/chilwee-series/chilwee-platinum' },
-      { name: 'Chilwee 12V-20AH', href: '/batre/chilwee-series/chilwee-12v-20ah' },
-      { name: 'Lithium 48V-12AH', href: '/batre/lithium-series/lithium-48v-12ah' },
-      { name: 'Lithium 48V-21AH', href: '/batre/lithium-series/lithium-48v-21ah' },
+      { name: 'Greenlife 12KG', href: '/baterai/greenlife-series/greenlife-12kg' },
+      { name: 'Greenlife 13.8KG', href: '/baterai/greenlife-series/greenlife-13.8kg' },
+      { name: 'Tianneng 12V-15AH', href: '/baterai/tianneng-series/tianneng-12v-15ah' },
+      { name: 'Tianneng 12V-25AH', href: '/baterai/tianneng-series/tianneng-12v-25ah' },
+      { name: 'Chilwee Gold', href: '/baterai/chilwee-series/chilwee-gold' },
+      { name: 'Chilwee Platinum', href: '/baterai/chilwee-series/chilwee-platinum' },
+      { name: 'Chilwee 12V-20AH', href: '/baterai/chilwee-series/chilwee-12v-20ah' },
+      { name: 'Lithium 48V-12AH', href: '/baterai/lithium-series/lithium-48v-12ah' },
+      { name: 'Lithium 48V-21AH', href: '/baterai/lithium-series/lithium-48v-21ah' },
     ],
   },
   {
@@ -133,7 +133,7 @@ export default function Navbar() {
     // Navigate to the right page and open the product modal
     // For now, navigate to the category page — product detail modals are handled per-page
     if (product.category === 'sepeda-listrik') navigate('/sepeda-listrik');
-    else if (product.category === 'batre') navigate('/batre');
+    else if (product.category === 'baterai') navigate('/baterai');
     else if (product.category === 'sparepart') navigate('/sparepart');
   };
 

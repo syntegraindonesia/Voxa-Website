@@ -806,7 +806,7 @@ export default function Sparepart() {
             <span className="text-gray-300 mx-1">|</span>
             <Link href="/sepeda-listrik" className="hover:text-[#00B4D8] text-gray-400">Sepeda Listrik</Link>
             <ChevronRight size={14} />
-            <Link href="/batre" className="hover:text-[#00B4D8] text-gray-400">Baterai</Link>
+            <Link href="/baterai" className="hover:text-[#00B4D8] text-gray-400">Baterai</Link>
           </div>
         </div>
       </div>

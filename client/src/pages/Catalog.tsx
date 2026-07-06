@@ -13,7 +13,7 @@ const categoryConfig = {
     series: ['Semua', 'Liberty Series', 'Eiffel Series', 'Elite Series', 'Voxa Series'],
     headerBg: '/manus-storage/P1015067_6aacd27c.webp',
   },
-  'batre': {
+  'baterai': {
     title: 'BATERAI',
     subtitle: 'Temukan baterai VOXA yang sesuai untuk kendaraan Anda',
     products: batre,
@@ -120,7 +120,7 @@ export default function Catalog() {
   if (sortBy === 'price-asc') filtered = [...filtered].sort((a: any, b: any) => (a.priceNum || 0) - (b.priceNum || 0));
   if (sortBy === 'price-desc') filtered = [...filtered].sort((a: any, b: any) => (b.priceNum || 0) - (a.priceNum || 0));
 
-  const isProductCatalog = category === 'sepeda-listrik' || category === 'batre';
+  const isProductCatalog = category === 'sepeda-listrik' || category === 'baterai';
 
   return (
     <div className="min-h-screen bg-white">
@@ -135,13 +135,13 @@ export default function Catalog() {
             {category !== 'sepeda-listrik' && (
               <Link href="/sepeda-listrik" className="hover:text-[#00B4D8] text-gray-400">Sepeda Listrik</Link>
             )}
-            {category !== 'sepeda-listrik' && category !== 'batre' && (
+            {category !== 'sepeda-listrik' && category !== 'baterai' && (
               <ChevronRight size={14} />
             )}
-            {category !== 'batre' && (
-              <Link href="/batre" className="hover:text-[#00B4D8] text-gray-400">Baterai</Link>
+            {category !== 'baterai' && (
+              <Link href="/baterai" className="hover:text-[#00B4D8] text-gray-400">Baterai</Link>
             )}
-            {category !== 'batre' && category !== 'sparepart' && (
+            {category !== 'baterai' && category !== 'sparepart' && (
               <ChevronRight size={14} />
             )}
             {category !== 'sparepart' && (
@@ -273,7 +273,7 @@ function CatalogCard({ product, category, onSelect }: { product: any; category: 
           <Heart size={14} className={saved ? 'fill-red-500 text-red-500' : 'text-gray-400'} />
         </button>
         {/* Gallery count hint */}
-        {(category === 'sepeda-listrik' || category === 'batre') && (() => {
+        {(category === 'sepeda-listrik' || category === 'baterai') && (() => {
           const gallery = getProductGallery(product.id, product.image);
           return gallery.length > 1 ? (
             <span className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full font-medium">

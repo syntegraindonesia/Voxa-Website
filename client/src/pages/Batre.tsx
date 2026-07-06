@@ -37,19 +37,19 @@ export default function Batre() {
 
   const handleSeriesClick = (series: string) => {
     setSelectedProduct(null);
-    if (series === 'Semua') navigate('/batre');
-    else navigate(`/batre/${toSlug(series)}`);
+    if (series === 'Semua') navigate('/baterai');
+    else navigate(`/baterai/${toSlug(series)}`);
   };
 
   const handleProductSelect = (product: Product) => {
     setSelectedProduct(product);
-    navigate(`/batre/${toSlug(product.series)}/${toSlug(product.name)}`);
+    navigate(`/baterai/${toSlug(product.series)}/${toSlug(product.name)}`);
   };
 
   const handleProductClose = () => {
     setSelectedProduct(null);
-    if (params.series) navigate(`/batre/${params.series}`);
-    else navigate('/batre');
+    if (params.series) navigate(`/baterai/${params.series}`);
+    else navigate('/baterai');
   };
 
   useEffect(() => {
