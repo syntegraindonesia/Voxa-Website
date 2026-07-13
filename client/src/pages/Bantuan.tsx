@@ -125,7 +125,7 @@ export default function Bantuan() {
       </section>
 
       {/* Warranty */}
-      <section className="py-16 bg-gray-50">
+      <section id="garansi-resmi" className="py-16 bg-gray-50">
         <div className="container max-w-5xl">
           <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
             <div className="flex items-center gap-4 mb-6">

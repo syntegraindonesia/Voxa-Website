@@ -38,18 +38,24 @@ export default function Footer() {
           <div>
             <h4 className="text-xs font-bold tracking-widest text-gray-900 mb-5 uppercase">Bantuan</h4>
             <ul className="space-y-3">
-              {[
-                { label: 'Pusat Bantuan', href: '/bantuan' },
-                { label: 'Cara Pemesanan', href: '/bantuan' },
-                { label: 'Garansi Produk', href: '/bantuan' },
-                { label: 'Sparepart & Servis', href: '/bantuan' },
-              ].map(item => (
-                <li key={item.label}>
-                  <Link href={item.href} onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+              <li>
+                <Link href="/bantuan" onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                  Pusat Bantuan
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/bantuan#garansi-resmi"
+                  onClick={() => {
+                    setTimeout(() => {
+                      document.getElementById('garansi-resmi')?.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                  }}
+                  className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
+                >
+                  Garansi Produk
+                </Link>
+              </li>
               <li>
                 <a
                   href="https://wa.me/628156161071?text=Halo%2C%20saya%20mengunjungi%20website%20VOXA%20dan%20ingin%20mengetahui%20lebih%20lanjut%20mengenai%20produk-produk%20VOXA.%20Terima%20kasih."
