@@ -43,14 +43,23 @@ export default function Footer() {
                 { label: 'Cara Pemesanan', href: '/bantuan' },
                 { label: 'Garansi Produk', href: '/bantuan' },
                 { label: 'Sparepart & Servis', href: '/bantuan' },
-                { label: 'Hubungi Kami', href: '/bantuan' },
               ].map(item => (
                 <li key={item.label}>
-                  <Link href={item.href} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                  <Link href={item.href} onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
                     {item.label}
                   </Link>
                 </li>
               ))}
+              <li>
+                <a
+                  href="https://wa.me/628156161071?text=Halo%2C%20saya%20mengunjungi%20website%20VOXA%20dan%20ingin%20mengetahui%20lebih%20lanjut%20mengenai%20produk-produk%20VOXA.%20Terima%20kasih."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
+                >
+                  Hubungi Kami
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -63,10 +72,9 @@ export default function Footer() {
                 { label: 'Baterai', href: '/baterai' },
                 { label: 'Sparepart', href: '/sparepart' },
                 { label: 'Bandingkan Model', href: '/compare' },
-                { label: 'Produk Terbaru', href: '/sepeda-listrik' },
               ].map(item => (
                 <li key={item.label}>
-                  <Link href={item.href} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                  <Link href={item.href} onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
                     {item.label}
                   </Link>
                 </li>
@@ -83,10 +91,9 @@ export default function Footer() {
                 { label: 'Artikel', href: '/artikel' },
                 { label: 'Distributor VOXA', href: '/pemerintah' },
                 { label: 'Showroom', href: '/showroom' },
-                { label: 'VOXA Guide', href: '/guide' },
               ].map(item => (
                 <li key={item.label}>
-                  <Link href={item.href} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                  <Link href={item.href} onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
                     {item.label}
                   </Link>
                 </li>
