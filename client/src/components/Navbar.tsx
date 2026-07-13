@@ -168,7 +168,7 @@ export default function Navbar() {
               onMouseLeave={handleMouseLeaveArea}
             >
               <Link
-                href="/catalog/sepeda-listrik"
+                href="/sepeda-listrik"
                 className={`flex items-center gap-0.5 px-2 py-5 text-[13px] font-medium transition-colors border-b-2 whitespace-nowrap ${
                   megaOpen
                     ? 'text-gray-900 border-gray-900'

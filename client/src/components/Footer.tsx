@@ -59,11 +59,11 @@ export default function Footer() {
             <h4 className="text-xs font-bold tracking-widest text-gray-900 mb-5 uppercase">Produk</h4>
             <ul className="space-y-3">
               {[
-                { label: 'Sepeda Listrik', href: '/catalog/sepeda-listrik' },
-                { label: 'Baterai', href: '/catalog/baterai' },
-                { label: 'Sparepart', href: '/catalog/sparepart' },
+                { label: 'Sepeda Listrik', href: '/sepeda-listrik' },
+                { label: 'Baterai', href: '/baterai' },
+                { label: 'Sparepart', href: '/sparepart' },
                 { label: 'Bandingkan Model', href: '/compare' },
-                { label: 'Produk Terbaru', href: '/catalog/sepeda-listrik' },
+                { label: 'Produk Terbaru', href: '/sepeda-listrik' },
               ].map(item => (
                 <li key={item.label}>
                   <Link href={item.href} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
