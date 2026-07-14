@@ -24,6 +24,9 @@ import Bantuan from "./pages/Bantuan";
 import Guide from "./pages/Guide";
 import Wishlist from "./pages/Wishlist";
 import AdminArticles from "./pages/AdminArticles";
+import Checkout from "./pages/Checkout";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
+import CheckoutPending from "./pages/CheckoutPending";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import CartSidebar from "./components/CartSidebar";
@@ -68,6 +71,9 @@ function Router() {
       <Route path="/bantuan" component={Bantuan} />
       <Route path="/guide" component={Guide} />
       <Route path="/wishlist" component={Wishlist} />
+      <Route path="/checkout" component={Checkout} />
+      <Route path="/checkout/success" component={CheckoutSuccess} />
+      <Route path="/checkout/pending" component={CheckoutPending} />
       <Route path="/admin/articles" component={AdminArticles} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
@@ -81,7 +87,7 @@ const WA_MESSAGE = encodeURIComponent(
 );
 
 // Product pages where the button stays bottom-right
-const PRODUCT_PATHS = ['/sepeda-listrik', '/baterai', '/sparepart', '/catalog', '/products'];
+const PRODUCT_PATHS = ['/sepeda-listrik', '/baterai', '/sparepart', '/catalog', '/products', '/checkout'];
 
 // Pages where the button is hidden entirely
 const HIDDEN_PATHS = ['/wishlist'];

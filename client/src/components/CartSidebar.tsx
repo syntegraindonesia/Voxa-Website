@@ -1,13 +1,10 @@
 import { X, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { getProductById } from '@/data/products';
-import { useAuth } from '@/_core/hooks/useAuth';
-import { getLoginUrl } from '@/const';
 import { useLocation } from 'wouter';
 
 export default function CartSidebar() {
   const { items, isOpen, closeCart, updateQuantity, removeItem, clearCart } = useCart();
-  const { isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
 
   const enriched = items.map((item) => ({
@@ -131,30 +128,22 @@ export default function CartSidebar() {
               <span className="text-base font-bold text-gray-900">{formatRp(subtotal)}</span>
             </div>
 
-            {isAuthenticated ? (
-              <a
-                href={`https://wa.me/628156161071?text=${encodeURIComponent(
-                  'Halo, saya ingin memesan:\n' +
-                  enriched.map((i) => `- ${i.product?.name ?? i.productId} x${i.quantity}`).join('\n') +
-                  `\nTotal: ${formatRp(subtotal)}`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full py-3 bg-[#25D366] text-white text-sm font-bold text-center rounded-xl hover:bg-[#1ebe5d] transition-colors"
-              >
-                Pesan via WhatsApp
-              </a>
-            ) : (
-              <div className="space-y-2">
-                <p className="text-xs text-gray-400 text-center">Masuk untuk melanjutkan pemesanan</p>
-                <a
-                  href={getLoginUrl()}
-                  className="block w-full py-3 bg-[#00B4D8] text-white text-sm font-bold text-center rounded-xl hover:bg-[#0099bb] transition-colors"
-                >
-                  Masuk & Checkout
-                </a>
-              </div>
-            )}
+            <button
+              onClick={() => { closeCart(); navigate('/checkout'); }}
+              className="block w-full py-3 bg-[#00B4D8] text-white text-sm font-bold text-center rounded-xl hover:bg-[#0099bb] transition-colors"
+            >
+              Lanjut ke Pembayaran
+            </button>
+            <a
+              href={`https://wa.me/628156161071?text=${encodeURIComponent(
+                'Halo, saya ingin menanyakan tentang produk VOXA.'
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full py-2 text-xs text-gray-400 hover:text-[#25D366] transition-colors text-center"
+            >
+              Ada pertanyaan? Chat WhatsApp
+            </a>
 
             <button
               onClick={clearCart}

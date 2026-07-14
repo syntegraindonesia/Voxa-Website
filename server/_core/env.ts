@@ -7,4 +7,8 @@ export const ENV = {
   isProduction: process.env.NODE_ENV === "production",
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
+  // Xendit payment integration (test/sandbox keys)
+  xenditSecretKey: process.env.XENDIT_SECRET_KEY ?? "",
+  xenditWebhookToken: process.env.XENDIT_WEBHOOK_TOKEN ?? "",
+  frontendUrl: process.env.FRONTEND_URL ?? "https://voxa.co.id",
 };

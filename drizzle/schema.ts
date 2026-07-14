@@ -71,3 +71,25 @@ export const articlesTable = mysqlTable('articles', {
 });
 export type ArticleRow = typeof articlesTable.$inferSelect;
 export type InsertArticle = typeof articlesTable.$inferInsert;
+
+// Orders: one row per checkout attempt, linked to a Xendit invoice
+export const orders = mysqlTable('orders', {
+  id: int('id').autoincrement().primaryKey(),
+  xenditInvoiceId: varchar('xenditInvoiceId', { length: 128 }).notNull().unique(),
+  externalId: varchar('externalId', { length: 128 }).notNull().unique(),
+  status: mysqlEnum('status', ['pending', 'paid', 'expired', 'failed']).notNull().default('pending'),
+  totalAmount: int('totalAmount').notNull(),
+  customerName: varchar('customerName', { length: 256 }).notNull(),
+  customerEmail: varchar('customerEmail', { length: 320 }).notNull(),
+  customerPhone: varchar('customerPhone', { length: 32 }).notNull(),
+  customerAddress: text('customerAddress'),
+  // JSON array of { productId, name, quantity, unitPrice }
+  items: text('items').notNull(),
+  invoiceUrl: text('invoiceUrl').notNull(),
+  paidAt: timestamp('paidAt'),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow().notNull(),
+});
+
+export type Order = typeof orders.$inferSelect;
+export type InsertOrder = typeof orders.$inferInsert;
