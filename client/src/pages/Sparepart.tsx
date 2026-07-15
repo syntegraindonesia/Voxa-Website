@@ -134,9 +134,9 @@ const sparepartProducts: SparepartItem[] = [
       { label: 'Dimensi', value: '11.4 × 8.3 × 4 cm' },
     ],
     images: [
-      '/manus-storage/VOXASparepart-Controller350w#2(1)_f478ef4b.jpg',
-      '/manus-storage/VOXASparepart-Controller350w#2(2)_d5e75262.jpg',
-      '/manus-storage/VOXASparepart-Controller350w#2(3)_4cf636a8.jpg',
+      '/manus-storage/VOXASparepart-Controller350w-2-1.jpg',
+      '/manus-storage/VOXASparepart-Controller350w-2-2.jpg',
+      '/manus-storage/VOXASparepart-Controller350w-2-3.jpg',
     ],
   },
   // ── Controller 500W ────────────────────────────────────────────────────────
@@ -159,9 +159,9 @@ const sparepartProducts: SparepartItem[] = [
       { label: 'Dimensi', value: '11.4 × 8.3 × 4 cm' },
     ],
     images: [
-      '/manus-storage/VOXASparepart-Controller500w#2(1)_cab8dcf1.jpg',
-      '/manus-storage/VOXASparepart-Controller500w#2(2)_7abd8686.jpg',
-      '/manus-storage/VOXASparepart-Controller500w#2(3)_5f882edb.jpg',
+      '/manus-storage/VOXASparepart-Controller500w-2-1.jpg',
+      '/manus-storage/VOXASparepart-Controller500w-2-2.jpg',
+      '/manus-storage/VOXASparepart-Controller500w-2-3.jpg',
     ],
     badge: 'Populer',
   },
