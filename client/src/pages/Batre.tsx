@@ -182,6 +182,7 @@ export default function Batre() {
 function BatreCard({ product, onSelect }: { product: Product; onSelect: (p: Product) => void }) {
   const gallery = getProductGallery(product.id, product.image);
   const { isSaved, toggle } = useWishlist();
+  const { addItem, openCart } = useCart();
   const saved = isSaved(product.id);
   return (
     <div
@@ -213,13 +214,15 @@ function BatreCard({ product, onSelect }: { product: Product; onSelect: (p: Prod
         <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#00B4D8] transition-colors leading-snug">
           {product.name}
         </h3>
-        <p className="text-xs text-gray-500 mb-3 line-clamp-2">{product.shortDesc}</p>
-        <div className="flex items-center justify-between">
-          <span className="font-bold text-[#00B4D8] text-sm">{product.price}</span>
-          <span className="text-xs text-gray-400 group-hover:text-[#00B4D8] transition-colors flex items-center gap-1">
-            Detail <ChevronRight size={12} />
-          </span>
-        </div>
+        <p className="text-xs text-gray-500 mb-2 line-clamp-2">{product.shortDesc}</p>
+        <p className="font-bold text-[#00B4D8] text-sm mb-2">{product.price}</p>
+        <button
+          onClick={e => { e.stopPropagation(); addItem(product.id); openCart(); }}
+          className="w-full flex items-center justify-center gap-1.5 py-2 bg-[#00B4D8] text-white text-xs font-bold rounded-lg hover:bg-[#0099bb] transition-colors"
+        >
+          <ShoppingCart size={12} />
+          Tambahkan ke Keranjang
+        </button>
       </div>
     </div>
   );

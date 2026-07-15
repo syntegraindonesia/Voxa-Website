@@ -937,6 +937,9 @@ function SparepartCard({ product, onSelect }: { product: SparepartItem; onSelect
           {product.name}
         </h3>
         <p className="text-xs text-gray-500 mb-2 line-clamp-2">{product.shortDesc}</p>
+        <p className="font-bold text-[#00B4D8] text-sm mb-2">
+          {product.priceNum > 0 ? 'Rp ' + product.priceNum.toLocaleString('id-ID') : 'Hubungi Kami'}
+        </p>
         <button
           onClick={e => { e.stopPropagation(); addItem(product.id); openCart(); }}
           className="w-full flex items-center justify-center gap-1.5 py-2 bg-[#00B4D8] text-white text-xs font-bold rounded-lg hover:bg-[#0099bb] transition-colors"
