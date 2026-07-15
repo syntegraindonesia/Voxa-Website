@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useLocation } from 'wouter';
-import { ChevronRight, ChevronLeft, Filter, Heart, ShoppingCart, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowRight, ChevronRight, ChevronLeft, Filter, Heart, ShoppingCart, SlidersHorizontal, X } from 'lucide-react';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useCart } from '@/contexts/CartContext';
 
