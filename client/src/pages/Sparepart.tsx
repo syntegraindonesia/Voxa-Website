@@ -26,7 +26,7 @@ const sparepartProducts: SparepartItem[] = [
     name: 'Alarm Keyless VOXA',
     series: 'Keamanan',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Sistem kunci keyless dengan alarm anti-maling untuk sepeda listrik VOXA',
     description:
       'Tingkatkan keamanan sepeda listrik Anda dengan Kunci Keyless Alarm VOXA. Produk 100% original VOXA ini memudahkan aktivitas harian Anda — cukup satu sentuhan untuk mengunci dan membuka kunci kendaraan tanpa perlu memasukkan kunci fisik. Dilengkapi sistem alarm yang akan berbunyi jika ada gangguan, memberikan ketenangan pikiran di mana pun Anda berada.',
@@ -49,7 +49,7 @@ const sparepartProducts: SparepartItem[] = [
     name: 'As Roda Depan VOXA',
     series: 'Rangka & Suspensi',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'As roda depan stainless steel 14 cm, kuat dan tahan karat untuk sepeda listrik VOXA',
     description:
       'As Roda Depan VOXA terbuat dari bahan stainless steel berkualitas tinggi yang memberikan kekuatan optimal sekaligus ketahanan terhadap karat dan cuaca. Komponen ini merupakan suku cadang original VOXA yang dirancang presisi untuk memastikan kestabilan dan keamanan roda depan kendaraan Anda dalam setiap kondisi jalan.',
@@ -72,7 +72,7 @@ const sparepartProducts: SparepartItem[] = [
     name: 'Charger Sepeda Listrik VOXA',
     series: 'Charger',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Charger original 48V dengan perlindungan arus dan hubung singkat untuk pengisian aman',
     description:
       'Charger Sepeda Listrik VOXA dibuat dari bahan berkualitas tinggi dan merupakan produk 100% Original. Dilengkapi dengan teknologi canggih yang mencakup perlindungan output, perlindungan hubung singkat, dan perlindungan arus lebih — menjamin proses pengisian yang aman, efisien, dan memperpanjang umur baterai Anda. Pastikan spesifikasi charger sesuai dengan baterai kendaraan Anda sebelum melakukan pembelian.',
@@ -96,7 +96,7 @@ const sparepartProducts: SparepartItem[] = [
     name: 'Charger Grade A VOXA',
     series: 'Charger',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Charger Grade A 48V 128W dengan input 180–240V dan proteksi lengkap',
     description:
       'Charger Grade A VOXA adalah pilihan premium untuk pengisian baterai sepeda listrik Anda. Dibuat dari bahan berkualitas tinggi dan merupakan produk 100% Original, charger ini hadir dengan daya 128W dan rentang tegangan input yang lebih lebar (180–240 VAC) sehingga lebih stabil di berbagai kondisi jaringan listrik. Dilengkapi perlindungan output, hubung singkat, dan arus lebih untuk keamanan pengisian maksimal.',
@@ -120,7 +120,7 @@ const sparepartProducts: SparepartItem[] = [
     name: 'Controller 350W VOXA',
     series: 'Controller',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Controller 350W 48V dengan arus 17A, proteksi under-voltage, desain universal',
     description:
       'Controller 350W VOXA dirancang untuk memberikan tenaga yang stabil dan efisiensi optimal pada sepeda listrik bertegangan 48V. Dengan arus terkontrol serta fitur perlindungan under-voltage, controller ini memastikan motor bekerja halus, responsif, dan aman untuk penggunaan harian. Desain universal menjadikannya kompatibel dengan berbagai motor 48V, sehingga sangat cocok untuk penggantian controller lama atau peningkatan performa tanpa harus mengganti seluruh sistem.',
@@ -145,7 +145,7 @@ const sparepartProducts: SparepartItem[] = [
     name: 'Controller 500W VOXA',
     series: 'Controller',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Controller 500W 48V dengan arus 21A, ideal untuk upgrade performa sepeda listrik',
     description:
       'Controller 500W VOXA dirancang untuk memberikan performa optimal pada berbagai jenis sepeda listrik. Dengan arus yang stabil dan perlindungan under-voltage, controller ini memastikan motor bekerja efisien, responsif, dan aman ketika digunakan sehari-hari. Desain universal membuatnya kompatibel dengan sebagian besar motor 48V, sehingga menjadi pilihan ideal untuk upgrade, penggantian, atau peningkatan tenaga pada sepeda listrik Anda. Pemasangan wajib dilakukan oleh teknisi atau ahli.',
@@ -171,7 +171,7 @@ const sparepartProducts: SparepartItem[] = [
     name: 'Fork Garpu Depan VOXA',
     series: 'Rangka & Suspensi',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Fork garpu depan besi ringan tahan cuaca, original VOXA untuk kestabilan berkendara',
     description:
       'Fork Garpu Depan VOXA merupakan komponen suku cadang original yang dirancang khusus untuk sepeda listrik VOXA. Terbuat dari bahan besi berkualitas tinggi yang kuat, ringan, dan tahan terhadap berbagai kondisi cuaca, fork ini memastikan kestabilan kemudi dan kenyamanan berkendara yang optimal. Cocok sebagai pengganti fork yang aus atau rusak untuk mengembalikan performa kendaraan Anda seperti semula.',
@@ -200,7 +200,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Jok Belakang VOXA',
     series: 'Jok & Aksesori',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Jok belakang hitam 33×16×4.5 cm, nyaman dan tahan lama untuk sepeda listrik VOXA',
     description:
       'Jok Belakang VOXA adalah suku cadang original yang dirancang untuk memberikan kenyamanan penumpang belakang. Dengan dimensi 33×16×4.5 cm dan warna hitam elegan, jok ini mudah dipasang dan cocok sebagai pengganti jok yang aus atau rusak.',
@@ -221,7 +221,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Jok Depan VOXA',
     series: 'Jok & Aksesori',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Jok depan hitam 27×19.5×8 cm, ergonomis dan nyaman untuk pengendara utama',
     description:
       'Jok Depan VOXA dirancang secara ergonomis untuk memberikan kenyamanan maksimal bagi pengendara utama. Dengan dimensi 27×19.5×8 cm dan material berkualitas, jok ini memberikan bantalan yang cukup untuk perjalanan harian maupun jarak jauh.',
@@ -242,7 +242,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Kabel Motor 350W VOXA',
     series: 'Kelistrikan',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Set kabel motor 350W original VOXA untuk koneksi motor yang andal dan aman',
     description:
       'Kabel Motor 350W VOXA adalah komponen kelistrikan original yang dirancang khusus untuk motor 350W pada sepeda listrik VOXA. Kabel berkualitas tinggi ini memastikan koneksi yang stabil dan aman antara controller dan motor, mencegah gangguan kelistrikan yang dapat merusak sistem penggerak kendaraan.',
@@ -262,7 +262,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Kabel Motor 500W VOXA',
     series: 'Kelistrikan',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Set kabel motor 500W original VOXA untuk koneksi motor bertenaga tinggi',
     description:
       'Kabel Motor 500W VOXA adalah komponen kelistrikan original yang dirancang untuk motor 500W pada sepeda listrik VOXA. Dengan spesifikasi kabel yang lebih tebal dan tahan arus tinggi, produk ini memastikan performa motor 500W berjalan optimal dan aman dalam jangka panjang.',
@@ -282,7 +282,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Keranjang VOXA',
     series: 'Jok & Aksesori',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Keranjang PP universal 29×30×25 cm, ringan, tahan benturan, dan waterproof',
     description:
       'Keranjang VOXA cocok untuk berbagai tipe sepeda listrik. Terbuat dari material PP (Polypropylene) berkualitas tinggi yang dikenal ringan, kuat, dan tahan cuaca, sehingga ideal untuk penggunaan harian maupun perjalanan jarak jauh. Tahan benturan, tidak mudah patah, dan tidak menyerap air. Dilengkapi bracket dan baut pemasangan untuk instalasi yang mudah.',
@@ -307,7 +307,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Klakson Trumpet Horn VOXA',
     series: 'Kelistrikan',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Klakson trumpet horn 18 cm, suara keras dan jelas untuk keselamatan berkendara',
     description:
       'Klakson Trumpet Horn VOXA menghadirkan suara yang keras dan jelas untuk meningkatkan keselamatan berkendara di jalan raya. Dengan desain trumpet berukuran 18 cm dan warna hitam yang elegan, klakson ini mudah dipasang dan kompatibel dengan berbagai tipe sepeda listrik VOXA.',
@@ -329,7 +329,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Kunci Kontak VOXA',
     series: 'Keamanan',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Kunci kontak original VOXA 19×2.5 cm, presisi dan tahan lama',
     description:
       'Kunci Kontak VOXA adalah suku cadang original yang dirancang dengan presisi tinggi untuk memastikan sistem pengapian kendaraan bekerja dengan andal. Dengan dimensi 19×2.5 cm, kunci ini mudah digunakan dan cocok sebagai pengganti kunci kontak yang hilang atau rusak pada sepeda listrik VOXA.',
@@ -350,7 +350,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Lampu Depan VOXA',
     series: 'Pencahayaan',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Lampu depan original VOXA 14×3×5 cm, terang dan hemat energi',
     description:
       'Lampu Depan VOXA merupakan suku cadang original yang memberikan pencahayaan optimal untuk berkendara malam hari maupun kondisi minim cahaya. Dengan dimensi kompak 14×3×5 cm dan desain aerodinamis, lampu ini mudah dipasang dan dirancang untuk bertahan dalam kondisi cuaca apapun.',
@@ -371,7 +371,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Lampu Sein Depan VOXA',
     series: 'Pencahayaan',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Lampu sein depan universal 32 cm, 70g — visibilitas tinggi untuk keselamatan',
     description:
       'Lampu Sein Depan VOXA adalah komponen pencahayaan universal yang meningkatkan visibilitas dan keselamatan berkendara. Dengan panjang 32 cm dan bobot ringan hanya 70 gram, lampu sein ini mudah dipasang pada berbagai tipe sepeda listrik dan memberikan sinyal yang jelas kepada pengguna jalan lainnya.',
@@ -392,7 +392,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Motor Listrik 350W VOXA',
     series: 'Motor Listrik',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Motor brushless 350W universal, berat 4.55 kg, diameter 26 cm — andal untuk harian',
     description:
       'Motor Listrik 350W VOXA adalah penggerak utama yang handal untuk sepeda listrik entry-level hingga menengah. Terbuat dari bahan besi berkualitas tinggi yang kuat, ringan, dan tahan cuaca, motor brushless ini menghadirkan tenaga yang cukup untuk berbagai kondisi jalan perkotaan dengan efisiensi energi yang baik.',
@@ -416,7 +416,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Motor Listrik 500W VOXA',
     series: 'Motor Listrik',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Motor brushless 500W universal, berat 5.265 kg, diameter 26 cm — performa tinggi',
     description:
       'Motor Listrik 500W VOXA menghadirkan tenaga ekstra untuk penggunaan yang lebih menuntut, seperti medan berbukit atau membawa beban berat. Terbuat dari bahan besi berkualitas tinggi yang kuat, ringan, dan tahan cuaca, motor ini menjadi pilihan ideal untuk upgrade performa sepeda listrik Anda ke level berikutnya.',
@@ -441,7 +441,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Pedal Set VOXA',
     series: 'Rangka & Suspensi',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Pedal set universal nylon/resin dengan poros baja, 9×7×2 cm, 450g',
     description:
       'Pedal Set VOXA terbuat dari material nylon/resin berkualitas dengan poros baja yang kokoh, menghadirkan kombinasi bobot ringan dan kekuatan struktural yang optimal. Dengan dimensi 9×7×2 cm dan berat 450 gram, pedal ini memberikan pijakan yang nyaman dan anti-selip untuk pengendara dalam berbagai kondisi.',
@@ -464,7 +464,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Pijakan Kaki Depan VOXA',
     series: 'Rangka & Suspensi',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Front footrest universal 14×3×1 cm, 355g — pijakan kokoh untuk penumpang depan',
     description:
       'Pijakan Kaki Depan VOXA (Front Footrest) adalah aksesori universal yang memberikan tempat pijakan yang aman dan nyaman bagi penumpang di bagian depan. Dengan dimensi 14×3×1 cm dan bobot 355 gram, produk ini mudah dipasang dan dirancang untuk menahan beban dengan stabil.',
@@ -486,7 +486,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Rem Tromol Belakang VOXA',
     series: 'Rem & Komponen',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Rem tromol belakang besi 32×32×15.5 cm, 450g — pengereman andal dan aman',
     description:
       'Rem Tromol Belakang VOXA adalah komponen pengereman original yang memastikan daya henti yang andal dan konsisten. Terbuat dari bahan besi berkualitas tinggi yang kuat, ringan, dan tahan cuaca, rem ini dirancang untuk memberikan performa pengereman optimal dalam berbagai kondisi jalan dan cuaca.',
@@ -510,7 +510,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Rem Tromol Depan VOXA',
     series: 'Rem & Komponen',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Rem tromol depan besi diameter 13 cm, 570g — kontrol pengereman presisi',
     description:
       'Rem Tromol Depan VOXA memberikan kontrol pengereman yang presisi dan responsif untuk sepeda listrik Anda. Terbuat dari bahan besi berkualitas tinggi yang kuat, ringan, dan tahan cuaca, rem dengan diameter 13 cm ini memastikan daya henti yang optimal dan konsisten di berbagai kondisi permukaan jalan.',
@@ -533,7 +533,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Set Grip VOXA',
     series: 'Setang & Kontrol',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Grip lever set universal 60×7×5 cm, 200g — genggaman nyaman dan anti-selip',
     description:
       'Set Grip VOXA (Grip Lever Set) adalah aksesori setang universal yang memberikan genggaman nyaman, anti-selip, dan ergonomis untuk pengendara. Dengan panjang 60 cm dan bobot ringan 200 gram, set grip ini mudah dipasang dan meningkatkan kontrol kendaraan secara keseluruhan.',
@@ -554,7 +554,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Set Kabel Utama VOXA',
     series: 'Kelistrikan',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Set kabel utama hitam 60×7×5 cm, 200g — koneksi kelistrikan lengkap dan andal',
     description:
       'Set Kabel Utama VOXA adalah paket kabel kelistrikan lengkap yang menghubungkan seluruh komponen elektrikal utama pada sepeda listrik. Dengan kualitas kabel yang terjamin dan koneksi yang presisi, set ini memastikan aliran listrik yang stabil dan aman ke seluruh sistem kendaraan.',
@@ -576,7 +576,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Set Tuas Rem VOXA',
     series: 'Rem & Komponen',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Set tuas rem universal panjang 111 cm, 420g — kontrol pengereman presisi',
     description:
       'Set Tuas Rem VOXA adalah komponen pengereman universal yang memberikan kontrol rem yang presisi dan responsif. Dengan total panjang 111 cm dan bobot 420 gram, set ini mencakup tuas rem kiri dan kanan beserta kabel rem yang siap dipasang untuk menggantikan komponen yang aus atau rusak.',
@@ -599,7 +599,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Setang VOXA',
     series: 'Setang & Kontrol',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Setang besi universal 25×2×32 cm, 625g — kokoh, ringan, dan tahan cuaca',
     description:
       'Setang VOXA terbuat dari bahan besi berkualitas tinggi yang kuat, ringan, dan tahan terhadap berbagai kondisi cuaca. Dengan dimensi 25×2×32 cm dan bobot 625 gram, setang ini memberikan kontrol kemudi yang presisi dan nyaman. Desain universal membuatnya kompatibel dengan berbagai tipe sepeda listrik VOXA.',
@@ -624,7 +624,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Shockbreaker Set VOXA',
     series: 'Rangka & Suspensi',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Shockbreaker set besi 24.5×5×5 cm, 1.315 kg — suspensi optimal untuk jalan bergelombang',
     description:
       'Shockbreaker Set VOXA adalah komponen suspensi universal yang meredam getaran dan benturan dari permukaan jalan yang tidak rata, memberikan kenyamanan berkendara yang optimal. Terbuat dari bahan besi berkualitas tinggi yang kuat, ringan, dan tahan cuaca, shockbreaker ini memastikan stabilitas kendaraan dan kenyamanan pengendara dalam setiap kondisi jalan.',
@@ -647,7 +647,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Speedometer VOXA',
     series: 'Kelistrikan',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Speedometer digital universal 4×3×4 cm, 130g — tampilan kecepatan dan baterai akurat',
     description:
       'Speedometer VOXA adalah panel instrumen digital universal yang menampilkan informasi kecepatan, level baterai, dan data perjalanan secara akurat dan mudah dibaca. Dengan dimensi kompak 4×3×4 cm dan bobot ringan 130 gram, speedometer ini mudah dipasang di setang dan kompatibel dengan berbagai tipe sepeda listrik.',
@@ -668,7 +668,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Spion VOXA',
     series: 'Setang & Kontrol',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Spion besi universal diameter 10 cm, panjang 26 cm, 255g — visibilitas belakang optimal',
     description:
       'Spion VOXA terbuat dari bahan besi berkualitas tinggi yang kuat, ringan, dan tahan cuaca. Dengan diameter cermin 10 cm dan panjang total 26 cm, spion ini memberikan sudut pandang belakang yang luas untuk meningkatkan keselamatan berkendara. Desain universal membuatnya mudah dipasang pada berbagai tipe setang sepeda listrik.',
@@ -692,7 +692,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Standar Samping VOXA',
     series: 'Rangka & Suspensi',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Standar samping stainless universal 19.5×2.5×2 cm, 145g — parkir praktis dan aman',
     description:
       'Standar Samping VOXA terbuat dari bahan stainless steel berkualitas yang ringan dan tahan karat. Dengan dimensi 19.5×2.5×2 cm dan bobot hanya 145 gram, standar ini mudah dioperasikan dengan satu kaki dan memberikan kestabilan parkir yang baik pada berbagai permukaan.',
@@ -714,7 +714,7 @@ const pendingProducts: SparepartItem[] = [
     name: 'Standar Tengah (Double Stand) VOXA',
     series: 'Rangka & Suspensi',
     price: 'Hubungi Kami',
-    priceNum: 0,
+    priceNum: 1000,
     shortDesc: 'Standar dua kaki belakang 25.5×24×8 cm — parkir stabil di berbagai permukaan',
     description:
       'Standar Tengah VOXA (Double Stand) adalah standar dua kaki belakang yang memberikan kestabilan parkir superior dibandingkan standar samping biasa. Dengan ukuran 25.5×24×8 cm dan kompatibilitas universal untuk sepeda listrik dan skuter listrik, standar ini memastikan kendaraan Anda berdiri tegak dan stabil di berbagai permukaan.',
