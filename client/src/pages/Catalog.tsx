@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useSearch, useLocation } from 'wouter';
-import { ArrowRight, ChevronRight, ChevronLeft, Filter, Heart, MessageCircle, Shield, SlidersHorizontal, Wrench, X, Zap } from 'lucide-react';
+import { ArrowRight, ChevronRight, ChevronLeft, Filter, Heart, Shield, SlidersHorizontal, ShoppingCart, Wrench, X, Zap } from 'lucide-react';
 import { sepedaListrik, batre, type Product } from '@/data/products';
 import { getProductGallery } from '@/data/productGalleries';
 import { useWishlist } from '@/contexts/WishlistContext';
+import { useCart } from '@/contexts/CartContext';
 
 const categoryConfig = {
   'sepeda-listrik': {
@@ -318,12 +319,11 @@ function CatalogCard({ product, category, onSelect }: { product: any; category: 
 function ProductModal({ product, onClose }: { product: Product; onClose: () => void }) {
   const [activeImg, setActiveImg] = useState(0);
   const galleryImages = getProductGallery(product.id, product.image);
+  const { addItem, openCart } = useCart();
 
   const prev = () => setActiveImg(i => (i - 1 + galleryImages.length) % galleryImages.length);
   const next = () => setActiveImg(i => (i + 1) % galleryImages.length);
 
-  const waMessage = encodeURIComponent(`Halo VOXA, saya tertarik dengan produk ${product.name}. Bisa tolong informasi lebih lanjut?`);
-  const waUrl = `https://wa.me/628156161071?text=${waMessage}`;
 
   // Build specs array from the product.specs object
   const specLabels: Record<string, string> = {
@@ -453,15 +453,13 @@ function ProductModal({ product, onClose }: { product: Product; onClose: () => v
             </div>
 
             {/* CTA */}
-            <a
-              href={waUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-auto inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-full transition-all"
+            <button
+              onClick={() => { addItem(product.id); openCart(); onClose(); }}
+              className="mt-auto inline-flex items-center justify-center gap-2 bg-[#00B4D8] hover:bg-[#0099bb] text-white font-bold px-6 py-3 rounded-full transition-all"
             >
-              <MessageCircle size={18} />
-              Chat WhatsApp — Tanya Harga
-            </a>
+              <ShoppingCart size={18} />
+              Tambahkan ke Keranjang
+            </button>
           </div>
         </div>
       </div>

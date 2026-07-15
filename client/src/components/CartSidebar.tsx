@@ -1,7 +1,16 @@
 import { X, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { getProductById } from '@/data/products';
+import { ALL_SPAREPART_PRODUCTS } from '@/pages/Sparepart';
 import { useLocation } from 'wouter';
+
+function resolveProduct(productId: string) {
+  const p = getProductById(productId);
+  if (p) return { name: p.name, image: p.image, priceNum: p.priceNum, price: p.price };
+  const sp = ALL_SPAREPART_PRODUCTS.find(s => s.id === productId);
+  if (sp) return { name: sp.name, image: sp.images[0] ?? '', priceNum: sp.priceNum, price: sp.price };
+  return undefined;
+}
 
 export default function CartSidebar() {
   const { items, isOpen, closeCart, updateQuantity, removeItem, clearCart } = useCart();
@@ -9,7 +18,7 @@ export default function CartSidebar() {
 
   const enriched = items.map((item) => ({
     ...item,
-    product: getProductById(item.productId),
+    product: resolveProduct(item.productId),
   }));
 
   const subtotal = enriched.reduce((sum, item) => {

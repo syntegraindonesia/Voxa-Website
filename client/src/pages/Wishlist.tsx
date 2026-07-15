@@ -1,21 +1,30 @@
-import { useState } from 'react';
 import { Heart, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { Link } from 'wouter';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/_core/hooks/useAuth';
-import { getProductById, Product } from '@/data/products';
+import { getProductById } from '@/data/products';
+import { ALL_SPAREPART_PRODUCTS } from '@/pages/Sparepart';
 import { getLoginUrl } from '@/const';
+
+type WishlistProduct = { id: string; name: string; series: string; price: string; priceNum: number; image: string };
+
+function resolveWishlistProduct(id: string): WishlistProduct | undefined {
+  const p = getProductById(id);
+  if (p) return { id: p.id, name: p.name, series: p.series, price: p.price, priceNum: p.priceNum, image: p.image };
+  const sp = ALL_SPAREPART_PRODUCTS.find(s => s.id === id);
+  if (sp) return { id: sp.id, name: sp.name, series: sp.series, price: sp.price, priceNum: sp.priceNum, image: sp.images[0] ?? '' };
+  return undefined;
+}
 
 export default function WishlistPage() {
   const { savedIds, toggle } = useWishlist();
   const { addItem, openCart } = useCart();
   const { isAuthenticated } = useAuth();
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const savedProducts = Array.from(savedIds)
-    .map((id) => getProductById(id))
-    .filter(Boolean) as Product[];
+    .map((id) => resolveWishlistProduct(id))
+    .filter(Boolean) as WishlistProduct[];
 
   if (!isAuthenticated) {
     return (

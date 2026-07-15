@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams, useLocation } from 'wouter';
-import { ArrowRight, ChevronRight, ChevronLeft, Filter, Heart, SlidersHorizontal, X } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Filter, Heart, ShoppingCart, SlidersHorizontal, X } from 'lucide-react';
 import { useWishlist } from '@/contexts/WishlistContext';
+import { useCart } from '@/contexts/CartContext';
 
 // ─── Sparepart product data ───────────────────────────────────────────────────
 
-interface SparepartItem {
+export interface SparepartItem {
   id: string;
   name: string;
   series: string;
@@ -731,7 +732,7 @@ const pendingProducts: SparepartItem[] = [
   },
 ];
 
-const ALL_SPAREPART_PRODUCTS = [...sparepartProducts, ...pendingProducts];
+export const ALL_SPAREPART_PRODUCTS = [...sparepartProducts, ...pendingProducts];
 
 const SERIES_FILTERS = [
   'Semua',
@@ -903,6 +904,7 @@ export default function Sparepart() {
 
 function SparepartCard({ product, onSelect }: { product: SparepartItem; onSelect: (p: SparepartItem) => void }) {
   const { isSaved, toggle } = useWishlist();
+  const { addItem, openCart } = useCart();
   const saved = isSaved(product.id);
   return (
     <div
@@ -934,13 +936,14 @@ function SparepartCard({ product, onSelect }: { product: SparepartItem; onSelect
         <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#00B4D8] transition-colors leading-snug">
           {product.name}
         </h3>
-        <p className="text-xs text-gray-500 mb-3 line-clamp-2">{product.shortDesc}</p>
-        <div className="flex items-center justify-between">
-          <span className="font-bold text-[#00B4D8] text-sm">{product.price}</span>
-          <span className="text-xs text-gray-400 group-hover:text-[#00B4D8] transition-colors flex items-center gap-1">
-            Detail <ChevronRight size={12} />
-          </span>
-        </div>
+        <p className="text-xs text-gray-500 mb-2 line-clamp-2">{product.shortDesc}</p>
+        <button
+          onClick={e => { e.stopPropagation(); addItem(product.id); openCart(); }}
+          className="w-full flex items-center justify-center gap-1.5 py-2 bg-[#00B4D8] text-white text-xs font-bold rounded-lg hover:bg-[#0099bb] transition-colors"
+        >
+          <ShoppingCart size={12} />
+          Tambahkan ke Keranjang
+        </button>
       </div>
     </div>
   );
@@ -950,6 +953,7 @@ function SparepartCard({ product, onSelect }: { product: SparepartItem; onSelect
 
 function ProductModal({ product, onClose }: { product: SparepartItem; onClose: () => void }) {
   const [activeImg, setActiveImg] = useState(0);
+  const { addItem, openCart } = useCart();
 
   const prev = () => setActiveImg(i => (i - 1 + product.images.length) % product.images.length);
   const next = () => setActiveImg(i => (i + 1) % product.images.length);
@@ -1030,14 +1034,13 @@ function ProductModal({ product, onClose }: { product: SparepartItem; onClose: (
             )}
 
             {/* CTA */}
-            <a
-              href={`https://wa.me/6281234567890?text=Halo, saya tertarik dengan ${encodeURIComponent(product.name)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-auto inline-flex items-center justify-center gap-2 bg-[#00B4D8] text-white font-bold px-6 py-3 rounded-full hover:bg-[#0090b0] transition-all"
+            <button
+              onClick={() => { addItem(product.id); openCart(); onClose(); }}
+              className="mt-auto inline-flex items-center justify-center gap-2 bg-[#00B4D8] text-white font-bold px-6 py-3 rounded-full hover:bg-[#0099bb] transition-all"
             >
-              Tanya via WhatsApp <ArrowRight size={16} />
-            </a>
+              <ShoppingCart size={16} />
+              Tambahkan ke Keranjang
+            </button>
             <p className="text-xs text-gray-400 text-center -mt-2">
               Klaim pengembalian wajib sertakan video unboxing
             </p>
