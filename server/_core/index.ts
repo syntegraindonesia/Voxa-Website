@@ -5,6 +5,7 @@ import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerGoogleAuthRoutes } from "./googleAuth";
 import { registerStorageProxy } from "./storageProxy";
+import { registerLandingProxy } from "./landingProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
@@ -39,6 +40,9 @@ async function startServer() {
   registerStorageProxy(app);
   registerGoogleAuthRoutes(app);
   registerXenditWebhook(app);
+  // Reverse-proxy the Greenlife landing pages under /artikel/... (must be
+  // registered before the Vite/static catch-all so it intercepts these paths).
+  registerLandingProxy(app);
   // tRPC API
   app.use(
     "/api/trpc",

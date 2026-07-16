@@ -19,6 +19,14 @@ export interface Article {
   image: string;
   author: string;
   tags?: string[];
+  /**
+   * When true, this "article" is a reverse-proxied landing page served under
+   * /artikel/<slug> by the Express server (see server/_core/landingProxy.ts).
+   * Its card must link with a full-page navigation (a real <a href>), not a
+   * client-side wouter <Link>, so the request reaches the server proxy instead
+   * of the SPA's ArtikelDetail route.
+   */
+  proxied?: boolean;
 }
 
 export const articles: Article[] = [
@@ -216,6 +224,39 @@ VOXA berkomitmen untuk memastikan semua produknya mematuhi regulasi yang berlaku
     featured: false,
     image: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663445867947/4sqHUsbGrVj8sgaCaL4hAC/article-ev-regulations-Z9KSU9oCQPTzVxHdKVce7o.webp',
     author: 'Tim Legal VOXA',
+  },
+  {
+    id: 'greenlife-b2c',
+    slug: 'baterai-sepeda-listrik-greenlife-12v',
+    title: 'Baterai Sepeda Listrik Mulai Drop? Ini Pilihan Penggantinya',
+    excerpt:
+      'Baterai Greenlife 12V untuk sepeda listrik: pilihan 12AH hingga 20AH, tersedia varian 3kg, 3,45kg, 3,75kg, dan 5,2kg. Konsultasi gratis sebelum beli — pastikan cocok dengan sepeda listrikmu.',
+    content:
+      'Halaman ini disajikan langsung dari landing page Greenlife VOXA. Jika Anda membaca teks ini, buka /artikel/baterai-sepeda-listrik-greenlife-12v secara langsung.',
+    category: 'Tips Kendaraan Listrik',
+    publishDate: '2026-07-15',
+    readTime: 4,
+    featured: false,
+    image:
+      'https://lp-voxa-greenlife-b2c-production.up.railway.app/img/hero-lifestyle.png?v=2',
+    author: 'Tim VOXA',
+    proxied: true,
+  },
+  {
+    id: 'greenlife-b2b',
+    slug: 'mitra-reseller-baterai-greenlife',
+    title: 'Peluang Reseller Baterai Sepeda Listrik: Stok Greenlife untuk Mitra',
+    excerpt:
+      'Stok baterai Greenlife 12V 12AH dan 20AH untuk reseller, bengkel, dealer, dan distributor sepeda listrik. Minta harga grosir, daftar jadi mitra — dukungan materi jualan dan konsultasi stok tersedia.',
+    content:
+      'Halaman ini disajikan langsung dari landing page Greenlife VOXA. Jika Anda membaca teks ini, buka /artikel/mitra-reseller-baterai-greenlife secara langsung.',
+    category: 'Industri Otomotif',
+    publishDate: '2026-07-15',
+    readTime: 4,
+    featured: false,
+    image: 'https://lp-voxa-greenlife-b2b-production.up.railway.app/img/hero.jpg',
+    author: 'Tim VOXA',
+    proxied: true,
   },
 ];
 

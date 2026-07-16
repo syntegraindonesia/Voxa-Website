@@ -21,6 +21,7 @@ type UnifiedArticle = {
   image: string;
   author: string;
   tags?: string[];
+  proxied?: boolean;
 };
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -64,9 +65,9 @@ function toUnified(dbRow: {
 // ─── Article Card ────────────────────────────────────────────────────────────
 
 function ArticleCard({ article }: { article: UnifiedArticle }) {
-  return (
-    <Link href={`/artikel/${article.slug}`}>
-      <article className="group cursor-pointer bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-[#37C5FF]/40 hover:shadow-xl hover:shadow-[#37C5FF]/10 transition-all duration-300 hover:-translate-y-1">
+  const href = `/artikel/${article.slug}`;
+  const body = (
+    <article className="group cursor-pointer bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-[#37C5FF]/40 hover:shadow-xl hover:shadow-[#37C5FF]/10 transition-all duration-300 hover:-translate-y-1">
         {/* Thumbnail */}
         <div className="relative overflow-hidden aspect-[16/9]">
           <img
@@ -99,8 +100,16 @@ function ArticleCard({ article }: { article: UnifiedArticle }) {
           </span>
         </div>
       </article>
-    </Link>
   );
+
+  // Proxied landing pages are served by the Express server, not the SPA router,
+  // so they need a full-page navigation (a real <a href>) rather than a
+  // client-side wouter <Link> which would render the empty ArtikelDetail route.
+  if (article.proxied) {
+    return <a href={href}>{body}</a>;
+  }
+
+  return <Link href={href}>{body}</Link>;
 }
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
