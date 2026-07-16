@@ -10,18 +10,28 @@ import type { Express, Request, Response } from "express";
  *
  * The landing pages reference all of their assets with RELATIVE paths
  * (e.g. src="img/hero.jpg", url('img/logos/tokopedia.svg')). Served under
- * /artikel/... those would resolve against voxa.co.id and break, so the HTML is
- * rewritten on the fly to point every img/ reference at the page's own Railway
- * origin. We also inject canonical / Open Graph metadata pointing at the
- * voxa.co.id path (the source pages ship none), so search engines and social
- * shares treat voxa.co.id as the authoritative URL.
+ * /artikel/... those would resolve against voxa.co.id and break.
+ *
+ * We serve the assets SAME-ORIGIN: img/ references are rewritten to
+ * `<article-path>/img/...` on voxa.co.id, and a second proxy route relays those
+ * requests to the page's Railway origin. Same-origin matters because one asset —
+ * img/ebike-anatomy.svg — is itself an <object type="image/svg+xml"> whose SVG
+ * pulls in a nested <image href="moped-anatomy.png">. Cross-origin that breaks
+ * two ways: Chrome's Opaque Response Blocking blanks the cross-origin <object>,
+ * and an <img> fallback renders the SVG in "secure static mode" which strips the
+ * nested PNG. Serving everything from voxa.co.id sidesteps both — the page's own
+ * <object> renders exactly as it does on Railway.
+ *
+ * We also inject canonical / Open Graph metadata pointing at the voxa.co.id path
+ * (the source pages ship none), so search engines and social shares treat
+ * voxa.co.id as the authoritative URL.
  *
  * Mirrors the fetch-based proxy pattern already used in storageProxy.ts — no
  * extra dependency required (Node's global fetch).
  */
 
 type ProxyTarget = {
-  /** Path on voxa.co.id that should serve the proxied page. */
+  /** Path on voxa.co.id that serves the proxied page (also the asset base). */
   path: string;
   /** Railway origin serving the real page (no trailing slash). */
   origin: string;
@@ -56,38 +66,18 @@ function escapeAttr(value: string): string {
 }
 
 function rewriteHtml(html: string, target: ProxyTarget): string {
-  const { origin, canonical, ogImage } = target;
+  const { path, canonical, ogImage } = target;
 
-  // 1. Point every relative `img/...` reference at the Railway origin.
-  //    Covers src/href/poster/data attributes (single or double quoted) and CSS
-  //    url(). `data` catches <object data="img/ebike-anatomy.svg"> — an <object>
-  //    that resolves to voxa.co.id would embed our SPA's 404 page instead.
-  //    Leaves absolute URLs (wa.me, socials, fonts) and #fragment links untouched.
+  // 1. Point every relative `img/...` reference at the same-origin asset path
+  //    (`<article-path>/img/...`), served by the asset proxy below. Covers
+  //    src/href/poster/data attributes (single or double quoted) and CSS url().
+  //    `data` catches <object data="img/ebike-anatomy.svg">. Leaves absolute
+  //    URLs (wa.me, socials, fonts) and #fragment links untouched.
   let out = html
-    .replace(/(\b(?:src|href|poster|data)\s*=\s*["'])img\//gi, `$1${origin}/img/`)
-    .replace(/url\(\s*(["']?)img\//gi, `url($1${origin}/img/`);
+    .replace(/(\b(?:src|href|poster|data)\s*=\s*["'])img\//gi, `$1${path}/img/`)
+    .replace(/url\(\s*(["']?)img\//gi, `url($1${path}/img/`);
 
-  // 2. Convert <object type="image/svg+xml" data="..."> to <img>. Loaded from a
-  //    different origin, an <object> fetches the SVG as a cross-origin document,
-  //    which Chrome's Opaque Response Blocking blocks — the element renders
-  //    blank. An <img> loads the same SVG as an image (allowed cross-origin) and
-  //    renders reliably. Carries over class + aria-label (as alt). Runs after
-  //    step 1, so data= is already the absolute Railway URL.
-  out = out.replace(
-    /<object\b([^>]*?)\btype=["']image\/svg\+xml["']([^>]*)>[\s\S]*?<\/object>/gi,
-    (match, pre, post) => {
-      const attrs = `${pre} ${post}`;
-      const dataMatch = attrs.match(/\bdata=(["'])([\s\S]*?)\1/i);
-      if (!dataMatch) return match;
-      const classMatch = attrs.match(/\bclass=(["'])([\s\S]*?)\1/i);
-      const ariaMatch = attrs.match(/\baria-label=(["'])([\s\S]*?)\1/i);
-      const cls = classMatch ? ` class="${classMatch[2]}"` : "";
-      const alt = ariaMatch ? ` alt="${ariaMatch[2]}"` : "";
-      return `<img src="${dataMatch[2]}"${cls}${alt} loading="lazy" />`;
-    }
-  );
-
-  // 3. Inject canonical + Open Graph metadata (the source pages ship none).
+  // 2. Inject canonical + Open Graph metadata (the source pages ship none).
   const titleMatch = out.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
   const descMatch = out.match(
     /<meta[^>]+name=["']description["'][^>]*content=["']([^"']*)["']/i
@@ -148,8 +138,52 @@ async function proxyLandingPage(target: ProxyTarget, res: Response): Promise<voi
   }
 }
 
+/**
+ * Relay an asset request (`<article-path>/img/...`) to the page's Railway
+ * origin. `assetPath` is everything after `<article-path>/` — e.g.
+ * "img/ebike-anatomy.svg" — including any query string.
+ */
+async function proxyLandingAsset(
+  target: ProxyTarget,
+  assetPath: string,
+  res: Response
+): Promise<void> {
+  try {
+    const upstream = await fetch(`${target.origin}/${assetPath}`);
+
+    if (!upstream.ok) {
+      res.status(upstream.status).send("Asset not found");
+      return;
+    }
+
+    const buf = Buffer.from(await upstream.arrayBuffer());
+    res
+      .status(200)
+      .set({
+        "Content-Type":
+          upstream.headers.get("content-type") ?? "application/octet-stream",
+        "Cache-Control": "public, max-age=86400",
+      })
+      .send(buf);
+  } catch (err) {
+    console.error(
+      `[LandingProxy] failed to proxy asset ${target.origin}/${assetPath}:`,
+      err
+    );
+    res.status(502).send("Asset backend unreachable");
+  }
+}
+
 export function registerLandingProxy(app: Express) {
   for (const target of TARGETS) {
+    // Assets first (more specific path), then the page itself.
+    app.get(`${target.path}/img/*`, (req: Request, res: Response) => {
+      // originalUrl is `<article-path>/img/...?query`; strip the leading
+      // `<article-path>/` to get the upstream-relative asset path + query.
+      const assetPath = req.originalUrl.slice(target.path.length + 1);
+      void proxyLandingAsset(target, assetPath, res);
+    });
+
     app.get(target.path, (_req: Request, res: Response) => {
       void proxyLandingPage(target, res);
     });
