@@ -67,7 +67,27 @@ function rewriteHtml(html: string, target: ProxyTarget): string {
     .replace(/(\b(?:src|href|poster|data)\s*=\s*["'])img\//gi, `$1${origin}/img/`)
     .replace(/url\(\s*(["']?)img\//gi, `url($1${origin}/img/`);
 
-  // 2. Inject canonical + Open Graph metadata (the source pages ship none).
+  // 2. Convert <object type="image/svg+xml" data="..."> to <img>. Loaded from a
+  //    different origin, an <object> fetches the SVG as a cross-origin document,
+  //    which Chrome's Opaque Response Blocking blocks — the element renders
+  //    blank. An <img> loads the same SVG as an image (allowed cross-origin) and
+  //    renders reliably. Carries over class + aria-label (as alt). Runs after
+  //    step 1, so data= is already the absolute Railway URL.
+  out = out.replace(
+    /<object\b([^>]*?)\btype=["']image\/svg\+xml["']([^>]*)>[\s\S]*?<\/object>/gi,
+    (match, pre, post) => {
+      const attrs = `${pre} ${post}`;
+      const dataMatch = attrs.match(/\bdata=(["'])([\s\S]*?)\1/i);
+      if (!dataMatch) return match;
+      const classMatch = attrs.match(/\bclass=(["'])([\s\S]*?)\1/i);
+      const ariaMatch = attrs.match(/\baria-label=(["'])([\s\S]*?)\1/i);
+      const cls = classMatch ? ` class="${classMatch[2]}"` : "";
+      const alt = ariaMatch ? ` alt="${ariaMatch[2]}"` : "";
+      return `<img src="${dataMatch[2]}"${cls}${alt} loading="lazy" />`;
+    }
+  );
+
+  // 3. Inject canonical + Open Graph metadata (the source pages ship none).
   const titleMatch = out.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
   const descMatch = out.match(
     /<meta[^>]+name=["']description["'][^>]*content=["']([^"']*)["']/i
