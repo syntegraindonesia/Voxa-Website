@@ -59,10 +59,12 @@ function rewriteHtml(html: string, target: ProxyTarget): string {
   const { origin, canonical, ogImage } = target;
 
   // 1. Point every relative `img/...` reference at the Railway origin.
-  //    Covers src/href/poster attributes (single or double quoted) and CSS url().
+  //    Covers src/href/poster/data attributes (single or double quoted) and CSS
+  //    url(). `data` catches <object data="img/ebike-anatomy.svg"> — an <object>
+  //    that resolves to voxa.co.id would embed our SPA's 404 page instead.
   //    Leaves absolute URLs (wa.me, socials, fonts) and #fragment links untouched.
   let out = html
-    .replace(/(\b(?:src|href|poster)\s*=\s*["'])img\//gi, `$1${origin}/img/`)
+    .replace(/(\b(?:src|href|poster|data)\s*=\s*["'])img\//gi, `$1${origin}/img/`)
     .replace(/url\(\s*(["']?)img\//gi, `url($1${origin}/img/`);
 
   // 2. Inject canonical + Open Graph metadata (the source pages ship none).
