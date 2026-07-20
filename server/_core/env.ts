@@ -8,6 +8,12 @@ export const ENV = {
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
   deepseekApiKey: process.env.DEEPSEEK_API_KEY ?? "",
+  googleAdsClientId: process.env.GOOGLE_ADS_CLIENT_ID ?? "",
+  googleAdsClientSecret: process.env.GOOGLE_ADS_CLIENT_SECRET ?? "",
+  googleAdsRefreshToken: process.env.GOOGLE_ADS_REFRESH_TOKEN ?? "",
+  googleAdsDeveloperToken: process.env.GOOGLE_ADS_DEVELOPER_TOKEN ?? "",
+  googleAdsCustomerId: process.env.GOOGLE_ADS_CUSTOMER_ID ?? "",
+  googleAdsManagerId: process.env.GOOGLE_ADS_MANAGER_ID ?? "",
   // Xendit payment integration (test/sandbox keys)
   xenditSecretKey: process.env.XENDIT_SECRET_KEY ?? "",
   xenditWebhookToken: process.env.XENDIT_WEBHOOK_TOKEN ?? "",
