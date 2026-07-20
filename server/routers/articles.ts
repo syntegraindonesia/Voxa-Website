@@ -86,25 +86,7 @@ Pastikan artikel relevan dengan produk VOXA dan pasar Indonesia.`;
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt + variation },
           ],
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "article_draft",
-              strict: true,
-              schema: {
-                type: "object",
-                properties: {
-                  title: { type: "string" },
-                  excerpt: { type: "string" },
-                  content: { type: "string" },
-                  seoKeywords: { type: "string" },
-                  tags: { type: "array", items: { type: "string" } },
-                },
-                required: ["title", "excerpt", "content", "seoKeywords", "tags"],
-                additionalProperties: false,
-              },
-            },
-          },
+          response_format: { type: "json_object" },
         });
 
         const raw = (response.choices[0]?.message?.content as string) ?? "{}";
@@ -337,25 +319,7 @@ Pastikan artikel relevan dengan produk VOXA dan pasar Indonesia.`;
               `Contoh format: ["Topik 1", "Topik 2", "Topik 3"]`,
           },
         ],
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "topic_suggestions",
-            strict: true,
-            schema: {
-              type: "object",
-              properties: {
-                topics: {
-                  type: "array",
-                  items: { type: "string" },
-                  description: "List of suggested article topics",
-                },
-              },
-              required: ["topics"],
-              additionalProperties: false,
-            },
-          },
-        },
+        response_format: { type: "json_object" },
       });
 
       const content = response.choices[0]?.message?.content ?? "{}";
@@ -397,25 +361,7 @@ Pastikan artikel relevan dengan produk VOXA dan pasar Indonesia.`;
               `Contoh: ["voxa", "sepeda listrik", "kendaraan listrik indonesia"]`,
           },
         ],
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "keyword_suggestions",
-            strict: true,
-            schema: {
-              type: "object",
-              properties: {
-                keywords: {
-                  type: "array",
-                  items: { type: "string" },
-                  description: "List of suggested SEO keywords",
-                },
-              },
-              required: ["keywords"],
-              additionalProperties: false,
-            },
-          },
-        },
+        response_format: { type: "json_object" },
       });
 
       const content = response.choices[0]?.message?.content ?? "{}";
@@ -468,21 +414,7 @@ Pastikan artikel relevan dengan produk VOXA dan pasar Indonesia.`;
               `Kembalikan HANYA string prompt, tanpa penjelasan.`,
           },
         ],
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "image_prompt",
-            strict: true,
-            schema: {
-              type: "object",
-              properties: {
-                prompt: { type: "string", description: "The image generation prompt" },
-              },
-              required: ["prompt"],
-              additionalProperties: false,
-            },
-          },
-        },
+        response_format: { type: "json_object" },
       });
 
       const promptContent = promptResponse.choices[0]?.message?.content ?? "{}";
