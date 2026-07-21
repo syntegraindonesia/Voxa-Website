@@ -303,10 +303,10 @@ export default function Navbar() {
                         )}
                         {user.role === 'admin' && (
                           <Link href="/admin/ads" className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold hover:bg-[#37C5FF]/10 transition-colors" style={{ color: '#37C5FF' }}>
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3v18h18M7 14l4-4 4 4 5-5" />
                             </svg>
-                            Google Ads Dashboard
+                            <span className="whitespace-nowrap">Google Ads Dashboard</span>
                           </Link>
                         )}
                         <button
