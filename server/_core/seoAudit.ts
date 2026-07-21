@@ -1,10 +1,85 @@
 // SEO/GEO audit engine: fetches VOXA pages, parses them, extracts signals,
 // scores each page, and returns findings for the admin dashboard.
-import * as cheerio from 'cheerio';
+// Uses lightweight regex-based extraction (no HTML parser dependency).
 import { ENV } from './env';
 import { getDb } from '../db';
 import { pageOverrides } from '../../drizzle/schema';
 import { eq } from 'drizzle-orm';
+
+// ── Regex-based HTML extraction helpers ──────────────────────────────────────
+
+const attr = (html: string, tag: string, attrName: string, attrValue: string, wantAttr: string): string | null => {
+  const re = new RegExp(`<${tag}[^>]*\\b${attrName}=(?:"([^"]*)"|'([^']*)')(?:[^>]*\\b${wantAttr}=(?:"([^"]*)"|'([^']*)'))?[^>]*>`, 'i');
+  const m = html.match(re);
+  if (!m) return null;
+  const a = (m[1] ?? m[2] ?? '').toLowerCase() === attrValue.toLowerCase();
+  return a ? (m[3] ?? m[4] ?? null) : null;
+};
+
+const metaContent = (html: string, nameOrProperty: 'name' | 'property', key: string): string | null => {
+  // Match either order: <meta name="foo" content="bar"> or <meta content="bar" name="foo">
+  const re1 = new RegExp(`<meta[^>]*\\b${nameOrProperty}=(?:"|')${key}(?:"|')[^>]*\\bcontent=(?:"([^"]*)"|'([^']*)')`, 'i');
+  const re2 = new RegExp(`<meta[^>]*\\bcontent=(?:"([^"]*)"|'([^']*)')[^>]*\\b${nameOrProperty}=(?:"|')${key}(?:"|')`, 'i');
+  const m = html.match(re1) || html.match(re2);
+  return m ? (m[1] ?? m[2] ?? null) : null;
+};
+
+const linkHref = (html: string, rel: string): string | null => {
+  const re = new RegExp(`<link[^>]*\\brel=(?:"|')${rel}(?:"|')[^>]*\\bhref=(?:"([^"]*)"|'([^']*)')`, 'i');
+  const m = html.match(re);
+  return m ? (m[1] ?? m[2] ?? null) : null;
+};
+
+const tagText = (html: string, tag: string): string | null => {
+  const re = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i');
+  const m = html.match(re);
+  return m ? m[1].replace(/<[^>]+>/g, '').trim() : null;
+};
+
+const allTagText = (html: string, tag: string): string[] => {
+  const re = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'gi');
+  const out: string[] = [];
+  let m;
+  while ((m = re.exec(html)) !== null) out.push(m[1].replace(/<[^>]+>/g, '').trim());
+  return out;
+};
+
+const countTag = (html: string, tag: string): number => {
+  const re = new RegExp(`<${tag}\\b[^>]*>`, 'gi');
+  return (html.match(re) || []).length;
+};
+
+const imgsWithAndWithoutAlt = (html: string): { total: number; withAlt: number } => {
+  const imgRe = /<img\b[^>]*>/gi;
+  const imgs = html.match(imgRe) || [];
+  const withAlt = imgs.filter(t => /\balt=(?:"[^"]*[^\s"][^"]*"|'[^']*[^\s'][^']*')/i.test(t)).length;
+  return { total: imgs.length, withAlt };
+};
+
+const extractJsonLd = (html: string): any[] => {
+  const re = /<script[^>]*type=(?:"|')application\/ld\+json(?:"|')[^>]*>([\s\S]*?)<\/script>/gi;
+  const out: any[] = [];
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    try {
+      const parsed = JSON.parse(m[1].trim());
+      if (Array.isArray(parsed)) out.push(...parsed);
+      else out.push(parsed);
+    } catch { /* malformed */ }
+  }
+  return out;
+};
+
+const stripToText = (html: string): string => {
+  const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  const body = bodyMatch ? bodyMatch[1] : html;
+  return body
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
 
 const SITE_BASE = ENV.frontendUrl.replace(/\/$/, '') || 'https://voxa.co.id';
 
@@ -91,40 +166,30 @@ async function fetchHtml(url: string, timeoutMs = 15_000): Promise<{ status: num
 // ── Per-page analysis ─────────────────────────────────────────────────────────
 
 function analyzePage(path: string, name: string, html: string, status: number, llmsTxtExists: boolean): PageAudit {
-  const $ = cheerio.load(html);
   const findings: PageFinding[] = [];
 
-  // Extract signals
-  const title = $('head > title').text().trim() || null;
-  const desc = $('meta[name="description"]').attr('content')?.trim() || null;
-  const canonical = $('link[rel="canonical"]').attr('href')?.trim() || null;
-  const robots = $('meta[name="robots"]').attr('content')?.trim() || null;
-  const viewport = $('meta[name="viewport"]').attr('content')?.trim() || null;
-  const ogTitle = $('meta[property="og:title"]').attr('content')?.trim() || null;
-  const ogDesc = $('meta[property="og:description"]').attr('content')?.trim() || null;
-  const ogImage = $('meta[property="og:image"]').attr('content')?.trim() || null;
-  const h1s = $('h1').map((_, el) => $(el).text().trim()).get();
-  const h2s = $('h2').length;
-  const h3s = $('h3').length;
-  const imgs = $('img');
-  const imgsWithAlt = imgs.filter((_, el) => !!$(el).attr('alt')?.trim()).length;
-  const totalImgs = imgs.length;
-  const jsonLdBlocks: any[] = [];
-  $('script[type="application/ld+json"]').each((_, el) => {
-    try {
-      const parsed = JSON.parse($(el).contents().text());
-      if (Array.isArray(parsed)) jsonLdBlocks.push(...parsed);
-      else jsonLdBlocks.push(parsed);
-    } catch { /* malformed schema */ }
-  });
+  // Extract signals (regex-based)
+  const title = tagText(html, 'title');
+  const desc = metaContent(html, 'name', 'description');
+  const canonical = linkHref(html, 'canonical');
+  const robots = metaContent(html, 'name', 'robots');
+  const viewport = metaContent(html, 'name', 'viewport');
+  const ogTitle = metaContent(html, 'property', 'og:title');
+  const ogDesc = metaContent(html, 'property', 'og:description');
+  const ogImage = metaContent(html, 'property', 'og:image');
+  const h1s = allTagText(html, 'h1');
+  const h2s = countTag(html, 'h2');
+  const h3s = countTag(html, 'h3');
+  const { total: totalImgs, withAlt: imgsWithAlt } = imgsWithAndWithoutAlt(html);
+  const jsonLdBlocks = extractJsonLd(html);
   const jsonLdTypes = new Set<string>(jsonLdBlocks.map(b => b['@type']).filter(Boolean));
 
   // Content signals
-  const bodyText = $('body').text().replace(/\s+/g, ' ').trim();
+  const bodyText = stripToText(html);
   const wordCount = bodyText ? bodyText.split(' ').length : 0;
-  const hasTable = $('table').length > 0;
-  const hasFaq = jsonLdTypes.has('FAQPage') || $('details, summary').length >= 2;
-  const hasAuthor = $('[rel="author"], .author, [itemprop="author"]').length > 0 || jsonLdTypes.has('Person');
+  const hasTable = countTag(html, 'table') > 0;
+  const hasFaq = jsonLdTypes.has('FAQPage') || (countTag(html, 'details') + countTag(html, 'summary')) >= 2;
+  const hasAuthor = /(rel=["']author["']|class=["'][^"']*\bauthor\b|itemprop=["']author["'])/.test(html) || jsonLdTypes.has('Person');
   // Explicit facts heuristic: numbers / prices / km / kg
   const explicitFactMatches = (bodyText.match(/\b(rp|idr)\s?[\d.,]+|\b\d+\s?(km|kg|watt|volt|amp|hari|tahun|bulan)\b/gi) || []).length;
 
@@ -166,9 +231,10 @@ function analyzePage(path: string, name: string, html: string, status: number, l
     (jsonLdTypes.has('Product') ? 40 : 0) +
     (jsonLdTypes.has('FAQPage') ? 30 : 0) +
     (jsonLdTypes.has('Organization') ? 30 : 0);
-  const faqSectionsScore = hasFaq ? 100 : $('details').length >= 1 ? 50 : 0;
-  const eeatScore = (hasAuthor ? 60 : 0) + ($('time, [itemprop="datePublished"]').length > 0 ? 40 : 0);
-  const specTablesScore = hasTable ? 100 : $('dl').length > 0 ? 60 : 0;
+  const faqSectionsScore = hasFaq ? 100 : countTag(html, 'details') >= 1 ? 50 : 0;
+  const hasTime = countTag(html, 'time') > 0 || /itemprop=["']datePublished["']/.test(html);
+  const eeatScore = (hasAuthor ? 60 : 0) + (hasTime ? 40 : 0);
+  const specTablesScore = hasTable ? 100 : countTag(html, 'dl') > 0 ? 60 : 0;
   const llmsTxtScore = llmsTxtExists ? 100 : 0;
 
   const geoScore = Math.round(
