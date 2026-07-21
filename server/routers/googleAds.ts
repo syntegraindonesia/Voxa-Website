@@ -1,6 +1,9 @@
 import { z } from 'zod';
+import { eq } from 'drizzle-orm';
 import { TRPCError } from '@trpc/server';
 import { protectedProcedure, router } from '../_core/trpc';
+import { getDb } from '../db';
+import { archivedCampaigns } from '../../drizzle/schema';
 import {
   getCampaigns,
   pauseCampaign,
@@ -8,15 +11,93 @@ import {
   updateCampaignBudget,
   getKeywords,
   createSearchCampaign,
+  getMetricsSummary,
+  previousPeriod,
+  getAccountBalance,
 } from '../_core/googleAds';
 import { invokeLLM } from '../_core/llm';
 
 export const googleAdsRouter = router({
-  // Get all campaigns with metrics
+  // Get all campaigns with metrics + archive flag, scoped to a date range
   getCampaigns: protectedProcedure
+    .input(z.object({
+      startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+      endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+    }).optional())
+    .query(async ({ input, ctx }) => {
+      if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
+      const range = input?.startDate && input?.endDate
+        ? { startDate: input.startDate, endDate: input.endDate }
+        : undefined;
+      const [campaigns, db] = [await getCampaigns(range), await getDb()];
+      const archivedIds = new Set<string>();
+      if (db) {
+        const rows = await db.select({ campaignId: archivedCampaigns.campaignId }).from(archivedCampaigns);
+        rows.forEach(r => archivedIds.add(r.campaignId));
+      }
+      return campaigns.map(c => ({ ...c, archived: archivedIds.has(c.id) }));
+    }),
+
+  // Get current account balance (live from Google Ads)
+  getAccountBalance: protectedProcedure
     .query(async ({ ctx }) => {
       if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
-      return getCampaigns();
+      return getAccountBalance();
+    }),
+
+  // Get aggregate metrics for tiles: current period + previous equivalent period
+  // scope: "all" = every non-removed campaign, "active" = ENABLED only, or a specific campaignId
+  getMetricsSummary: protectedProcedure
+    .input(z.object({
+      startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      scope: z.union([z.literal('all'), z.literal('active'), z.string()]).default('active'),
+    }))
+    .query(async ({ input, ctx }) => {
+      if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
+      const range = { startDate: input.startDate, endDate: input.endDate };
+      const prev = previousPeriod(range);
+      const opts = input.scope === 'all' ? {}
+        : input.scope === 'active' ? { onlyActive: true }
+        : { campaignId: input.scope };
+      const [current, previous] = await Promise.all([
+        getMetricsSummary(range, opts),
+        getMetricsSummary(prev, opts),
+      ]);
+      const pct = (a: number, b: number) => b === 0 ? null : ((a - b) / b) * 100;
+      return {
+        current,
+        previous,
+        deltas: {
+          spend: pct(current.spend, previous.spend),
+          clicks: pct(current.clicks, previous.clicks),
+          impressions: pct(current.impressions, previous.impressions),
+          ctr: current.ctr - previous.ctr, // pp difference, not %
+        },
+        previousRange: prev,
+      };
+    }),
+
+  // Archive a campaign (hide from dashboard, don't touch Google Ads)
+  archiveCampaign: protectedProcedure
+    .input(z.object({ campaignId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB unavailable' });
+      await db.insert(archivedCampaigns).values({ campaignId: input.campaignId }).onDuplicateKeyUpdate({ set: { campaignId: input.campaignId } });
+      return { success: true };
+    }),
+
+  // Unarchive (bring back to main list)
+  unarchiveCampaign: protectedProcedure
+    .input(z.object({ campaignId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB unavailable' });
+      await db.delete(archivedCampaigns).where(eq(archivedCampaigns.campaignId, input.campaignId));
+      return { success: true };
     }),
 
   // Pause a campaign
@@ -46,12 +127,19 @@ export const googleAdsRouter = router({
       return { success: true };
     }),
 
-  // Get keywords (optionally filtered by campaign)
+  // Get keywords (optionally filtered by campaign + date range)
   getKeywords: protectedProcedure
-    .input(z.object({ campaignId: z.string().optional() }))
+    .input(z.object({
+      campaignId: z.string().optional(),
+      startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+      endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+    }))
     .query(async ({ input, ctx }) => {
       if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
-      return getKeywords(input.campaignId);
+      const range = input.startDate && input.endDate
+        ? { startDate: input.startDate, endDate: input.endDate }
+        : undefined;
+      return getKeywords(input.campaignId, range);
     }),
 
   // AI: suggest keywords for a topic/URL

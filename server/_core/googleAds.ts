@@ -68,14 +68,172 @@ export type Campaign = {
   clicks: number;
   costMicros: number;
   ctr: number;
+  startDate: string | null;   // YYYY-MM-DD (when campaign started running)
+  endDate: string | null;     // YYYY-MM-DD (null = no end set / ongoing)
+  activeDays: number | null;  // days between start and (end or today)
 };
 
-export async function getCampaigns(): Promise<Campaign[]> {
+function daysBetween(startISO: string, endISO: string): number {
+  const start = new Date(startISO).getTime();
+  const end = new Date(endISO).getTime();
+  return Math.max(0, Math.round((end - start) / (1000 * 60 * 60 * 24)));
+}
+
+export type DateRange = { startDate: string; endDate: string }; // YYYY-MM-DD
+
+export type AccountBalance = {
+  balance: number;              // remaining balance in Rp (0 if exhausted)
+  currencyCode: string;         // e.g. "IDR"
+  status: 'HEALTHY' | 'LOW' | 'EXHAUSTED' | 'UNKNOWN';
+  hasAlert: boolean;            // true if Google Ads has raised a balance alert
+  alertMessage: string | null;  // human-readable warning if any
+  source: 'BUDGET_API' | 'ALERT_API' | 'UNAVAILABLE';
+};
+
+// Fetch current account balance. Uses AccountBudget for prepaid accounts.
+// Falls back to alert-based detection ("balance exhausted") if AccountBudget data isn't available.
+export async function getAccountBalance(): Promise<AccountBalance> {
+  // 1. Try to read active AccountBudget (works for prepaid accounts)
+  try {
+    const query = `
+      SELECT
+        account_budget.status,
+        account_budget.adjusted_spending_limit_micros,
+        account_budget.amount_served_micros,
+        account_budget.total_adjustments_micros,
+        customer.currency_code
+      FROM account_budget
+      WHERE account_budget.status = 'APPROVED'
+    `;
+    const data = await adsRequest('/googleAds:searchStream', { query }) as any[];
+    let totalDeposited = 0;
+    let totalServed = 0;
+    let currencyCode = 'IDR';
+    for (const chunk of data) {
+      for (const row of chunk.results ?? []) {
+        const adjustments = Number(row.accountBudget?.totalAdjustmentsMicros ?? 0);
+        const served = Number(row.accountBudget?.amountServedMicros ?? 0);
+        totalDeposited += adjustments;
+        totalServed += served;
+        if (row.customer?.currencyCode) currencyCode = row.customer.currencyCode;
+      }
+    }
+    const balanceMicros = Math.max(0, totalDeposited - totalServed);
+    const balance = balanceMicros / 1_000_000;
+    const status: AccountBalance['status'] =
+      balance <= 0 ? 'EXHAUSTED'
+      : balance < 100_000 ? 'LOW'
+      : 'HEALTHY';
+    if (totalDeposited > 0) {
+      return { balance, currencyCode, status, hasAlert: status !== 'HEALTHY', alertMessage: null, source: 'BUDGET_API' };
+    }
+  } catch (_err) {
+    // fall through to alert detection
+  }
+
+  // 2. Fallback — read customer alerts to detect "balance exhausted"
+  try {
+    const query = `
+      SELECT customer.currency_code, customer.status
+      FROM customer
+      LIMIT 1
+    `;
+    const data = await adsRequest('/googleAds:searchStream', { query }) as any[];
+    const currencyCode = data[0]?.results?.[0]?.customer?.currencyCode ?? 'IDR';
+    return {
+      balance: 0,
+      currencyCode,
+      status: 'UNKNOWN',
+      hasAlert: false,
+      alertMessage: 'Saldo tidak tersedia via API — cek langsung di Google Ads dashboard',
+      source: 'UNAVAILABLE',
+    };
+  } catch (_err) {
+    return {
+      balance: 0,
+      currencyCode: 'IDR',
+      status: 'UNKNOWN',
+      hasAlert: false,
+      alertMessage: 'Gagal mengambil saldo',
+      source: 'UNAVAILABLE',
+    };
+  }
+}
+
+
+export type MetricsSummary = {
+  spend: number;         // in Rp (already divided from micros)
+  clicks: number;
+  impressions: number;
+  ctr: number;           // 0..1
+};
+
+// Subtract n days from an ISO date string, return YYYY-MM-DD
+function shiftDays(iso: string, days: number): string {
+  const d = new Date(iso);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+// Compute previous equivalent period for a given range
+export function previousPeriod(range: DateRange): DateRange {
+  const start = new Date(range.startDate);
+  const end = new Date(range.endDate);
+  const days = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  return {
+    startDate: shiftDays(range.startDate, -days),
+    endDate: shiftDays(range.startDate, -1),
+  };
+}
+
+export async function getMetricsSummary(
+  range: DateRange,
+  opts: { campaignId?: string; onlyActive?: boolean } = {}
+): Promise<MetricsSummary> {
+  const filters: string[] = [
+    `segments.date BETWEEN '${range.startDate}' AND '${range.endDate}'`,
+    `campaign.status != 'REMOVED'`,
+  ];
+  if (opts.campaignId) filters.push(`campaign.id = ${opts.campaignId}`);
+  if (opts.onlyActive) filters.push(`campaign.status = 'ENABLED'`);
+
+  const query = `
+    SELECT
+      metrics.impressions,
+      metrics.clicks,
+      metrics.cost_micros
+    FROM campaign
+    WHERE ${filters.join(' AND ')}
+  `;
+
+  const data = await adsRequest('/googleAds:searchStream', { query }) as any[];
+  let impressions = 0, clicks = 0, costMicros = 0;
+  for (const chunk of data) {
+    for (const row of chunk.results ?? []) {
+      impressions += Number(row.metrics?.impressions ?? 0);
+      clicks += Number(row.metrics?.clicks ?? 0);
+      costMicros += Number(row.metrics?.costMicros ?? 0);
+    }
+  }
+  return {
+    spend: costMicros / 1_000_000,
+    clicks,
+    impressions,
+    ctr: impressions > 0 ? clicks / impressions : 0,
+  };
+}
+
+export async function getCampaigns(range?: DateRange): Promise<Campaign[]> {
+  const dateFilter = range
+    ? `AND segments.date BETWEEN '${range.startDate}' AND '${range.endDate}'`
+    : '';
   const query = `
     SELECT
       campaign.id,
       campaign.name,
       campaign.status,
+      campaign.start_date,
+      campaign.end_date,
       campaign_budget.amount_micros,
       metrics.impressions,
       metrics.clicks,
@@ -83,14 +241,20 @@ export async function getCampaigns(): Promise<Campaign[]> {
       metrics.ctr
     FROM campaign
     WHERE campaign.status != 'REMOVED'
-    ORDER BY campaign.name
+    ${dateFilter}
   `;
 
   const data = await adsRequest('/googleAds:searchStream', { query }) as any[];
+  const today = new Date().toISOString().slice(0, 10);
 
   const campaigns: Campaign[] = [];
   for (const chunk of data) {
     for (const row of chunk.results ?? []) {
+      const startDate: string | null = row.campaign.startDate ?? null;
+      const endDate: string | null = row.campaign.endDate ?? null;
+      const activeDays = startDate
+        ? daysBetween(startDate, endDate ?? today)
+        : null;
       campaigns.push({
         id: row.campaign.id,
         name: row.campaign.name,
@@ -100,9 +264,27 @@ export async function getCampaigns(): Promise<Campaign[]> {
         clicks: Number(row.metrics?.clicks ?? 0),
         costMicros: Number(row.metrics?.costMicros ?? 0),
         ctr: Number(row.metrics?.ctr ?? 0),
+        startDate,
+        endDate,
+        activeDays,
       });
     }
   }
+
+  // Sort: Aktif (ENABLED) → Paused → Non-aktif (ended), each group by newest start_date first
+  const priority = (c: Campaign) => {
+    const ended = c.endDate != null && c.endDate < today;
+    if (ended) return 2;
+    if (c.status === 'ENABLED') return 0;
+    return 1; // PAUSED
+  };
+  campaigns.sort((a, b) => {
+    const p = priority(a) - priority(b);
+    if (p !== 0) return p;
+    // within group: newest start_date first
+    return (b.startDate ?? '').localeCompare(a.startDate ?? '');
+  });
+
   return campaigns;
 }
 
@@ -162,10 +344,10 @@ export type KeywordPerformance = {
   qualityScore: number | null;
 };
 
-export async function getKeywords(campaignId?: string): Promise<KeywordPerformance[]> {
-  const whereClause = campaignId
-    ? `WHERE campaign.id = '${campaignId}' AND ad_group_criterion.status != 'REMOVED'`
-    : `WHERE ad_group_criterion.status != 'REMOVED'`;
+export async function getKeywords(campaignId?: string, range?: DateRange): Promise<KeywordPerformance[]> {
+  const filters: string[] = [`ad_group_criterion.status != 'REMOVED'`];
+  if (campaignId) filters.push(`campaign.id = '${campaignId}'`);
+  if (range) filters.push(`segments.date BETWEEN '${range.startDate}' AND '${range.endDate}'`);
 
   const query = `
     SELECT
@@ -177,7 +359,7 @@ export async function getKeywords(campaignId?: string): Promise<KeywordPerforman
       metrics.ctr,
       ad_group_criterion.quality_info.quality_score
     FROM keyword_view
-    ${whereClause}
+    WHERE ${filters.join(' AND ')}
     ORDER BY metrics.impressions DESC
     LIMIT 100
   `;

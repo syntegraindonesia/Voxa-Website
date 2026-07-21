@@ -93,3 +93,12 @@ export const orders = mysqlTable('orders', {
 
 export type Order = typeof orders.$inferSelect;
 export type InsertOrder = typeof orders.$inferInsert;
+
+// Archived Google Ads campaigns — admin can hide campaigns from the dashboard
+// without deleting them from Google Ads. Filtered client-side against getCampaigns.
+export const archivedCampaigns = mysqlTable('archivedCampaigns', {
+  id: int('id').autoincrement().primaryKey(),
+  campaignId: varchar('campaignId', { length: 64 }).notNull().unique(),
+  archivedAt: timestamp('archivedAt').defaultNow().notNull(),
+});
+export type ArchivedCampaign = typeof archivedCampaigns.$inferSelect;

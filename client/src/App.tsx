@@ -24,6 +24,7 @@ import Bantuan from "./pages/Bantuan";
 import Guide from "./pages/Guide";
 import Wishlist from "./pages/Wishlist";
 import AdminArticles from "./pages/AdminArticles";
+import AdminAds from "./pages/AdminAds";
 import Checkout from "./pages/Checkout";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import CheckoutPending from "./pages/CheckoutPending";
@@ -75,6 +76,7 @@ function Router() {
       <Route path="/checkout/success" component={CheckoutSuccess} />
       <Route path="/checkout/pending" component={CheckoutPending} />
       <Route path="/admin/articles" component={AdminArticles} />
+      <Route path="/admin/ads" component={AdminAds} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
