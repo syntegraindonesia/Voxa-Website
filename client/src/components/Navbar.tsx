@@ -309,6 +309,14 @@ export default function Navbar() {
                             <span className="whitespace-nowrap">Google Ads Dashboard</span>
                           </Link>
                         )}
+                        {user.role === 'admin' && (
+                          <Link href="/admin/seo" className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold hover:bg-[#37C5FF]/10 transition-colors" style={{ color: '#37C5FF' }}>
+                            <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <circle cx="11" cy="11" r="8" strokeWidth={2}/><line x1="21" y1="21" x2="16.65" y2="16.65" strokeWidth={2}/>
+                            </svg>
+                            <span className="whitespace-nowrap">SEO / GEO Optimizer</span>
+                          </Link>
+                        )}
                         <button
                           onClick={() => logout()}
                           className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"

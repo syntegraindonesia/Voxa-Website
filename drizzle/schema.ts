@@ -102,3 +102,50 @@ export const archivedCampaigns = mysqlTable('archivedCampaigns', {
   archivedAt: timestamp('archivedAt').defaultNow().notNull(),
 });
 export type ArchivedCampaign = typeof archivedCampaigns.$inferSelect;
+
+// SEO/GEO audits: one row per full-site scan
+export const seoAudits = mysqlTable('seoAudits', {
+  id: int('id').autoincrement().primaryKey(),
+  seoScore: int('seoScore').notNull(),        // 0..100 overall SEO score
+  geoScore: int('geoScore').notNull(),        // 0..100 overall GEO score
+  // Full audit payload: per-page scores + issues + recommendations. JSON blob.
+  data: text('data').notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+});
+export type SeoAudit = typeof seoAudits.$inferSelect;
+
+// Approved SEO overrides applied to specific pages by path.
+// The Express HTML middleware injects these into <head> before serving.
+export const pageOverrides = mysqlTable('pageOverrides', {
+  id: int('id').autoincrement().primaryKey(),
+  path: varchar('path', { length: 256 }).notNull().unique(),  // e.g. "/" or "/sepeda-listrik"
+  title: varchar('title', { length: 256 }),
+  description: varchar('description', { length: 512 }),
+  ogTitle: varchar('ogTitle', { length: 256 }),
+  ogDescription: varchar('ogDescription', { length: 512 }),
+  ogImage: varchar('ogImage', { length: 512 }),
+  canonical: varchar('canonical', { length: 512 }),
+  robots: varchar('robots', { length: 128 }),
+  jsonLd: text('jsonLd'),                     // stringified JSON-LD schema block
+  updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow().notNull(),
+});
+export type PageOverride = typeof pageOverrides.$inferSelect;
+
+// Audit log of every applied fix (for revert + history)
+export const seoFixHistory = mysqlTable('seoFixHistory', {
+  id: int('id').autoincrement().primaryKey(),
+  path: varchar('path', { length: 256 }).notNull(),
+  fixType: varchar('fixType', { length: 64 }).notNull(),  // e.g. "meta_description", "og_tags", "json_ld"
+  beforeValue: text('beforeValue'),
+  afterValue: text('afterValue'),
+  appliedAt: timestamp('appliedAt').defaultNow().notNull(),
+});
+export type SeoFixHistory = typeof seoFixHistory.$inferSelect;
+
+// Content of /llms.txt (single-row table). Rebuilt on demand.
+export const llmsTxt = mysqlTable('llmsTxt', {
+  id: int('id').primaryKey().default(1),
+  content: text('content').notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow().notNull(),
+});
+export type LlmsTxt = typeof llmsTxt.$inferSelect;
