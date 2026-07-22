@@ -259,6 +259,37 @@ export const seoRouter = router({
     return { content: row?.content ?? '' };
   }),
 
+  // List every currently-active override across the site — powers the "Applied Fixes" section
+  getAppliedOverrides: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
+    const db = await getDb();
+    if (!db) return [];
+    const rows = await db.select().from(pageOverrides).orderBy(desc(pageOverrides.updatedAt));
+    // Flatten to one entry per applied fix type (a single row may have multiple fields set)
+    const out: Array<{
+      path: string;
+      fixType: string;
+      label: string;
+      value: string;
+      updatedAt: Date;
+    }> = [];
+    for (const r of rows) {
+      const pushIf = (v: string | null, fixType: string, label: string) => {
+        if (v) out.push({ path: r.path, fixType, label, value: v, updatedAt: r.updatedAt });
+      };
+      pushIf(r.title, 'title', 'Page title');
+      pushIf(r.description, 'meta_description', 'Meta description');
+      pushIf(r.canonical, 'canonical', 'Canonical URL');
+      pushIf(r.robots, 'robots', 'Robots meta');
+      pushIf(r.h1Text, 'h1', 'H1 heading');
+      if (r.ogTitle || r.ogDescription || r.ogImage) {
+        pushIf(JSON.stringify({ title: r.ogTitle, description: r.ogDescription, image: r.ogImage }, null, 2), 'og_tags', 'OpenGraph tags');
+      }
+      pushIf(r.jsonLd, 'json_ld', 'JSON-LD schema');
+    }
+    return out;
+  }),
+
   // Get override for a specific path
   getPageOverride: protectedProcedure
     .input(z.object({ path: z.string() }))

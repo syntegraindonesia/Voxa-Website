@@ -164,10 +164,27 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
   const [expanded, setExpanded] = useState(false);
   const [editValue, setEditValue] = useState(f.suggestedValue && f.suggestedValue !== "MANUAL" && f.suggestedValue !== "AUTO" ? f.suggestedValue : "");
   const [dirty, setDirty] = useState(false);
+  const [appliedState, setAppliedState] = useState<null | { value: string }>(null);
 
+  const utils = trpc.useUtils();
   const apply = trpc.seo.applyFix.useMutation({
-    onSuccess: () => { toast.success(`Fix diterapkan ke ${f.path}`); onApplied(); },
+    onSuccess: (_d, vars) => {
+      toast.success(`Fix diterapkan ke ${f.path}`);
+      setAppliedState({ value: vars.value });
+      setExpanded(false);
+      utils.seo.getAppliedOverrides.invalidate();
+      utils.seo.getHistory.invalidate();
+    },
     onError: (e) => toast.error("Gagal: " + e.message),
+  });
+  const revert = trpc.seo.revertFix.useMutation({
+    onSuccess: () => {
+      toast.success("Fix dibatalkan — halaman kembali ke aslinya");
+      setAppliedState(null);
+      utils.seo.getAppliedOverrides.invalidate();
+      utils.seo.getHistory.invalidate();
+    },
+    onError: (e) => toast.error("Gagal revert: " + e.message),
   });
 
   const suggest = trpc.seo.suggestFix.useMutation({
@@ -224,8 +241,61 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
         <span className="font-semibold">Dampak:</span> {f.expectedImpact}
       </div>
 
+      {/* Applied confirmation state — persistent until user dismisses or reverts */}
+      {appliedState && !expanded && (
+        <div className="bg-green-50 border border-green-300 rounded-lg p-4 space-y-3">
+          <div className="flex items-start gap-2">
+            <CheckCircle2 size={18} className="text-green-600 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-bold text-green-800">Fix berhasil diterapkan</div>
+              <div className="text-xs text-green-700 mt-0.5">
+                Perubahan sudah live di <code className="bg-white/60 px-1 rounded">{f.path}</code>.
+                Google &amp; AI crawlers akan melihat perubahan pada next crawl.
+              </div>
+            </div>
+          </div>
+          <div>
+            <div className="text-xs uppercase font-bold text-gray-500 tracking-wider mb-1">Nilai yang diterapkan</div>
+            <pre className="bg-white border border-green-200 rounded p-2 text-xs font-mono text-gray-800 whitespace-pre-wrap break-words max-h-32 overflow-y-auto">
+              {appliedState.value}
+            </pre>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <a
+              href={`https://voxa.co.id${f.path}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold bg-white border border-green-300 text-green-700 rounded-md hover:bg-green-50"
+            >
+              <Eye size={12} /> Buka halaman
+            </a>
+            <a
+              href={`view-source:https://voxa.co.id${f.path}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold bg-white border border-gray-200 text-gray-700 rounded-md hover:border-gray-400"
+            >
+              <FileText size={12} /> View source
+            </a>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => revert.mutate({ path: f.path, fixType: f.fixType })}
+              disabled={revert.isPending}
+              className="text-red-600 border-red-200 hover:bg-red-50"
+            >
+              {revert.isPending ? <Loader2 className="animate-spin" size={12} /> : <RefreshCw size={12} className="mr-1" />}
+              Kembalikan (undo)
+            </Button>
+            <Button size="sm" variant="ghost" onClick={onApplied}>
+              Sembunyikan
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Collapsed state: just show the action buttons */}
-      {!expanded && (
+      {!appliedState && !expanded && (
         <div className="flex gap-2 flex-wrap">
           {isManualOnly ? (
             <div className="text-xs text-gray-500 italic">
@@ -355,11 +425,93 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
+function AppliedFixesSection() {
+  const utils = trpc.useUtils();
+  const { data: applied, isLoading } = trpc.seo.getAppliedOverrides.useQuery();
+  const revert = trpc.seo.revertFix.useMutation({
+    onSuccess: () => {
+      toast.success("Fix dibatalkan");
+      utils.seo.getAppliedOverrides.invalidate();
+      utils.seo.getLatest.invalidate();
+    },
+    onError: (e) => toast.error("Gagal: " + e.message),
+  });
+
+  if (isLoading || !applied || applied.length === 0) return null;
+
+  // Group by path
+  const byPath: Record<string, typeof applied> = {};
+  for (const r of applied) {
+    (byPath[r.path] ??= []).push(r);
+  }
+
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-bold text-gray-900">Fix yang Sudah Diterapkan</h2>
+        <div className="text-xs text-gray-500">
+          {applied.length} fix aktif di {Object.keys(byPath).length} halaman
+        </div>
+      </div>
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+        {Object.entries(byPath).map(([path, fixes], idx) => (
+          <div key={path} className={idx > 0 ? "border-t border-gray-100" : ""}>
+            <div className="px-6 py-3 bg-gray-50 flex items-center justify-between">
+              <div>
+                <code className="text-sm font-mono font-semibold text-gray-900">{path}</code>
+                <span className="text-xs text-gray-500 ml-2">{fixes.length} fix</span>
+              </div>
+              <a
+                href={`https://voxa.co.id${path}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-[#37C5FF] hover:underline"
+              >
+                <Eye size={12} /> Buka halaman
+              </a>
+            </div>
+            <div className="divide-y divide-gray-100">
+              {fixes.map(f => (
+                <div key={`${f.path}::${f.fixType}`} className="px-6 py-4 flex items-start gap-4">
+                  <div className="mt-1">
+                    <CheckCircle2 size={16} className="text-green-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline gap-2 flex-wrap">
+                      <span className="text-sm font-semibold text-gray-900">{f.label}</span>
+                      <span className="text-xs text-gray-400">
+                        · diterapkan {fmtDateTime(f.updatedAt)}
+                      </span>
+                    </div>
+                    <pre className="mt-1 bg-green-50 border-l-2 border-green-400 rounded p-2 text-xs font-mono text-gray-700 whitespace-pre-wrap break-words max-h-32 overflow-y-auto">
+                      {f.value}
+                    </pre>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => revert.mutate({ path: f.path, fixType: f.fixType })}
+                    disabled={revert.isPending}
+                    className="text-red-600 border-red-200 hover:bg-red-50 shrink-0"
+                  >
+                    {revert.isPending ? <Loader2 className="animate-spin" size={12} /> : <RefreshCw size={12} className="mr-1" />}
+                    Kembalikan
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function AdminSeo() {
   const utils = trpc.useUtils();
   const { data: latest, isLoading } = trpc.seo.getLatest.useQuery();
   const runAudit = trpc.seo.runAudit.useMutation({
-    onSuccess: () => { utils.seo.getLatest.invalidate(); toast.success("Audit selesai"); },
+    onSuccess: () => { utils.seo.getLatest.invalidate(); utils.seo.getAppliedOverrides.invalidate(); toast.success("Audit selesai"); },
     onError: (e) => toast.error("Audit gagal: " + e.message),
   });
 
@@ -434,6 +586,9 @@ export default function AdminSeo() {
                 }, {} as Record<string, number>)
               } />
             </div>
+
+            {/* Applied fixes */}
+            <AppliedFixesSection />
 
             {/* Priority findings */}
             <div className="flex items-center justify-between mb-4">
