@@ -537,10 +537,22 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
+// YYYY-MM-DD in local timezone
+const toISODate = (d: Date | string) => {
+  const dt = new Date(d);
+  const y = dt.getFullYear();
+  const m = String(dt.getMonth() + 1).padStart(2, "0");
+  const day = String(dt.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
 function AppliedFixesSection() {
   const utils = trpc.useUtils();
   const { data: applied, isLoading } = trpc.seo.getAppliedOverrides.useQuery();
   const [verifyMap, setVerifyMap] = useState<Record<string, { verified: boolean; reason?: string }>>({});
+  const todayISO = toISODate(new Date());
+  const [dateFilter, setDateFilter] = useState<string>(todayISO);
+  const [showAll, setShowAll] = useState(false);
 
   const revert = trpc.seo.revertFix.useMutation({
     onSuccess: () => {
@@ -566,32 +578,98 @@ function AppliedFixesSection() {
 
   if (isLoading || !applied || applied.length === 0) return null;
 
-  // Group by path
+  // Bucket by date, then group by path within the chosen date.
+  const availableDates = Array.from(new Set(applied.map(a => toISODate(a.updatedAt))))
+    .sort((a, b) => b.localeCompare(a));
+  const olderCount = applied.filter(a => toISODate(a.updatedAt) !== dateFilter).length;
+  const visibleFixes = showAll
+    ? applied
+    : applied.filter(a => toISODate(a.updatedAt) === dateFilter);
+
+  // Group by path within the visible slice
   const byPath: Record<string, typeof applied> = {};
-  for (const r of applied) {
+  for (const r of visibleFixes) {
     (byPath[r.path] ??= []).push(r);
   }
 
+  const isToday = dateFilter === todayISO;
+  const humanDate = new Date(dateFilter + "T00:00:00").toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+
   return (
     <div className="mb-8">
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-        <div>
+      <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
+        <div className="min-w-0">
           <h2 className="text-lg font-bold text-gray-900">Fix yang Sudah Diterapkan</h2>
           <div className="text-xs text-gray-500 mt-0.5">
-            {applied.length} fix di database, di {Object.keys(byPath).length} halaman.
-            Klik <b>Verifikasi Semua</b> untuk cek apakah semua benar-benar live di halaman.
+            Total <b className="text-gray-900">{applied.length}</b> fix aktif di database.
+            {showAll
+              ? " Menampilkan semua fix — klik tombol untuk kembali ke tanggal terpilih."
+              : ` Menampilkan fix dari ${isToday ? "hari ini" : humanDate}.`}
           </div>
         </div>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => verifyAll.mutate()}
-          disabled={verifyAll.isPending}
-        >
-          {verifyAll.isPending ? <Loader2 className="animate-spin" size={12} /> : <RefreshCw size={12} className="mr-1" />}
-          Verifikasi Semua Live
-        </Button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <input
+            type="date"
+            value={dateFilter}
+            max={todayISO}
+            onChange={(e) => { setDateFilter(e.target.value); setShowAll(false); }}
+            className="border border-gray-200 rounded-lg px-3 py-1.5 text-xs bg-white font-medium"
+            title="Pilih tanggal untuk melihat fix yang diterapkan pada hari itu"
+          />
+          {!isToday && !showAll && (
+            <Button size="sm" variant="outline" onClick={() => setDateFilter(todayISO)}>
+              Hari ini
+            </Button>
+          )}
+          <Button
+            size="sm"
+            variant={showAll ? "default" : "outline"}
+            onClick={() => setShowAll(v => !v)}
+            className={showAll ? "bg-[#37C5FF] hover:bg-[#0A4A63]" : ""}
+          >
+            {showAll ? "Tampilkan filter tanggal" : `Lihat semua (${applied.length})`}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => verifyAll.mutate()}
+            disabled={verifyAll.isPending}
+          >
+            {verifyAll.isPending ? <Loader2 className="animate-spin" size={12} /> : <RefreshCw size={12} className="mr-1" />}
+            Verifikasi Semua Live
+          </Button>
+        </div>
       </div>
+
+      {/* Empty state when the selected date has no fixes */}
+      {Object.keys(byPath).length === 0 && (
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 text-center text-sm text-gray-500 mb-3">
+          Tidak ada fix yang diterapkan pada <b>{humanDate}</b>.
+          {availableDates.length > 0 && (
+            <div className="mt-2 flex items-center justify-center gap-2 flex-wrap">
+              <span className="text-xs">Tanggal yang punya fix:</span>
+              {availableDates.slice(0, 6).map(d => (
+                <button
+                  key={d}
+                  onClick={() => { setDateFilter(d); setShowAll(false); }}
+                  className="text-xs px-2 py-1 rounded-md border border-gray-200 hover:border-[#37C5FF] hover:text-[#37C5FF] tabular-nums"
+                >
+                  {new Date(d + "T00:00:00").toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
+                </button>
+              ))}
+              {olderCount > 0 && (
+                <button
+                  onClick={() => setShowAll(true)}
+                  className="text-xs px-2 py-1 rounded-md text-[#37C5FF] hover:underline"
+                >
+                  Lihat semua →
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+      {Object.keys(byPath).length > 0 && (
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         {Object.entries(byPath).map(([path, fixes], idx) => (
           <div key={path} className={idx > 0 ? "border-t border-gray-100" : ""}>
@@ -663,6 +741,17 @@ function AppliedFixesSection() {
           </div>
         ))}
       </div>
+      )}
+
+      {/* Show more hint — appears when there are hidden fixes from other dates */}
+      {!showAll && olderCount > 0 && Object.keys(byPath).length > 0 && (
+        <button
+          onClick={() => setShowAll(true)}
+          className="w-full mt-2 py-3 text-xs font-semibold text-[#37C5FF] border border-dashed border-gray-300 rounded-xl hover:border-[#37C5FF] hover:bg-[#37C5FF]/5 transition-colors"
+        >
+          Lihat {olderCount} fix lebih lama dari tanggal lain →
+        </button>
+      )}
     </div>
   );
 }
