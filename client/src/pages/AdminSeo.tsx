@@ -342,9 +342,20 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
       </div>
       <h4 className="text-base font-bold text-gray-900 mb-3">{f.title}</h4>
 
-      <div className="text-sm text-gray-700 mb-2">
-        <span className="font-semibold">Halaman:</span>{" "}
-        <code className="text-xs bg-black/5 px-1.5 py-0.5 rounded">{f.path}</code>
+      {/* Prominent target-page banner so users always know which page each finding targets */}
+      <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 mb-3 flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="text-[10px] uppercase tracking-wider font-bold text-gray-500 shrink-0">Fix ini untuk halaman:</div>
+          <code className="text-xs font-mono font-bold text-gray-900 truncate">https://voxa.co.id{f.path === "/" ? "" : f.path}</code>
+        </div>
+        <a
+          href={`https://voxa.co.id${f.path}`}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1 text-xs font-semibold text-[#37C5FF] hover:underline shrink-0"
+        >
+          <Eye size={12} /> Buka halaman ini
+        </a>
       </div>
       <div className="text-sm text-gray-700 mb-2">
         <span className="font-semibold">Masalah:</span> {f.issue}
@@ -532,13 +543,20 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
               <div className="grid md:grid-cols-2 gap-3">
                 <div className="border border-red-200 rounded-lg overflow-hidden">
                   <div className="bg-red-50 text-red-700 text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 border-b border-red-200">
-                    SEBELUM (halaman saat ini)
+                    SEBELUM (yang dilihat non-JS crawler)
                   </div>
-                  <div className="bg-white p-4 h-64 overflow-y-auto flex items-center justify-center">
-                    <div className="text-center text-gray-400 text-xs italic">
-                      Bagian bawah halaman <code className="not-italic bg-gray-100 px-1 rounded">voxa.co.id{f.path}</code> tidak punya konten teks tambahan.
-                      <br /><br />
-                      Crawler tanpa JS rendering hanya melihat shell HTML kosong.
+                  <div className="bg-white p-4 h-64 overflow-y-auto text-xs text-gray-600 space-y-3">
+                    <div>
+                      <div className="font-semibold text-gray-900 mb-1">🌐 Browser (Chrome, Safari) &amp; Googlebot:</div>
+                      <div className="pl-4 text-gray-500 italic">Melihat halaman <code className="not-italic bg-gray-100 px-1 rounded">voxa.co.id{f.path}</code> lengkap dengan semua konten React (hero, produk, teks) — karena mereka menjalankan JavaScript. ✅</div>
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900 mb-1">🤖 AI crawler tanpa JS (GPTBot, PerplexityBot, ClaudeBot lama, Bingbot):</div>
+                      <div className="pl-4">
+                        <div className="text-gray-500 italic mb-2">Melihat HTML mentah — hanya container React kosong. Ini yang mereka baca:</div>
+                        <pre className="bg-gray-100 rounded p-2 font-mono text-[10px] whitespace-pre-wrap">&lt;body&gt;{"\n"}  &lt;div id="root"&gt;&lt;/div&gt;{"\n"}  &lt;script src="/index.js"&gt;&lt;/script&gt;{"\n"}&lt;/body&gt;</pre>
+                        <div className="text-red-600 mt-1 font-medium">Hasil: {f.currentValue ?? "konten tidak terlihat"} — tidak cukup untuk index. ❌</div>
+                      </div>
                     </div>
                   </div>
                 </div>

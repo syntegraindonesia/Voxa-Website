@@ -359,13 +359,13 @@ function analyzePage(path: string, name: string, html: string, status: number, l
   if (wordCount < 300) {
     findings.push({
       id: `${path}::thin_content`,
-      path, category: 'SEO', severity: 'MEDIUM',
+      path, category: 'GEO', severity: 'MEDIUM',
       fixType: 'thin_content',
-      title: `Halaman ${name} kontennya tipis (${wordCount} kata)`,
-      issue: 'Halaman dengan konten kurang dari 300 kata sulit rank di Google. Konten pendek juga tidak dianggap otoritatif oleh AI.',
-      currentValue: `${wordCount} kata`,
+      title: `Halaman ${name}: raw HTML hanya punya ${wordCount} kata (React SPA)`,
+      issue: `Karena voxa.co.id adalah React SPA, konten halaman ${name} dirender oleh JavaScript SETELAH page load. Browser & Googlebot melihat konten lengkap (Google menjalankan JS). TAPI banyak AI crawler (Perplexity, GPTBot, ClaudeBot, Bingbot lama) TIDAK menjalankan JS, jadi mereka hanya melihat HTML shell dengan ${wordCount} kata — tidak cukup untuk index sebagai sumber jawaban AI. Solusi: inject konten SEO tetap sebagai <footer> di HTML mentah, sehingga semua crawler (JS-rendering & non-JS) punya konten untuk baca.`,
+      currentValue: `${wordCount} kata di raw HTML shell`,
       suggestedValue: null,
-      expectedImpact: 'Konten 600+ kata biasanya rank 2-3x lebih baik.',
+      expectedImpact: `Menambahkan konten SEO footer (400-600 kata) akan meningkatkan skor GEO halaman ${name} dari ${geoScore} ke ~${Math.min(100, geoScore + 25)}. Berpotensi muncul di jawaban ChatGPT/Perplexity/Claude ketika user tanya tentang topik terkait ${name}.`,
     });
   }
 
