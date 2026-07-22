@@ -553,6 +553,11 @@ function AppliedFixesSection() {
   const todayISO = toISODate(new Date());
   const [dateFilter, setDateFilter] = useState<string>(todayISO);
   const [showAll, setShowAll] = useState(false);
+  // Track which page groups are expanded (default = collapsed, showing only the most recent fix per group)
+  const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
+  const togglePath = (p: string) => setExpandedPaths(prev => {
+    const n = new Set(prev); n.has(p) ? n.delete(p) : n.add(p); return n;
+  });
 
   const revert = trpc.seo.revertFix.useMutation({
     onSuccess: () => {
@@ -671,24 +676,43 @@ function AppliedFixesSection() {
       )}
       {Object.keys(byPath).length > 0 && (
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-        {Object.entries(byPath).map(([path, fixes], idx) => (
+        {Object.entries(byPath).map(([path, fixes], idx) => {
+          const sortedFixes = [...fixes].sort(
+            (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          );
+          const isExpanded = expandedPaths.has(path);
+          const visible = isExpanded ? sortedFixes : sortedFixes.slice(0, 1);
+          const hiddenCount = sortedFixes.length - visible.length;
+          return (
           <div key={path} className={idx > 0 ? "border-t border-gray-100" : ""}>
-            <div className="px-6 py-3 bg-gray-50 flex items-center justify-between">
+            <div className="px-6 py-3 bg-gray-50 flex items-center justify-between flex-wrap gap-2">
               <div>
                 <code className="text-sm font-mono font-semibold text-gray-900">{path}</code>
-                <span className="text-xs text-gray-500 ml-2">{fixes.length} fix</span>
+                <span className="text-xs text-gray-500 ml-2">
+                  {isExpanded ? `${fixes.length} fix` : `Fix paling baru · ${fixes.length} total`}
+                </span>
               </div>
-              <a
-                href={`https://voxa.co.id${path}`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 text-xs font-semibold text-[#37C5FF] hover:underline"
-              >
-                <Eye size={12} /> Buka halaman
-              </a>
+              <div className="flex items-center gap-2">
+                {fixes.length > 1 && (
+                  <button
+                    onClick={() => togglePath(path)}
+                    className="text-xs font-semibold text-[#37C5FF] hover:underline"
+                  >
+                    {isExpanded ? "Sembunyikan" : `Lihat semua (${fixes.length}) →`}
+                  </button>
+                )}
+                <a
+                  href={`https://voxa.co.id${path}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#37C5FF] hover:underline"
+                >
+                  <Eye size={12} /> Buka halaman
+                </a>
+              </div>
             </div>
             <div className="divide-y divide-gray-100">
-              {fixes.map(f => {
+              {visible.map(f => {
                 const key = `${f.path}::${f.fixType}`;
                 const v = verifyMap[key];
                 const badge = v == null
@@ -737,9 +761,26 @@ function AppliedFixesSection() {
                   </div>
                 );
               })}
+              {!isExpanded && hiddenCount > 0 && (
+                <button
+                  onClick={() => togglePath(path)}
+                  className="w-full px-6 py-2 text-xs font-semibold text-gray-500 hover:text-[#37C5FF] hover:bg-[#37C5FF]/5 transition-colors border-t border-gray-100"
+                >
+                  + {hiddenCount} fix lebih lama di halaman ini
+                </button>
+              )}
+              {isExpanded && fixes.length > 1 && (
+                <button
+                  onClick={() => togglePath(path)}
+                  className="w-full px-6 py-2 text-xs font-semibold text-gray-500 hover:text-[#37C5FF] hover:bg-[#37C5FF]/5 transition-colors border-t border-gray-100"
+                >
+                  Sembunyikan — tampilkan hanya fix paling baru
+                </button>
+              )}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
       )}
 
