@@ -453,20 +453,35 @@ export async function runSiteAudit(): Promise<SiteAudit> {
   // Apply override state — if a fix has already been applied, remove it from findings
   const db = await getDb();
   const appliedByPath = new Map<string, any>();
+  let llmsTxtApplied = false;
   if (db) {
     const rows = await db.select().from(pageOverrides);
     for (const r of rows) appliedByPath.set(r.path, r);
+    try {
+      const { llmsTxt } = await import('../../drizzle/schema');
+      const [ltx] = await db.select().from(llmsTxt).where(eq(llmsTxt.id, 1)).limit(1);
+      llmsTxtApplied = Boolean(ltx?.content);
+    } catch { /* ignore */ }
   }
   for (const p of pageAudits) {
     const ov = appliedByPath.get(p.path);
     if (!ov) continue;
     p.findings = p.findings.filter(f => {
       if (f.fixType === 'meta_description' && ov.description) return false;
+      if (f.fixType === 'meta_description_length' && ov.description) return false;
       if (f.fixType === 'title' && ov.title) return false;
-      if (f.fixType === 'og_tags' && ov.ogTitle && ov.ogDescription && ov.ogImage) return false;
+      if (f.fixType === 'canonical' && ov.canonical) return false;
+      if (f.fixType === 'robots' && ov.robots) return false;
+      if (f.fixType === 'og_tags' && (ov.ogTitle || ov.ogDescription || ov.ogImage)) return false;
       if (f.fixType === 'json_ld' && ov.jsonLd) return false;
+      if (f.fixType === 'faq' && ov.jsonLd) return false;
+      if ((f.fixType === 'h1' || f.fixType === 'multiple_h1') && ov.h1Text) return false;
       return true;
     });
+  }
+  // Filter site-wide findings that are already applied
+  if (llmsTxtApplied) {
+    siteFindings.splice(0, siteFindings.length, ...siteFindings.filter(f => f.fixType !== 'llms_txt'));
   }
 
   const seoScore = Math.round(pageAudits.reduce((s, p) => s + p.seoScore, 0) / pageAudits.length);

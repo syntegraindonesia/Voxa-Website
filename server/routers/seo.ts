@@ -305,6 +305,29 @@ export const seoRouter = router({
       return { success: true };
     }),
 
+  // One-time cleanup: delete duplicate seoFixHistory rows for the same
+  // (path, fixType, afterValue), keeping only the most recent entry.
+  // Called automatically once on first load; safe to re-run.
+  cleanupDuplicateHistory: protectedProcedure.mutation(async ({ ctx }) => {
+    if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB unavailable' });
+
+    const rows = await db.select().from(seoFixHistory).orderBy(desc(seoFixHistory.appliedAt));
+    const seen = new Set<string>();
+    let deleted = 0;
+    for (const r of rows) {
+      const key = `${r.path}::${r.fixType}::${r.afterValue ?? ''}`;
+      if (seen.has(key)) {
+        await db.delete(seoFixHistory).where(eq(seoFixHistory.id, r.id));
+        deleted++;
+      } else {
+        seen.add(key);
+      }
+    }
+    return { deleted };
+  }),
+
   // Fix history log
   getHistory: protectedProcedure
     .input(z.object({ limit: z.number().min(1).max(200).default(50) }))

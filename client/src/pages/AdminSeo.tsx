@@ -255,8 +255,12 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
       }
       setAppliedState({ value: vars.value, verified: d.verified, reason: d.verificationReason });
       setExpanded(false);
+      // Invalidating triggers a refetch — since appliedKeys will now include this fix,
+      // the parent will filter this finding out of Rekomendasi Prioritas automatically.
       utils.seo.getAppliedOverrides.invalidate();
       utils.seo.getHistory.invalidate();
+      // Also hide this card immediately from the rec list (before refetch resolves)
+      setTimeout(() => onApplied(), 800);
     },
     onError: (e) => toast.error("Gagal: " + e.message),
   });
@@ -666,6 +670,7 @@ function AppliedFixesSection() {
 export default function AdminSeo() {
   const utils = trpc.useUtils();
   const { data: latest, isLoading } = trpc.seo.getLatest.useQuery();
+  const { data: applied = [] } = trpc.seo.getAppliedOverrides.useQuery();
   const runAudit = trpc.seo.runAudit.useMutation({
     onSuccess: () => { utils.seo.getLatest.invalidate(); utils.seo.getAppliedOverrides.invalidate(); toast.success("Audit selesai"); },
     onError: (e) => toast.error("Audit gagal: " + e.message),
@@ -675,12 +680,27 @@ export default function AdminSeo() {
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const dismiss = (id: string) => setDismissed(prev => new Set(prev).add(id));
 
+  // Which (path, fixType) combinations already have an active override.
+  // Findings matching these are hidden from Rekomendasi Prioritas immediately.
+  const appliedKeys = new Set<string>();
+  for (const a of applied) {
+    appliedKeys.add(`${a.path}::${a.fixType}`);
+    // Map related fix types that share the same underlying override column
+    if (a.fixType === 'meta_description') appliedKeys.add(`${a.path}::meta_description_length`);
+    if (a.fixType === 'json_ld') appliedKeys.add(`${a.path}::faq`);
+    if (a.fixType === 'faq') appliedKeys.add(`${a.path}::json_ld`);
+    if (a.fixType === 'h1') appliedKeys.add(`${a.path}::multiple_h1`);
+    if (a.fixType === 'multiple_h1') appliedKeys.add(`${a.path}::h1`);
+  }
+  const isAlreadyApplied = (f: PageFinding) => appliedKeys.has(`${f.path}::${f.fixType}`);
+
   const audit = (latest?.data as SiteAudit | undefined) ?? null;
-  const allFindings = audit
-    ? [...audit.siteFindings, ...audit.pages.flatMap(p => p.findings)].filter(f => !dismissed.has(f.id))
-    : [];
+  const rawFindings = audit ? [...audit.siteFindings, ...audit.pages.flatMap(p => p.findings)] : [];
+  const remainingFindings = rawFindings.filter(f => !dismissed.has(f.id) && !isAlreadyApplied(f));
+  const totalDetected = rawFindings.length;
+  const alreadyApplied = rawFindings.filter(isAlreadyApplied).length;
   const bySeverity = { HIGH: 0, MEDIUM: 0, LOW: 0 };
-  allFindings.forEach(f => { bySeverity[f.severity]++; });
+  remainingFindings.forEach(f => { bySeverity[f.severity]++; });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -804,11 +824,42 @@ export default function AdminSeo() {
             {/* Applied fixes */}
             <AppliedFixesSection />
 
+            {/* Progress bar */}
+            {totalDetected > 0 && (
+              <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-6">
+                <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                  <div>
+                    <div className="text-xs uppercase tracking-wide text-gray-500 font-semibold">Progres Fix</div>
+                    <div className="text-lg font-bold text-gray-900 tabular-nums">
+                      {alreadyApplied}<span className="text-gray-400">/{totalDetected}</span>
+                      <span className="text-sm font-normal text-gray-500 ml-2">fix sudah selesai</span>
+                    </div>
+                  </div>
+                  <div className="text-sm font-bold tabular-nums text-[#37C5FF]">
+                    {totalDetected === 0 ? 0 : Math.round((alreadyApplied / totalDetected) * 100)}%
+                  </div>
+                </div>
+                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-[#37C5FF] to-[#0A4A63] transition-all"
+                    style={{ width: `${totalDetected === 0 ? 0 : (alreadyApplied / totalDetected) * 100}%` }}
+                  />
+                </div>
+                <div className="text-xs text-gray-500 mt-2">
+                  {remainingFindings.length > 0 ? (
+                    <>Sisa <b className="text-gray-900">{remainingFindings.length}</b> fix untuk diselesaikan.</>
+                  ) : (
+                    <>🎉 Semua fix sudah selesai! Klik <b>Analisis Sekarang</b> untuk scan ulang &amp; cari issue baru.</>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Priority findings */}
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-gray-900">Rekomendasi Prioritas</h2>
               <div className="text-xs text-gray-500">
-                {allFindings.length} fix —{" "}
+                {remainingFindings.length} sisa —{" "}
                 <b className="text-red-600">{bySeverity.HIGH} high</b>,{" "}
                 <b className="text-yellow-600">{bySeverity.MEDIUM} medium</b>,{" "}
                 <b className="text-blue-600">{bySeverity.LOW} low</b>
@@ -816,12 +867,12 @@ export default function AdminSeo() {
             </div>
 
             <div className="space-y-3 mb-8">
-              {allFindings.length === 0 && (
+              {remainingFindings.length === 0 && (
                 <div className="text-center py-12 bg-white border border-gray-200 rounded-2xl text-gray-400">
                   Semua fix sudah diterapkan atau tidak ada issue prioritas.
                 </div>
               )}
-              {allFindings
+              {remainingFindings
                 .sort((a, b) => (a.severity === b.severity ? 0 : a.severity === "HIGH" ? -1 : b.severity === "HIGH" ? 1 : a.severity === "MEDIUM" ? -1 : 1))
                 .slice(0, 20)
                 .map(f => (
