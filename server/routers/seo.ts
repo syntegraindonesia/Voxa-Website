@@ -5,6 +5,7 @@ import { protectedProcedure, router } from '../_core/trpc';
 import { getDb } from '../db';
 import { seoAudits, pageOverrides, seoFixHistory, llmsTxt } from '../../drizzle/schema';
 import { runSiteAudit, AUDITED_PAGES, type SiteAudit, type PageFinding } from '../_core/seoAudit';
+import { verifyFixLive } from '../_core/seoInject';
 import { invokeLLM } from '../_core/llm';
 
 // ── AI fix suggestions ───────────────────────────────────────────────────────
@@ -188,12 +189,24 @@ export const seoRouter = router({
           updates.ogTitle = og.title ?? og.ogTitle;
           updates.ogDescription = og.description ?? og.ogDescription;
           updates.ogImage = og.image ?? og.ogImage;
-        } catch {
-          // treat as og:description
-          updates.ogDescription = input.value;
+          if (!updates.ogTitle && !updates.ogDescription && !updates.ogImage) {
+            throw new TRPCError({ code: 'BAD_REQUEST', message: 'og_tags JSON harus punya minimal 1 dari: title, description, image' });
+          }
+        } catch (e) {
+          if (e instanceof TRPCError) throw e;
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'og_tags value harus JSON valid: {"title":"...","description":"...","image":"..."}' });
         }
       }
-      else if (input.fixType === 'json_ld' || input.fixType === 'faq') updates.jsonLd = input.value;
+      else if (input.fixType === 'json_ld' || input.fixType === 'faq') {
+        // Validate JSON syntax so we don't inject broken schema into <head>
+        try {
+          const parsed = JSON.parse(input.value);
+          // Re-stringify to normalize whitespace
+          updates.jsonLd = JSON.stringify(parsed);
+        } catch (_e) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'JSON-LD tidak valid — periksa syntax JSON kamu (kurung kurawal, koma, quote)' });
+        }
+      }
       else if (input.fixType === 'canonical') updates.canonical = input.value;
       else if (input.fixType === 'robots') updates.robots = input.value;
       else if (input.fixType === 'h1' || input.fixType === 'multiple_h1') updates.h1Text = input.value;
@@ -204,7 +217,10 @@ export const seoRouter = router({
           path: '/llms.txt', fixType: 'llms_txt',
           beforeValue: null, afterValue: input.value,
         });
-        return { success: true };
+        // Wait 1s for any propagation, then verify
+        await new Promise(r => setTimeout(r, 1000));
+        const v = await verifyFixLive('/llms.txt', 'llms_txt', input.value);
+        return { success: true, verified: v.verified, verificationReason: v.reason };
       }
 
       if (existing) {
@@ -220,8 +236,47 @@ export const seoRouter = router({
         afterValue: input.value,
       });
 
-      return { success: true };
+      // Verify the fix is actually reaching visitors on the served HTML
+      await new Promise(r => setTimeout(r, 1000));
+      const v = await verifyFixLive(input.path, input.fixType, input.value);
+      return { success: true, verified: v.verified, verificationReason: v.reason };
     }),
+
+  // Batch re-verify all applied overrides against the live site
+  verifyAllApplied: protectedProcedure.mutation(async ({ ctx }) => {
+    if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB unavailable' });
+
+    const rows = await db.select().from(pageOverrides);
+    const results: Array<{ path: string; fixType: string; verified: boolean; reason?: string }> = [];
+
+    for (const r of rows) {
+      const checks: Array<{ fixType: string; value: string | null }> = [
+        { fixType: 'title', value: r.title },
+        { fixType: 'meta_description', value: r.description },
+        { fixType: 'canonical', value: r.canonical },
+        { fixType: 'robots', value: r.robots },
+        { fixType: 'h1', value: r.h1Text },
+        { fixType: 'og_tags', value: r.ogTitle || r.ogDescription || r.ogImage ? 'og' : null },
+        { fixType: 'json_ld', value: r.jsonLd },
+      ];
+      for (const c of checks) {
+        if (!c.value) continue;
+        const v = await verifyFixLive(r.path, c.fixType, c.value);
+        results.push({ path: r.path, fixType: c.fixType, verified: v.verified, reason: v.reason });
+      }
+    }
+
+    // Also check llms.txt
+    const [ltx] = await db.select().from(llmsTxt).where(eq(llmsTxt.id, 1)).limit(1);
+    if (ltx?.content) {
+      const v = await verifyFixLive('/llms.txt', 'llms_txt', ltx.content);
+      results.push({ path: '/llms.txt', fixType: 'llms_txt', verified: v.verified, reason: v.reason });
+    }
+
+    return { results, checkedAt: new Date().toISOString() };
+  }),
 
   // Revert an applied fix
   revertFix: protectedProcedure

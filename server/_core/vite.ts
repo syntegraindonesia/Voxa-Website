@@ -60,7 +60,9 @@ export function serveStatic(app: Express) {
     );
   }
 
-  app.use(express.static(distPath));
+  // { index: false } prevents express.static from auto-serving index.html for "/",
+  // so our injection middleware below handles the root path (and every SPA route).
+  app.use(express.static(distPath, { index: false }));
   app.get("/llms.txt", serveLlmsTxt);
 
   app.use("*", async (req, res) => {

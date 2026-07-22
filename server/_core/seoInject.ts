@@ -86,6 +86,59 @@ export async function injectSeoOverrides(html: string, path: string): Promise<st
   return out;
 }
 
+// Fetch a URL from the live site and confirm the fix is actually reaching visitors.
+// Returns { verified: true } if the marker is present, { verified: false, reason } otherwise.
+export async function verifyFixLive(
+  path: string,
+  fixType: string,
+  expectedValue: string
+): Promise<{ verified: boolean; reason?: string; sampleHtml?: string }> {
+  const base = (process.env.FRONTEND_URL || 'https://voxa.co.id').replace(/\/$/, '');
+  const url = fixType === 'llms_txt' ? `${base}/llms.txt` : `${base}${path}`;
+
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 15_000);
+    const res = await fetch(url, {
+      headers: { 'user-agent': 'VOXA-SEOAuditor/1.0 (verification)', 'cache-control': 'no-cache', 'pragma': 'no-cache' },
+      signal: ctrl.signal,
+    });
+    clearTimeout(t);
+    if (!res.ok) return { verified: false, reason: `HTTP ${res.status} from ${url}` };
+    const body = await res.text();
+
+    if (fixType === 'llms_txt') {
+      const first80 = expectedValue.slice(0, 80).replace(/\s+/g, ' ').trim();
+      const ok = body.replace(/\s+/g, ' ').includes(first80);
+      return ok ? { verified: true } : { verified: false, reason: '/llms.txt served but content does not match saved value', sampleHtml: body.slice(0, 400) };
+    }
+
+    // For head/body overrides, look for the data-seo-override marker + the fix-specific tag
+    const markers: Record<string, RegExp> = {
+      meta_description: /<meta[^>]+name=["']description["'][^>]+data-seo-override/i,
+      title: /<title[^>]*data-seo-override/i,
+      canonical: /<link[^>]+rel=["']canonical["'][^>]+data-seo-override/i,
+      robots: /<meta[^>]+name=["']robots["'][^>]+data-seo-override/i,
+      og_tags: /<meta[^>]+property=["']og:(?:title|description|image)["'][^>]+data-seo-override/i,
+      json_ld: /<script[^>]+application\/ld\+json[^>]+data-seo-override/i,
+      faq: /<script[^>]+application\/ld\+json[^>]+data-seo-override/i,
+      h1: /<h1[^>]+data-seo-override/i,
+      multiple_h1: /<h1[^>]+data-seo-override/i,
+    };
+    const re = markers[fixType];
+    if (!re) return { verified: false, reason: `No verification pattern for fix type "${fixType}"` };
+
+    if (re.test(body)) return { verified: true };
+    return {
+      verified: false,
+      reason: `Injection tag not found in served HTML. Middleware may not be running or Cloudflare is serving stale cached HTML. Try again in ~30 seconds.`,
+      sampleHtml: body.slice(0, 500),
+    };
+  } catch (e: any) {
+    return { verified: false, reason: `Fetch failed: ${e?.message ?? 'unknown'}` };
+  }
+}
+
 // Express handler for /llms.txt — serves DB-stored content as text/plain
 export async function serveLlmsTxt(_req: Request, res: Response) {
   const db = await getDb();

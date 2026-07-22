@@ -243,13 +243,17 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
       : defaultTemplate(f.fixType, f.path);
   const [editValue, setEditValue] = useState(startingValue);
   const [dirty, setDirty] = useState(false);
-  const [appliedState, setAppliedState] = useState<null | { value: string }>(null);
+  const [appliedState, setAppliedState] = useState<null | { value: string; verified: boolean; reason?: string }>(null);
 
   const utils = trpc.useUtils();
   const apply = trpc.seo.applyFix.useMutation({
-    onSuccess: (_d, vars) => {
-      toast.success(`Fix diterapkan ke ${f.path}`);
-      setAppliedState({ value: vars.value });
+    onSuccess: (d, vars) => {
+      if (d.verified) {
+        toast.success(`✓ Fix diterapkan dan diverifikasi live di ${f.path}`);
+      } else {
+        toast.warning(`Fix disimpan tapi belum terverifikasi di halaman: ${d.verificationReason ?? "unknown"}`);
+      }
+      setAppliedState({ value: vars.value, verified: d.verified, reason: d.verificationReason });
       setExpanded(false);
       utils.seo.getAppliedOverrides.invalidate();
       utils.seo.getHistory.invalidate();
@@ -322,14 +326,23 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
 
       {/* Applied confirmation state — persistent until user dismisses or reverts */}
       {appliedState && !expanded && (
-        <div className="bg-green-50 border border-green-300 rounded-lg p-4 space-y-3">
+        <div className={`border rounded-lg p-4 space-y-3 ${appliedState.verified ? "bg-green-50 border-green-300" : "bg-yellow-50 border-yellow-300"}`}>
           <div className="flex items-start gap-2">
-            <CheckCircle2 size={18} className="text-green-600 mt-0.5" />
+            {appliedState.verified ? (
+              <CheckCircle2 size={18} className="text-green-600 mt-0.5" />
+            ) : (
+              <AlertCircle size={18} className="text-yellow-600 mt-0.5" />
+            )}
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-bold text-green-800">Fix berhasil diterapkan</div>
-              <div className="text-xs text-green-700 mt-0.5">
-                Perubahan sudah live di <code className="bg-white/60 px-1 rounded">{f.path}</code>.
-                Google &amp; AI crawlers akan melihat perubahan pada next crawl.
+              <div className={`text-sm font-bold ${appliedState.verified ? "text-green-800" : "text-yellow-800"}`}>
+                {appliedState.verified
+                  ? "✓ Fix berhasil diterapkan dan terverifikasi LIVE di halaman"
+                  : "⚠ Fix disimpan ke database, TAPI belum terlihat di halaman"}
+              </div>
+              <div className={`text-xs mt-1 ${appliedState.verified ? "text-green-700" : "text-yellow-700"}`}>
+                {appliedState.verified
+                  ? <>Google &amp; AI crawlers akan melihat perubahan pada next crawl.</>
+                  : <>Alasan: {appliedState.reason ?? "unknown"}. Coba Verifikasi Ulang setelah ~30 detik atau cek deploy status Railway.</>}
               </div>
             </div>
           </div>
@@ -523,6 +536,8 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
 function AppliedFixesSection() {
   const utils = trpc.useUtils();
   const { data: applied, isLoading } = trpc.seo.getAppliedOverrides.useQuery();
+  const [verifyMap, setVerifyMap] = useState<Record<string, { verified: boolean; reason?: string }>>({});
+
   const revert = trpc.seo.revertFix.useMutation({
     onSuccess: () => {
       toast.success("Fix dibatalkan");
@@ -530,6 +545,19 @@ function AppliedFixesSection() {
       utils.seo.getLatest.invalidate();
     },
     onError: (e) => toast.error("Gagal: " + e.message),
+  });
+
+  const verifyAll = trpc.seo.verifyAllApplied.useMutation({
+    onSuccess: (d) => {
+      const map: Record<string, { verified: boolean; reason?: string }> = {};
+      const okCount = d.results.filter(r => r.verified).length;
+      const badCount = d.results.length - okCount;
+      for (const r of d.results) map[`${r.path}::${r.fixType}`] = { verified: r.verified, reason: r.reason };
+      setVerifyMap(map);
+      if (badCount === 0) toast.success(`✓ Semua ${okCount} fix terverifikasi live`);
+      else toast.warning(`${okCount} live, ${badCount} tidak terverifikasi — cek detail per baris`);
+    },
+    onError: (e) => toast.error("Verifikasi gagal: " + e.message),
   });
 
   if (isLoading || !applied || applied.length === 0) return null;
@@ -542,11 +570,23 @@ function AppliedFixesSection() {
 
   return (
     <div className="mb-8">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold text-gray-900">Fix yang Sudah Diterapkan</h2>
-        <div className="text-xs text-gray-500">
-          {applied.length} fix aktif di {Object.keys(byPath).length} halaman
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <div>
+          <h2 className="text-lg font-bold text-gray-900">Fix yang Sudah Diterapkan</h2>
+          <div className="text-xs text-gray-500 mt-0.5">
+            {applied.length} fix di database, di {Object.keys(byPath).length} halaman.
+            Klik <b>Verifikasi Semua</b> untuk cek apakah semua benar-benar live di halaman.
+          </div>
         </div>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => verifyAll.mutate()}
+          disabled={verifyAll.isPending}
+        >
+          {verifyAll.isPending ? <Loader2 className="animate-spin" size={12} /> : <RefreshCw size={12} className="mr-1" />}
+          Verifikasi Semua Live
+        </Button>
       </div>
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         {Object.entries(byPath).map(([path, fixes], idx) => (
@@ -566,34 +606,55 @@ function AppliedFixesSection() {
               </a>
             </div>
             <div className="divide-y divide-gray-100">
-              {fixes.map(f => (
-                <div key={`${f.path}::${f.fixType}`} className="px-6 py-4 flex items-start gap-4">
-                  <div className="mt-1">
-                    <CheckCircle2 size={16} className="text-green-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline gap-2 flex-wrap">
-                      <span className="text-sm font-semibold text-gray-900">{f.label}</span>
-                      <span className="text-xs text-gray-400">
-                        · diterapkan {fmtDateTime(f.updatedAt)}
-                      </span>
+              {fixes.map(f => {
+                const key = `${f.path}::${f.fixType}`;
+                const v = verifyMap[key];
+                const badge = v == null
+                  ? { color: "bg-gray-100 text-gray-500", icon: null as any, label: "Belum diverifikasi" }
+                  : v.verified
+                  ? { color: "bg-green-100 text-green-700", icon: CheckCircle2, label: "LIVE terverifikasi" }
+                  : { color: "bg-red-100 text-red-700", icon: AlertCircle, label: "TIDAK live" };
+                const BadgeIcon = badge.icon;
+                return (
+                  <div key={key} className="px-6 py-4 flex items-start gap-4">
+                    <div className="mt-1">
+                      {v == null ? <CheckCircle2 size={16} className="text-gray-300" />
+                        : v.verified ? <CheckCircle2 size={16} className="text-green-500" />
+                        : <AlertCircle size={16} className="text-red-500" />}
                     </div>
-                    <pre className="mt-1 bg-green-50 border-l-2 border-green-400 rounded p-2 text-xs font-mono text-gray-700 whitespace-pre-wrap break-words max-h-32 overflow-y-auto">
-                      {f.value}
-                    </pre>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-2 flex-wrap">
+                        <span className="text-sm font-semibold text-gray-900">{f.label}</span>
+                        <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${badge.color}`}>
+                          {BadgeIcon && <BadgeIcon size={10} />}
+                          {badge.label}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          · diterapkan {fmtDateTime(f.updatedAt)}
+                        </span>
+                      </div>
+                      {v && !v.verified && v.reason && (
+                        <div className="text-xs text-red-700 bg-red-50 border border-red-200 rounded px-2 py-1 mt-1">
+                          Alasan tidak live: {v.reason}
+                        </div>
+                      )}
+                      <pre className={`mt-1 border-l-2 rounded p-2 text-xs font-mono text-gray-700 whitespace-pre-wrap break-words max-h-32 overflow-y-auto ${v && !v.verified ? "bg-red-50 border-red-400" : "bg-green-50 border-green-400"}`}>
+                        {f.value}
+                      </pre>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => revert.mutate({ path: f.path, fixType: f.fixType })}
+                      disabled={revert.isPending}
+                      className="text-red-600 border-red-200 hover:bg-red-50 shrink-0"
+                    >
+                      {revert.isPending ? <Loader2 className="animate-spin" size={12} /> : <RefreshCw size={12} className="mr-1" />}
+                      Kembalikan
+                    </Button>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => revert.mutate({ path: f.path, fixType: f.fixType })}
-                    disabled={revert.isPending}
-                    className="text-red-600 border-red-200 hover:bg-red-50 shrink-0"
-                  >
-                    {revert.isPending ? <Loader2 className="animate-spin" size={12} /> : <RefreshCw size={12} className="mr-1" />}
-                    Kembalikan
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         ))}
