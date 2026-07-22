@@ -743,39 +743,11 @@ export default function AdminSeo() {
               } />
             </div>
 
-            {/* Applied fixes */}
-            <AppliedFixesSection />
-
-            {/* Priority findings */}
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">Rekomendasi Prioritas</h2>
-              <div className="text-xs text-gray-500">
-                {allFindings.length} fix —{" "}
-                <b className="text-red-600">{bySeverity.HIGH} high</b>,{" "}
-                <b className="text-yellow-600">{bySeverity.MEDIUM} medium</b>,{" "}
-                <b className="text-blue-600">{bySeverity.LOW} low</b>
-              </div>
-            </div>
-
-            <div className="space-y-3 mb-8">
-              {allFindings.length === 0 && (
-                <div className="text-center py-12 bg-white border border-gray-200 rounded-2xl text-gray-400">
-                  Semua fix sudah diterapkan atau tidak ada issue prioritas.
-                </div>
-              )}
-              {allFindings
-                .sort((a, b) => (a.severity === b.severity ? 0 : a.severity === "HIGH" ? -1 : b.severity === "HIGH" ? 1 : a.severity === "MEDIUM" ? -1 : 1))
-                .slice(0, 20)
-                .map(f => (
-                  <FindingCard key={f.id} f={f} onApplied={() => dismiss(f.id)} />
-                ))}
-            </div>
-
-            {/* Per-page table */}
-            <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+            {/* Per-page score breakdown — right below the two big tiles */}
+            <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mb-8">
               <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                 <h3 className="font-bold text-gray-900">Skor per Halaman</h3>
-                <div className="text-xs text-gray-500">Klik row untuk detail lengkap</div>
+                <div className="text-xs text-gray-500">Klik "Buka halaman" untuk melihat detail</div>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -827,6 +799,34 @@ export default function AdminSeo() {
                   </tbody>
                 </table>
               </div>
+            </div>
+
+            {/* Applied fixes */}
+            <AppliedFixesSection />
+
+            {/* Priority findings */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-gray-900">Rekomendasi Prioritas</h2>
+              <div className="text-xs text-gray-500">
+                {allFindings.length} fix —{" "}
+                <b className="text-red-600">{bySeverity.HIGH} high</b>,{" "}
+                <b className="text-yellow-600">{bySeverity.MEDIUM} medium</b>,{" "}
+                <b className="text-blue-600">{bySeverity.LOW} low</b>
+              </div>
+            </div>
+
+            <div className="space-y-3 mb-8">
+              {allFindings.length === 0 && (
+                <div className="text-center py-12 bg-white border border-gray-200 rounded-2xl text-gray-400">
+                  Semua fix sudah diterapkan atau tidak ada issue prioritas.
+                </div>
+              )}
+              {allFindings
+                .sort((a, b) => (a.severity === b.severity ? 0 : a.severity === "HIGH" ? -1 : b.severity === "HIGH" ? 1 : a.severity === "MEDIUM" ? -1 : 1))
+                .slice(0, 20)
+                .map(f => (
+                  <FindingCard key={f.id} f={f} onApplied={() => dismiss(f.id)} />
+                ))}
             </div>
           </>
         )}
