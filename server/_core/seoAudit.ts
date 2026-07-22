@@ -476,6 +476,7 @@ export async function runSiteAudit(): Promise<SiteAudit> {
       if (f.fixType === 'json_ld' && ov.jsonLd) return false;
       if (f.fixType === 'faq' && ov.jsonLd) return false;
       if ((f.fixType === 'h1' || f.fixType === 'multiple_h1') && ov.h1Text) return false;
+      if (f.fixType === 'thin_content' && ov.bodyContent) return false;
       return true;
     });
   }

@@ -128,6 +128,7 @@ export const pageOverrides = mysqlTable('pageOverrides', {
   robots: varchar('robots', { length: 128 }),
   jsonLd: text('jsonLd'),                     // stringified JSON-LD schema block
   h1Text: varchar('h1Text', { length: 256 }),  // injected as visible H1 before React root (crawlers see it)
+  bodyContent: text('bodyContent'),              // visible SEO content block injected as <footer> before </body>
   updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow().notNull(),
 });
 export type PageOverride = typeof pageOverrides.$inferSelect;

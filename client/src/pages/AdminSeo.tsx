@@ -178,6 +178,28 @@ function defaultTemplate(fixType: string, path: string): string {
           },
         ],
       }, null, 2);
+    case "thin_content":
+      return `<h2>Tentang VOXA — Sepeda Listrik Asli Indonesia</h2>
+<p>VOXA adalah brand sepeda listrik asli Indonesia yang berkomitmen menghadirkan solusi transportasi hemat, ramah lingkungan, dan mudah dirawat untuk kebutuhan harian masyarakat perkotaan. Setiap unit VOXA didesain untuk perjalanan komuter yang lebih cepat, lebih murah, dan lebih nyaman dibanding kendaraan bermotor konvensional.</p>
+
+<h3>Kenapa Memilih VOXA</h3>
+<ul>
+  <li>Baterai lithium tahan lama dengan jarak tempuh 40-80 km per pengisian penuh</li>
+  <li>Garansi resmi baterai selama 1 tahun dan motor selama 6 bulan</li>
+  <li>Jaringan servis resmi tersebar di berbagai kota besar Indonesia</li>
+  <li>Suku cadang lengkap tersedia melalui katalog <a href="/sparepart">Sparepart VOXA</a></li>
+  <li>Harga kompetitif mulai Rp 3.400.000 dengan pilihan cicilan 0%</li>
+</ul>
+
+<h3>Katalog Produk VOXA</h3>
+<p>Jelajahi lini lengkap sepeda listrik VOXA — dari <a href="/sepeda-listrik">Liberty Series</a> yang cocok untuk komuter harian ringan, hingga Elite Rider S yang dirancang untuk performa maksimal. Semua unit menggunakan komponen berkualitas dengan standar keamanan yang teruji.</p>
+<p>Untuk pilihan baterai pengganti dan upgrade, cek <a href="/baterai">koleksi Baterai Greenlife</a>. Untuk kebutuhan sparepart original, tersedia <a href="/sparepart">30+ komponen resmi</a> di katalog Sparepart kami.</p>
+
+<h3>Layanan &amp; Dukungan</h3>
+<p>Kunjungi <a href="/showroom">showroom VOXA terdekat</a> untuk test ride sebelum membeli, atau baca <a href="/artikel">artikel VOXA</a> untuk tips perawatan sepeda listrik. Jika ingin menjadi bagian dari jaringan VOXA, cek program <a href="/distributor-voxa">Distributor VOXA</a>.</p>
+
+<p>VOXA percaya bahwa transportasi listrik bukan hanya tentang produk, tapi tentang membangun ekosistem yang mendukung pengguna dari pra-pembelian hingga perawatan jangka panjang. Baca lebih lanjut di halaman <a href="/tentang">Tentang VOXA</a>.</p>`;
+
     case "llms_txt":
       return `# VOXA
 
@@ -227,6 +249,9 @@ function buildInjectedTag(fixType: string, value: string): string {
   }
   if (fixType === "h1" || fixType === "multiple_h1") {
     return `<!-- Injected into <body> before React root, visible to crawlers, styled with sr-only pattern -->\n<h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">${escape(value)}</h1>`;
+  }
+  if (fixType === "thin_content") {
+    return `<!-- Visible content section, injected before </body>, below your React app -->\n<footer class="seo-content" style="max-width:1200px;margin:64px auto 32px;padding:32px 24px;line-height:1.7;border-top:1px solid #e5e7eb;">\n${value}\n</footer>`;
   }
   if (fixType === "llms_txt") {
     return `# File yang akan dibuat di https://voxa.co.id/llms.txt:\n\n${value}`;
@@ -293,7 +318,7 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
     : "text-blue-700";
   const Icon = fixIcon[f.fixType] ?? Sparkles;
 
-  const isManualOnly = f.fixType === "thin_content" || f.fixType === "fetch_error" || f.fixType === "alt_text";
+  const isManualOnly = f.fixType === "fetch_error" || f.fixType === "alt_text";
   const injectedPreview = buildInjectedTag(f.fixType, editValue);
 
   const handleApply = () => {
@@ -487,13 +512,57 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
           {editValue && (
             <div>
               <div className="text-xs uppercase font-bold text-gray-500 tracking-wider mb-1">
-                🟢 Kode yang akan ditambahkan ke &lt;head&gt;
+                🟢 Kode yang akan ditambahkan ke {f.fixType === "thin_content" || f.fixType === "h1" || f.fixType === "multiple_h1" ? <>&lt;body&gt;</> : <>&lt;head&gt;</>}
               </div>
-              <pre className="bg-green-50 border-l-2 border-green-400 rounded p-3 text-xs font-mono text-gray-800 whitespace-pre-wrap break-words overflow-x-auto">
+              <pre className="bg-green-50 border-l-2 border-green-400 rounded p-3 text-xs font-mono text-gray-800 whitespace-pre-wrap break-words overflow-x-auto max-h-64">
                 {injectedPreview}
               </pre>
               <div className="text-xs text-gray-500 mt-1">
                 Perubahan ini langsung terlihat oleh Google &amp; AI crawlers di next crawl. Tidak perlu deploy ulang.
+              </div>
+            </div>
+          )}
+
+          {/* Visual before/after preview — only for thin_content since it produces visible content */}
+          {f.fixType === "thin_content" && editValue && (
+            <div>
+              <div className="text-xs uppercase font-bold text-gray-500 tracking-wider mb-2">
+                👁 Tampilan visual: sebelum &amp; sesudah
+              </div>
+              <div className="grid md:grid-cols-2 gap-3">
+                <div className="border border-red-200 rounded-lg overflow-hidden">
+                  <div className="bg-red-50 text-red-700 text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 border-b border-red-200">
+                    SEBELUM (halaman saat ini)
+                  </div>
+                  <div className="bg-white p-4 h-64 overflow-y-auto flex items-center justify-center">
+                    <div className="text-center text-gray-400 text-xs italic">
+                      Bagian bawah halaman <code className="not-italic bg-gray-100 px-1 rounded">voxa.co.id{f.path}</code> tidak punya konten teks tambahan.
+                      <br /><br />
+                      Crawler tanpa JS rendering hanya melihat shell HTML kosong.
+                    </div>
+                  </div>
+                </div>
+                <div className="border border-green-200 rounded-lg overflow-hidden">
+                  <div className="bg-green-50 text-green-700 text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 border-b border-green-200">
+                    SESUDAH (dengan konten baru)
+                  </div>
+                  <div
+                    className="bg-white p-6 h-64 overflow-y-auto text-sm text-gray-700 seo-content-preview"
+                    style={{ lineHeight: 1.7 }}
+                    dangerouslySetInnerHTML={{ __html: editValue }}
+                  />
+                </div>
+              </div>
+              <style>{`
+                .seo-content-preview h2 { font-size: 20px; font-weight: 700; color: #111827; margin: 0 0 12px; letter-spacing: -0.02em; }
+                .seo-content-preview h3 { font-size: 15px; font-weight: 700; color: #111827; margin: 20px 0 8px; }
+                .seo-content-preview p { margin: 0 0 12px; }
+                .seo-content-preview ul { margin: 0 0 16px; padding-left: 20px; }
+                .seo-content-preview li { margin-bottom: 4px; }
+                .seo-content-preview a { color: #37C5FF; text-decoration: underline; }
+              `}</style>
+              <div className="text-xs text-gray-500 mt-2">
+                Konten ini akan muncul di bagian paling bawah halaman, sebagai section &lt;footer&gt; dengan max-width 1200px. Tidak mengganggu layout React di atasnya.
               </div>
             </div>
           )}
@@ -821,6 +890,7 @@ export default function AdminSeo() {
     if (a.fixType === 'faq') appliedKeys.add(`${a.path}::json_ld`);
     if (a.fixType === 'h1') appliedKeys.add(`${a.path}::multiple_h1`);
     if (a.fixType === 'multiple_h1') appliedKeys.add(`${a.path}::h1`);
+    if (a.fixType === 'thin_content') appliedKeys.add(`${a.path}::thin_content`);
   }
   const isAlreadyApplied = (f: PageFinding) => appliedKeys.has(`${f.path}::${f.fixType}`);
 

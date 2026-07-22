@@ -83,6 +83,15 @@ export async function injectSeoOverrides(html: string, path: string): Promise<st
     out = out.replace(/<body([^>]*)>/i, `<body$1>\n${h1Html}`);
   }
 
+  // Visible SEO content footer — appears at bottom of every page, before </body>.
+  // Not disruptive to React app layout because it sits below #root.
+  // Google & AI crawlers see it, and users who scroll can read it.
+  if (ov.bodyContent) {
+    const safe = ov.bodyContent.replace(/<\/script>/gi, '<\\/script>');
+    const wrapper = `<footer data-seo-override class="seo-content" style="max-width:1200px;margin:64px auto 32px;padding:32px 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#374151;line-height:1.7;border-top:1px solid #e5e7eb;">${safe}</footer>`;
+    out = out.replace(/<\/body>/i, `${wrapper}\n</body>`);
+  }
+
   return out;
 }
 
@@ -124,6 +133,7 @@ export async function verifyFixLive(
       faq: /<script[^>]+application\/ld\+json[^>]+data-seo-override/i,
       h1: /<h1[^>]+data-seo-override/i,
       multiple_h1: /<h1[^>]+data-seo-override/i,
+      thin_content: /<footer[^>]+data-seo-override[^>]*>/i,
     };
     const re = markers[fixType];
     if (!re) return { verified: false, reason: `No verification pattern for fix type "${fixType}"` };

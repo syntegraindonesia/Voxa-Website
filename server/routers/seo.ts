@@ -123,6 +123,16 @@ export const seoRouter = router({
         robots: 'Return "index, follow" unless the page should be excluded.',
         h1: 'Return a short, keyword-rich H1 (30-70 chars) in Bahasa Indonesia for this page. Include the primary topic. Include "VOXA" naturally. Return just plain text.',
         multiple_h1: 'Return a single consolidated H1 (30-70 chars) to replace the multiple H1s on this page. Return just plain text.',
+        thin_content: `Return an HTML content block (400-600 words in Bahasa Indonesia) about the page topic for a footer SEO section.
+Requirements:
+- Use ONLY these tags: <h2>, <h3>, <p>, <ul>, <li>, <a href="...">. No inline styles, no divs, no images.
+- 1 <h2> for the section title. 2-3 <h3> subheadings. 4-6 short <p> paragraphs.
+- Include a bulleted list (<ul>) with 4-6 items highlighting features.
+- Include 3-5 internal links (<a href>) to related VOXA pages like /sepeda-listrik, /baterai, /artikel, /showroom, /tentang.
+- Mention "VOXA" naturally 4-8 times.
+- Reference the page's actual topic: for "/" mention overall brand; for "/sepeda-listrik" mention product range; for "/tentang" mention company history; etc.
+- No promotional hype or fake urgency. Educational and factual tone.
+Return raw HTML string.`,
         thin_content: 'Return "MANUAL" — content rewrites require human review.',
         alt_text: 'Return "AUTO" — alt text handled in a bulk pass.',
       };
@@ -210,6 +220,7 @@ export const seoRouter = router({
       else if (input.fixType === 'canonical') updates.canonical = input.value;
       else if (input.fixType === 'robots') updates.robots = input.value;
       else if (input.fixType === 'h1' || input.fixType === 'multiple_h1') updates.h1Text = input.value;
+      else if (input.fixType === 'thin_content') updates.bodyContent = input.value;
       else if (input.fixType === 'llms_txt') {
         // Special case: writes to llmsTxt table, not pageOverrides
         await db.insert(llmsTxt).values({ id: 1, content: input.value }).onDuplicateKeyUpdate({ set: { content: input.value } });
@@ -258,6 +269,7 @@ export const seoRouter = router({
         { fixType: 'canonical', value: r.canonical },
         { fixType: 'robots', value: r.robots },
         { fixType: 'h1', value: r.h1Text },
+        { fixType: 'thin_content', value: r.bodyContent },
         { fixType: 'og_tags', value: r.ogTitle || r.ogDescription || r.ogImage ? 'og' : null },
         { fixType: 'json_ld', value: r.jsonLd },
       ];
@@ -300,6 +312,7 @@ export const seoRouter = router({
       else if (input.fixType === 'canonical') clear.canonical = null;
       else if (input.fixType === 'robots') clear.robots = null;
       else if (input.fixType === 'h1' || input.fixType === 'multiple_h1') clear.h1Text = null;
+      else if (input.fixType === 'thin_content') clear.bodyContent = null;
 
       await db.update(pageOverrides).set(clear).where(eq(pageOverrides.path, input.path));
       return { success: true };
@@ -370,6 +383,7 @@ export const seoRouter = router({
       pushIf(r.canonical, 'canonical', 'Canonical URL');
       pushIf(r.robots, 'robots', 'Robots meta');
       pushIf(r.h1Text, 'h1', 'H1 heading');
+      pushIf(r.bodyContent, 'thin_content', 'SEO content block');
       if (r.ogTitle || r.ogDescription || r.ogImage) {
         pushIf(JSON.stringify({ title: r.ogTitle, description: r.ogDescription, image: r.ogImage }, null, 2), 'og_tags', 'OpenGraph tags');
       }
