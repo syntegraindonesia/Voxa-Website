@@ -120,7 +120,8 @@ export const seoRouter = router({
         llms_txt: `Return the full markdown content for /llms.txt for voxa.co.id. Include sections: # VOXA, Overview, Products, Categories (with markdown links to /sepeda-listrik, /baterai, /sparepart, /artikel, /showroom, /tentang, /bantuan, /pemerintah, /compare, /distributor-voxa), Optional links.`,
         canonical: 'Return the canonical URL for this page (starts with https://voxa.co.id). Return just the URL.',
         robots: 'Return "index, follow" unless the page should be excluded.',
-        h1: 'Return "MANUAL" — H1 must be edited in the React component.',
+        h1: 'Return a short, keyword-rich H1 (30-70 chars) in Bahasa Indonesia for this page. Include the primary topic. Include "VOXA" naturally. Return just plain text.',
+        multiple_h1: 'Return a single consolidated H1 (30-70 chars) to replace the multiple H1s on this page. Return just plain text.',
         thin_content: 'Return "MANUAL" — content rewrites require human review.',
         alt_text: 'Return "AUTO" — alt text handled in a bulk pass.',
       };
@@ -185,6 +186,7 @@ export const seoRouter = router({
       else if (input.fixType === 'json_ld' || input.fixType === 'faq') updates.jsonLd = input.value;
       else if (input.fixType === 'canonical') updates.canonical = input.value;
       else if (input.fixType === 'robots') updates.robots = input.value;
+      else if (input.fixType === 'h1' || input.fixType === 'multiple_h1') updates.h1Text = input.value;
       else if (input.fixType === 'llms_txt') {
         // Special case: writes to llmsTxt table, not pageOverrides
         await db.insert(llmsTxt).values({ id: 1, content: input.value }).onDuplicateKeyUpdate({ set: { content: input.value } });
@@ -232,6 +234,7 @@ export const seoRouter = router({
       else if (input.fixType === 'json_ld' || input.fixType === 'faq') clear.jsonLd = null;
       else if (input.fixType === 'canonical') clear.canonical = null;
       else if (input.fixType === 'robots') clear.robots = null;
+      else if (input.fixType === 'h1' || input.fixType === 'multiple_h1') clear.h1Text = null;
 
       await db.update(pageOverrides).set(clear).where(eq(pageOverrides.path, input.path));
       return { success: true };

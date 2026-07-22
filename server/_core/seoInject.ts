@@ -38,22 +38,52 @@ async function buildOverrideTags(path: string): Promise<string> {
   return `${titleTag}\n${parts.join('\n')}`;
 }
 
-// Given raw HTML and a request path, inject overrides into the <head>
-// Also removes the original <title> and any tags that we're replacing to avoid duplicates.
+// Given raw HTML and a request path, inject overrides into the <head> and
+// (for h1) into the <body>. Removes original tags we're replacing to avoid duplicates.
 export async function injectSeoOverrides(html: string, path: string): Promise<string> {
-  const tags = await buildOverrideTags(path);
-  if (!tags) return html;
+  const db = await getDb();
+  if (!db) return html;
+  const [ov] = await db.select().from(pageOverrides).where(eq(pageOverrides.path, path)).limit(1);
+  if (!ov) return html;
 
-  // Strip existing title/description if we're overriding them
   let out = html;
-  if (tags.includes('<title')) out = out.replace(/<title[^>]*>[\s\S]*?<\/title>/i, '');
-  if (tags.includes('name="description"')) out = out.replace(/<meta[^>]*name="description"[^>]*>/gi, '');
-  if (tags.includes('rel="canonical"')) out = out.replace(/<link[^>]*rel="canonical"[^>]*>/gi, '');
-  if (tags.includes('property="og:title"')) out = out.replace(/<meta[^>]*property="og:title"[^>]*>/gi, '');
-  if (tags.includes('property="og:description"')) out = out.replace(/<meta[^>]*property="og:description"[^>]*>/gi, '');
-  if (tags.includes('property="og:image"')) out = out.replace(/<meta[^>]*property="og:image"[^>]*>/gi, '');
 
-  return out.replace(/<\/head>/i, `${tags}\n</head>`);
+  // ── <head> injections ────────────────────────────────────────────
+  const headParts: string[] = [];
+  if (ov.description) headParts.push(`<meta name="description" content="${escapeAttr(ov.description)}" data-seo-override>`);
+  if (ov.canonical) headParts.push(`<link rel="canonical" href="${escapeAttr(ov.canonical)}" data-seo-override>`);
+  if (ov.robots) headParts.push(`<meta name="robots" content="${escapeAttr(ov.robots)}" data-seo-override>`);
+  if (ov.ogTitle) headParts.push(`<meta property="og:title" content="${escapeAttr(ov.ogTitle)}" data-seo-override>`);
+  if (ov.ogDescription) headParts.push(`<meta property="og:description" content="${escapeAttr(ov.ogDescription)}" data-seo-override>`);
+  if (ov.ogImage) headParts.push(`<meta property="og:image" content="${escapeAttr(ov.ogImage)}" data-seo-override>`);
+  if (ov.jsonLd) {
+    const safe = ov.jsonLd.replace(/<\/script>/gi, '<\\/script>');
+    headParts.push(`<script type="application/ld+json" data-seo-override>${safe}</script>`);
+  }
+  const titleTag = ov.title ? `<title data-seo-override>${escapeAttr(ov.title)}</title>` : '';
+
+  // Strip conflicting existing tags before injecting
+  if (titleTag) out = out.replace(/<title[^>]*>[\s\S]*?<\/title>/i, '');
+  if (ov.description) out = out.replace(/<meta[^>]*name="description"[^>]*>/gi, '');
+  if (ov.canonical) out = out.replace(/<link[^>]*rel="canonical"[^>]*>/gi, '');
+  if (ov.ogTitle) out = out.replace(/<meta[^>]*property="og:title"[^>]*>/gi, '');
+  if (ov.ogDescription) out = out.replace(/<meta[^>]*property="og:description"[^>]*>/gi, '');
+  if (ov.ogImage) out = out.replace(/<meta[^>]*property="og:image"[^>]*>/gi, '');
+
+  const headInject = `${titleTag}\n${headParts.join('\n')}`.trim();
+  if (headInject) out = out.replace(/<\/head>/i, `${headInject}\n</head>`);
+
+  // ── <body> injections (H1 for SPA pages) ─────────────────────────
+  // Injected BEFORE #root so React doesn't touch it. Visible but styled
+  // to be minimal — this is not cloaking (visible to both users & crawlers).
+  if (ov.h1Text) {
+    // Standard accessibility "sr-only" pattern — visible to crawlers and screen readers,
+    // visually hidden. Same pattern Google/GitHub/etc use for accessible headings.
+    const h1Html = `<h1 data-seo-override style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">${escapeAttr(ov.h1Text)}</h1>`;
+    out = out.replace(/<body([^>]*)>/i, `<body$1>\n${h1Html}`);
+  }
+
+  return out;
 }
 
 // Express handler for /llms.txt — serves DB-stored content as text/plain

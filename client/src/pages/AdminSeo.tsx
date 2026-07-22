@@ -151,6 +151,9 @@ function buildInjectedTag(fixType: string, value: string): string {
   if (fixType === "json_ld" || fixType === "faq") {
     return `<script type="application/ld+json">\n${value}\n</script>`;
   }
+  if (fixType === "h1" || fixType === "multiple_h1") {
+    return `<!-- Injected into <body> before React root, visible to crawlers, styled with sr-only pattern -->\n<h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">${escape(value)}</h1>`;
+  }
   if (fixType === "llms_txt") {
     return `# File yang akan dibuat di https://voxa.co.id/llms.txt:\n\n${value}`;
   }
@@ -186,7 +189,7 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
     : "text-blue-700";
   const Icon = fixIcon[f.fixType] ?? Sparkles;
 
-  const isManualOnly = f.fixType === "h1" || f.fixType === "thin_content" || f.fixType === "fetch_error" || f.fixType === "alt_text";
+  const isManualOnly = f.fixType === "thin_content" || f.fixType === "fetch_error" || f.fixType === "alt_text";
   const injectedPreview = buildInjectedTag(f.fixType, editValue);
 
   const handleApply = () => {

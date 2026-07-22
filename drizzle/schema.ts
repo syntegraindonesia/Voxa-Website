@@ -127,6 +127,7 @@ export const pageOverrides = mysqlTable('pageOverrides', {
   canonical: varchar('canonical', { length: 512 }),
   robots: varchar('robots', { length: 128 }),
   jsonLd: text('jsonLd'),                     // stringified JSON-LD schema block
+  h1Text: varchar('h1Text', { length: 256 }),  // injected as visible H1 before React root (crawlers see it)
   updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow().notNull(),
 });
 export type PageOverride = typeof pageOverrides.$inferSelect;
