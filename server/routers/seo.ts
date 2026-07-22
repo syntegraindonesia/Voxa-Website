@@ -141,14 +141,24 @@ export const seoRouter = router({
         response_format: { type: 'json_object' },
       });
 
-      try {
-        const content = response.choices[0]?.message?.content ?? '{}';
-        const parsed = JSON.parse(typeof content === 'string' ? content : JSON.stringify(content));
-        const v = parsed.value;
-        return { suggestion: typeof v === 'string' ? v : JSON.stringify(v, null, 2) };
-      } catch (_e) {
-        return { suggestion: '' };
+      const content = response.choices[0]?.message?.content ?? '';
+      if (!content) {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'AI mengembalikan respons kosong' });
       }
+      const raw = typeof content === 'string' ? content : JSON.stringify(content);
+      let parsed: any;
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        // AI returned plain text without JSON wrapping — use it directly
+        const trimmed = raw.trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
+        return { suggestion: trimmed || '' };
+      }
+      const v = parsed?.value ?? parsed;
+      if (v === undefined || v === null || v === '') {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'AI tidak menghasilkan saran — coba lagi atau isi manual' });
+      }
+      return { suggestion: typeof v === 'string' ? v : JSON.stringify(v, null, 2) };
     }),
 
   // Approve a single fix — writes to pageOverrides and logs history

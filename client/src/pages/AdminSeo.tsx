@@ -125,6 +125,80 @@ function ScoreTile({ label, score, kind, breakdown }: {
 
 // ── Finding card ──────────────────────────────────────────────────────────────
 
+// Sensible default template per fix type — pre-fills textarea so button
+// is never stuck disabled if AI hasn't run yet. User can edit or click
+// "Buat Saran AI" to have Claude generate a better version.
+function defaultTemplate(fixType: string, path: string): string {
+  const url = `https://voxa.co.id${path === "/" ? "" : path}`;
+  switch (fixType) {
+    case "meta_description":
+      return "VOXA — Sepeda listrik asli Indonesia. Baterai lithium, garansi resmi, harga mulai Rp 3.4jt. Beli online atau kunjungi showroom terdekat.";
+    case "title":
+      return "VOXA — Sepeda Listrik Asli Indonesia";
+    case "h1":
+    case "multiple_h1":
+      return "VOXA — Sepeda Listrik Asli Indonesia";
+    case "canonical":
+      return url;
+    case "robots":
+      return "index, follow";
+    case "og_tags":
+      return JSON.stringify({
+        title: "VOXA — Sepeda Listrik Asli Indonesia",
+        description: "Sepeda listrik VOXA dengan baterai lithium, garansi resmi, harga terjangkau.",
+        image: "https://voxa.co.id/logo.png",
+      }, null, 2);
+    case "json_ld":
+      return JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "VOXA",
+        url: "https://voxa.co.id",
+        logo: "https://voxa.co.id/logo.png",
+        description: "Merek sepeda listrik asli Indonesia.",
+        sameAs: [
+          "https://www.instagram.com/voxa.id",
+          "https://www.facebook.com/voxa.id",
+        ],
+      }, null, 2);
+    case "faq":
+      return JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: [
+          {
+            "@type": "Question",
+            name: "Berapa harga sepeda listrik VOXA?",
+            acceptedAnswer: { "@type": "Answer", text: "Harga sepeda listrik VOXA mulai Rp 3.400.000." },
+          },
+          {
+            "@type": "Question",
+            name: "Berapa jarak tempuh sepeda listrik VOXA?",
+            acceptedAnswer: { "@type": "Answer", text: "Jarak tempuh 40-60 km per pengisian penuh, tergantung model." },
+          },
+        ],
+      }, null, 2);
+    case "llms_txt":
+      return `# VOXA
+
+> Sepeda listrik asli Indonesia untuk commuter kota. Baterai lithium, garansi resmi.
+
+## Produk
+- [Sepeda Listrik](https://voxa.co.id/sepeda-listrik)
+- [Baterai](https://voxa.co.id/baterai)
+- [Sparepart](https://voxa.co.id/sparepart)
+
+## Info
+- [Tentang VOXA](https://voxa.co.id/tentang)
+- [Showroom](https://voxa.co.id/showroom)
+- [Bantuan](https://voxa.co.id/bantuan)
+- [Artikel](https://voxa.co.id/artikel)
+`;
+    default:
+      return "";
+  }
+}
+
 // Build the exact HTML snippet that will be injected into <head> for preview
 function buildInjectedTag(fixType: string, value: string): string {
   const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -162,7 +236,12 @@ function buildInjectedTag(fixType: string, value: string): string {
 
 function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }) {
   const [expanded, setExpanded] = useState(false);
-  const [editValue, setEditValue] = useState(f.suggestedValue && f.suggestedValue !== "MANUAL" && f.suggestedValue !== "AUTO" ? f.suggestedValue : "");
+  // Start with AI suggestion if available; otherwise the template. Never empty.
+  const startingValue =
+    f.suggestedValue && f.suggestedValue !== "MANUAL" && f.suggestedValue !== "AUTO"
+      ? f.suggestedValue
+      : defaultTemplate(f.fixType, f.path);
+  const [editValue, setEditValue] = useState(startingValue);
   const [dirty, setDirty] = useState(false);
   const [appliedState, setAppliedState] = useState<null | { value: string }>(null);
 
@@ -329,11 +408,11 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
 
           {/* Editable value */}
           <div>
-            <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
               <div className="text-xs uppercase font-bold text-gray-500 tracking-wider">
                 ✏️ Nilai yang akan diterapkan (editable)
               </div>
-              {!editValue && (
+              <div className="flex gap-2">
                 <Button
                   size="sm"
                   variant="outline"
@@ -349,9 +428,17 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
                   disabled={suggest.isPending}
                 >
                   {suggest.isPending ? <Loader2 className="animate-spin" size={12} /> : <Sparkles size={12} className="mr-1" />}
-                  Buat Saran AI
+                  {editValue ? "Ganti dgn saran AI" : "Buat Saran AI"}
                 </Button>
-              )}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => { setEditValue(defaultTemplate(f.fixType, f.path)); setDirty(false); }}
+                  title="Reset ke template default"
+                >
+                  Reset template
+                </Button>
+              </div>
             </div>
             <textarea
               value={editValue}
@@ -395,27 +482,35 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
           )}
 
           {/* Actions */}
-          <div className="flex gap-2 flex-wrap border-t border-gray-200 pt-3">
-            <Button
-              size="sm"
-              className="bg-[#37C5FF] hover:bg-[#0A4A63]"
-              onClick={handleApply}
-              disabled={apply.isPending || !editValue.trim()}
-            >
-              {apply.isPending ? <Loader2 className="animate-spin" size={12} /> : <CheckCircle2 size={12} className="mr-1" />}
-              Konfirmasi &amp; Terapkan
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => setExpanded(false)}>
-              Batal
-            </Button>
-            <a
-              href={`https://voxa.co.id${f.path}`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-md hover:border-gray-400"
-            >
-              <Eye size={12} /> Buka halaman
-            </a>
+          <div className="border-t border-gray-200 pt-3">
+            {!editValue.trim() && (
+              <div className="text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-md px-3 py-2 mb-3">
+                ⚠️ Nilai kosong. Ketik nilai atau klik "Reset template" untuk mulai dari default.
+              </div>
+            )}
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                size="sm"
+                className="bg-[#37C5FF] hover:bg-[#0A4A63]"
+                onClick={handleApply}
+                disabled={apply.isPending || !editValue.trim()}
+                title={!editValue.trim() ? "Isi dulu nilai fix di atas" : "Terapkan fix"}
+              >
+                {apply.isPending ? <Loader2 className="animate-spin" size={12} /> : <CheckCircle2 size={12} className="mr-1" />}
+                Konfirmasi &amp; Terapkan
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => setExpanded(false)}>
+                Batal
+              </Button>
+              <a
+                href={`https://voxa.co.id${f.path}`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-md hover:border-gray-400"
+              >
+                <Eye size={12} /> Buka halaman
+              </a>
+            </div>
           </div>
         </div>
       )}
