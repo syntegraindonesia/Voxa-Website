@@ -99,6 +99,57 @@ export const seoRouter = router({
     return audit;
   }),
 
+  // Lazy: generate an AI suggestion for a single finding on demand
+  suggestFix: protectedProcedure
+    .input(z.object({
+      path: z.string(),
+      fixType: z.string(),
+      title: z.string(),
+      issue: z.string(),
+      currentValue: z.string().nullable(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
+
+      const rules: Record<string, string> = {
+        meta_description: 'Return a meta description in Bahasa Indonesia, 120-160 characters, includes "VOXA", mentions product/category. Return just the plain text string.',
+        title: 'Return a page <title> in Bahasa Indonesia, 30-60 characters, keyword-focused, includes "VOXA". Return just the plain text.',
+        og_tags: 'Return a JSON object: {"title": "...", "description": "...", "image": "https://voxa.co.id/logo.png"}. Title max 60 chars, description max 160 chars.',
+        json_ld: `Return a valid JSON-LD schema block appropriate for this page. For "/" use Organization. For "/sepeda-listrik" use ItemList of Products. For "/artikel" use Blog. For "/showroom" use LocalBusiness. Return the raw JSON object without wrapping in <script>.`,
+        faq: 'Return a JSON-LD FAQPage schema with 5-8 realistic Q&A entries about VOXA electric bicycles in Bahasa Indonesia. Return the raw JSON object.',
+        llms_txt: `Return the full markdown content for /llms.txt for voxa.co.id. Include sections: # VOXA, Overview, Products, Categories (with markdown links to /sepeda-listrik, /baterai, /sparepart, /artikel, /showroom, /tentang, /bantuan, /pemerintah, /compare, /distributor-voxa), Optional links.`,
+        canonical: 'Return the canonical URL for this page (starts with https://voxa.co.id). Return just the URL.',
+        robots: 'Return "index, follow" unless the page should be excluded.',
+        h1: 'Return "MANUAL" — H1 must be edited in the React component.',
+        thin_content: 'Return "MANUAL" — content rewrites require human review.',
+        alt_text: 'Return "AUTO" — alt text handled in a bulk pass.',
+      };
+      const rule = rules[input.fixType] || 'Return a specific fix in JSON or plain text.';
+
+      const response = await invokeLLM({
+        messages: [
+          {
+            role: 'system',
+            content: `You are an SEO/GEO expert for VOXA (voxa.co.id), an Indonesian electric bicycle brand. Generate specific, ready-to-apply fixes. Rule for ${input.fixType}: ${rule}`,
+          },
+          {
+            role: 'user',
+            content: `Page path: ${input.path}\nIssue: ${input.title}\nDetail: ${input.issue}${input.currentValue ? `\nCurrent value: ${input.currentValue}` : ''}\n\nGenerate the fix. Return JSON: {"value": <string or object>}`,
+          },
+        ],
+        response_format: { type: 'json_object' },
+      });
+
+      try {
+        const content = response.choices[0]?.message?.content ?? '{}';
+        const parsed = JSON.parse(typeof content === 'string' ? content : JSON.stringify(content));
+        const v = parsed.value;
+        return { suggestion: typeof v === 'string' ? v : JSON.stringify(v, null, 2) };
+      } catch (_e) {
+        return { suggestion: '' };
+      }
+    }),
+
   // Approve a single fix — writes to pageOverrides and logs history
   applyFix: protectedProcedure
     .input(z.object({

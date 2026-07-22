@@ -125,12 +125,54 @@ function ScoreTile({ label, score, kind, breakdown }: {
 
 // ── Finding card ──────────────────────────────────────────────────────────────
 
+// Build the exact HTML snippet that will be injected into <head> for preview
+function buildInjectedTag(fixType: string, value: string): string {
+  const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  if (!value) return "";
+  if (fixType === "meta_description") return `<meta name="description" content="${escape(value)}">`;
+  if (fixType === "title") return `<title>${escape(value)}</title>`;
+  if (fixType === "canonical") return `<link rel="canonical" href="${escape(value)}">`;
+  if (fixType === "robots") return `<meta name="robots" content="${escape(value)}">`;
+  if (fixType === "og_tags") {
+    try {
+      const og = JSON.parse(value);
+      const t = og.title ?? og.ogTitle ?? "";
+      const d = og.description ?? og.ogDescription ?? "";
+      const i = og.image ?? og.ogImage ?? "";
+      return [
+        t && `<meta property="og:title" content="${escape(t)}">`,
+        d && `<meta property="og:description" content="${escape(d)}">`,
+        i && `<meta property="og:image" content="${escape(i)}">`,
+      ].filter(Boolean).join("\n");
+    } catch {
+      return `<meta property="og:description" content="${escape(value)}">`;
+    }
+  }
+  if (fixType === "json_ld" || fixType === "faq") {
+    return `<script type="application/ld+json">\n${value}\n</script>`;
+  }
+  if (fixType === "llms_txt") {
+    return `# File yang akan dibuat di https://voxa.co.id/llms.txt:\n\n${value}`;
+  }
+  return value;
+}
+
 function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }) {
-  const [editing, setEditing] = useState(false);
-  const [editValue, setEditValue] = useState(f.suggestedValue ?? "");
+  const [expanded, setExpanded] = useState(false);
+  const [editValue, setEditValue] = useState(f.suggestedValue && f.suggestedValue !== "MANUAL" && f.suggestedValue !== "AUTO" ? f.suggestedValue : "");
+  const [dirty, setDirty] = useState(false);
+
   const apply = trpc.seo.applyFix.useMutation({
     onSuccess: () => { toast.success(`Fix diterapkan ke ${f.path}`); onApplied(); },
     onError: (e) => toast.error("Gagal: " + e.message),
+  });
+
+  const suggest = trpc.seo.suggestFix.useMutation({
+    onSuccess: (d) => {
+      setEditValue(d.suggestion ?? "");
+      toast.success("Saran AI dibuat — silakan review sebelum apply");
+    },
+    onError: (e) => toast.error("Gagal generate: " + e.message),
   });
 
   const sevBg = f.category === "GEO"
@@ -143,18 +185,20 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
     : f.severity === "MEDIUM" ? "text-yellow-700"
     : "text-blue-700";
   const Icon = fixIcon[f.fixType] ?? Sparkles;
-  const isManual = !f.suggestedValue || f.suggestedValue === "MANUAL" || f.suggestedValue === "AUTO";
 
-  const handleApprove = () => {
-    if (isManual) {
-      toast.info("Fix ini perlu edit manual — buka halaman langsung untuk mengubahnya.");
+  const isManualOnly = f.fixType === "h1" || f.fixType === "thin_content" || f.fixType === "fetch_error" || f.fixType === "alt_text";
+  const injectedPreview = buildInjectedTag(f.fixType, editValue);
+
+  const handleApply = () => {
+    if (!editValue.trim()) {
+      toast.error("Isi dulu nilai fix-nya (atau klik 🤖 Buat Saran AI)");
       return;
     }
     apply.mutate({
       findingId: f.id,
       path: f.path,
       fixType: f.fixType,
-      value: editing ? editValue : f.suggestedValue!,
+      value: editValue,
     });
   };
 
@@ -167,49 +211,141 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
       <h4 className="text-base font-bold text-gray-900 mb-3">{f.title}</h4>
 
       <div className="text-sm text-gray-700 mb-2">
-        <span className="font-semibold">Halaman:</span> <code className="text-xs bg-black/5 px-1.5 py-0.5 rounded">{f.path}</code>
+        <span className="font-semibold">Halaman:</span>{" "}
+        <code className="text-xs bg-black/5 px-1.5 py-0.5 rounded">{f.path}</code>
       </div>
-      <div className="text-sm text-gray-700 mb-3">
+      <div className="text-sm text-gray-700 mb-2">
         <span className="font-semibold">Masalah:</span> {f.issue}
       </div>
-
-      {(f.currentValue || f.suggestedValue) && (
-        <div className="grid md:grid-cols-2 gap-2 mb-3">
-          <div className="bg-white border-l-2 border-red-400 rounded p-2 text-xs">
-            <div className="uppercase font-bold text-gray-500 tracking-wider mb-1">Saat ini</div>
-            <div className="font-mono text-gray-700 break-words">{f.currentValue ?? <em>(tidak ada)</em>}</div>
-          </div>
-          <div className="bg-white border-l-2 border-green-400 rounded p-2 text-xs">
-            <div className="uppercase font-bold text-gray-500 tracking-wider mb-1">Usulan Claude</div>
-            {editing ? (
-              <textarea value={editValue} onChange={e => setEditValue(e.target.value)} rows={3} className="w-full font-mono text-xs p-1 border border-gray-300 rounded" />
-            ) : (
-              <div className="font-mono text-gray-700 break-words">
-                {isManual ? <em className="text-gray-400">(perlu edit manual)</em> : f.suggestedValue}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       <div className="text-sm text-gray-700 mb-3">
         <span className="font-semibold">Dampak:</span> {f.expectedImpact}
       </div>
 
-      <div className="flex gap-2 flex-wrap">
-        <Button size="sm" className="bg-[#37C5FF] hover:bg-[#0A4A63]" onClick={handleApprove} disabled={apply.isPending || isManual}>
-          {apply.isPending ? <Loader2 className="animate-spin" size={12} /> : <CheckCircle2 size={12} className="mr-1" />}
-          Setujui & Terapkan
-        </Button>
-        <Button size="sm" variant="outline" onClick={onApplied}>
-          <X size={12} className="mr-1" /> Tolak
-        </Button>
-        {!isManual && (
-          <Button size="sm" variant="outline" onClick={() => setEditing(v => !v)}>
-            <FileText size={12} className="mr-1" /> {editing ? "Selesai" : "Edit"}
-          </Button>
-        )}
-      </div>
+      {/* Collapsed state: just show the action buttons */}
+      {!expanded && (
+        <div className="flex gap-2 flex-wrap">
+          {isManualOnly ? (
+            <div className="text-xs text-gray-500 italic">
+              Fix ini perlu edit manual di source code — tidak bisa auto-apply.
+            </div>
+          ) : (
+            <>
+              <Button size="sm" className="bg-[#37C5FF] hover:bg-[#0A4A63]" onClick={() => setExpanded(true)}>
+                <Eye size={12} className="mr-1" /> Preview &amp; Setujui
+              </Button>
+              <Button size="sm" variant="outline" onClick={onApplied}>
+                <X size={12} className="mr-1" /> Tolak
+              </Button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Expanded state: preview + editable value + apply */}
+      {expanded && !isManualOnly && (
+        <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
+          {/* Current value */}
+          <div>
+            <div className="text-xs uppercase font-bold text-gray-500 tracking-wider mb-1">
+              🔴 Saat ini di halaman
+            </div>
+            <div className="bg-red-50 border-l-2 border-red-400 rounded p-2 text-xs font-mono text-gray-700 break-words">
+              {f.currentValue ?? <em className="not-italic text-gray-400">(tidak ada — tag belum di-set)</em>}
+            </div>
+          </div>
+
+          {/* Editable value */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <div className="text-xs uppercase font-bold text-gray-500 tracking-wider">
+                ✏️ Nilai yang akan diterapkan (editable)
+              </div>
+              {!editValue && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() =>
+                    suggest.mutate({
+                      path: f.path,
+                      fixType: f.fixType,
+                      title: f.title,
+                      issue: f.issue,
+                      currentValue: f.currentValue,
+                    })
+                  }
+                  disabled={suggest.isPending}
+                >
+                  {suggest.isPending ? <Loader2 className="animate-spin" size={12} /> : <Sparkles size={12} className="mr-1" />}
+                  Buat Saran AI
+                </Button>
+              )}
+            </div>
+            <textarea
+              value={editValue}
+              onChange={(e) => { setEditValue(e.target.value); setDirty(true); }}
+              rows={f.fixType === "json_ld" || f.fixType === "faq" || f.fixType === "llms_txt" ? 8 : 3}
+              placeholder={
+                f.fixType === "og_tags"
+                  ? '{"title":"...","description":"...","image":"https://..."}'
+                  : f.fixType === "json_ld" || f.fixType === "faq"
+                  ? '{ "@context":"https://schema.org", "@type":"..." }'
+                  : "Ketik nilai fix di sini, atau klik 'Buat Saran AI'…"
+              }
+              className="w-full text-sm p-3 border border-gray-300 rounded font-mono resize-y"
+            />
+            {dirty && f.suggestedValue && editValue !== f.suggestedValue && (
+              <div className="text-xs text-yellow-700 mt-1">
+                ⚠️ Kamu sudah mengedit saran AI. Kalau ingin kembali, klik reset.
+                <button
+                  className="ml-1 underline"
+                  onClick={() => { setEditValue(f.suggestedValue ?? ""); setDirty(false); }}
+                >
+                  Reset ke saran AI
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* HTML injection preview */}
+          {editValue && (
+            <div>
+              <div className="text-xs uppercase font-bold text-gray-500 tracking-wider mb-1">
+                🟢 Kode yang akan ditambahkan ke &lt;head&gt;
+              </div>
+              <pre className="bg-green-50 border-l-2 border-green-400 rounded p-3 text-xs font-mono text-gray-800 whitespace-pre-wrap break-words overflow-x-auto">
+                {injectedPreview}
+              </pre>
+              <div className="text-xs text-gray-500 mt-1">
+                Perubahan ini langsung terlihat oleh Google &amp; AI crawlers di next crawl. Tidak perlu deploy ulang.
+              </div>
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex gap-2 flex-wrap border-t border-gray-200 pt-3">
+            <Button
+              size="sm"
+              className="bg-[#37C5FF] hover:bg-[#0A4A63]"
+              onClick={handleApply}
+              disabled={apply.isPending || !editValue.trim()}
+            >
+              {apply.isPending ? <Loader2 className="animate-spin" size={12} /> : <CheckCircle2 size={12} className="mr-1" />}
+              Konfirmasi &amp; Terapkan
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setExpanded(false)}>
+              Batal
+            </Button>
+            <a
+              href={`https://voxa.co.id${f.path}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold border border-gray-200 rounded-md hover:border-gray-400"
+            >
+              <Eye size={12} /> Buka halaman
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
