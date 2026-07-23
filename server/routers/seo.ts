@@ -112,17 +112,50 @@ export const seoRouter = router({
     .mutation(async ({ input, ctx }) => {
       if (ctx.user.role !== 'admin') throw new TRPCError({ code: 'FORBIDDEN' });
 
+      // Shared VOXA business context — dramatically improves output quality
+      // by giving the AI real facts to work with (rather than hallucinating).
+      // Verified via manual DeepSeek testing: without this, the AI invents
+      // product categories like "e-mountain-bike" that don't exist on VOXA's site.
+      const VOXA_CTX = `VOXA is voxa.co.id — Indonesian electric bicycle brand.
+Company: PT Voxa Indo Nusa, founded 2022, factory in Balaraja, Tangerang, Banten.
+
+REAL product catalog (do NOT invent products or categories outside this):
+- Sepeda Listrik (/sepeda-listrik): Liberty, Liberty Star, Liberty 7, Liberty Ultimate, Liberty Stylish, Eiffel Rider, Eiffel City, Eiffel 7, Elite City, Elite Fantasy, Elite Rider, Elite Fantasy S, Elite Rider S, VOXA G3, VOXA Kurir. Prices Rp 3.400.000 – Rp 12.600.000.
+- Baterai (/baterai): Greenlife 12KG, Greenlife 15KG, Greenlife 20KG. Prices Rp 1.500.000 – Rp 2.200.000.
+- Sparepart (/sparepart): controller, motor, charger, kabel, fork, jok, lampu, rem, setang, shockbreaker, speedometer, spion.
+
+REAL URLs only (do NOT invent):
+/ (Beranda), /tentang, /showroom, /sepeda-listrik, /baterai, /sparepart, /pemerintah (distributor & B2B), /compare, /artikel, /bantuan.
+
+MUST-FOLLOW RULES:
+1. Content in Bahasa Indonesia unless specifically asked otherwise
+2. Do NOT fabricate specific numbers (factory area, sales figures, ratings, review counts, kecepatan max in km/h if unknown)
+3. Only reference URLs from the list above — NEVER invent /product-category/xyz or similar
+4. Only reference product names from the catalog above
+5. When unsure of a fact, omit it rather than guess`;
+
       const rules: Record<string, string> = {
-        meta_description: 'Return a meta description in Bahasa Indonesia, 120-160 characters, includes "VOXA", mentions product/category. Return just the plain text string.',
-        title: 'Return a page <title> in Bahasa Indonesia, 30-60 characters, keyword-focused, includes "VOXA". Return just the plain text.',
-        og_tags: 'Return a JSON object: {"title": "...", "description": "...", "image": "https://voxa.co.id/logo.png"}. Title max 60 chars, description max 160 chars.',
-        json_ld: `Return a valid JSON-LD schema block appropriate for this page. For "/" use Organization. For "/sepeda-listrik" use ItemList of Products. For "/artikel" use Blog. For "/showroom" use LocalBusiness. Return the raw JSON object without wrapping in <script>.`,
-        faq: 'Return a JSON-LD FAQPage schema with 5-8 realistic Q&A entries about VOXA electric bicycles in Bahasa Indonesia. Return the raw JSON object.',
-        llms_txt: `Return the full markdown content for /llms.txt for voxa.co.id. Include sections: # VOXA, Overview, Products, Categories (with markdown links to /sepeda-listrik, /baterai, /sparepart, /artikel, /showroom, /tentang, /bantuan, /pemerintah, /compare, /distributor-voxa), Optional links.`,
-        canonical: 'Return the canonical URL for this page (starts with https://voxa.co.id). Return just the URL.',
-        robots: 'Return "index, follow" unless the page should be excluded.',
-        h1: 'Return a short, keyword-rich H1 (30-70 chars) in Bahasa Indonesia for this page. Include the primary topic. Include "VOXA" naturally. Return just plain text.',
-        multiple_h1: 'Return a single consolidated H1 (30-70 chars) to replace the multiple H1s on this page. Return just plain text.',
+        meta_description: 'Return json {"value": "<Bahasa Indonesia meta description, 120-160 characters, includes VOXA, mentions the page topic>"}',
+        title: 'Return json {"value": "<page title in Bahasa Indonesia, 30-60 characters, includes VOXA, keyword-focused>"}',
+        og_tags: 'Return json {"value": {"title": "<max 60 chars>", "description": "<max 160 chars>", "image": "https://voxa.co.id/logo.png"}} — all fields in Bahasa Indonesia',
+        json_ld: `Return json {"value": <full JSON-LD schema object>}. For "/" use @type Organization with VOXA facts. For "/sepeda-listrik" use ItemList of Products. For "/artikel" use Blog. For "/showroom" use LocalBusiness. Use ONLY the real VOXA facts and product names above.`,
+        faq: 'Return json {"value": <FAQPage schema with 5-8 realistic Q&A entries in Bahasa Indonesia about VOXA electric bicycles>}. Only mention real product names from the catalog.',
+        llms_txt: `Return json {"value": "<full markdown for /llms.txt>"}. Structure:
+# VOXA
+> One-line description in Bahasa Indonesia
+## Beranda
+- [Beranda](https://voxa.co.id/)
+## Produk
+- [Sepeda Listrik](https://voxa.co.id/sepeda-listrik)
+- [Baterai](https://voxa.co.id/baterai)
+- [Sparepart](https://voxa.co.id/sparepart)
+## Halaman lain
+- [Tentang VOXA](https://voxa.co.id/tentang), [Showroom](https://voxa.co.id/showroom), etc.
+Do NOT list individual product models or invent product-category URLs.`,
+        canonical: 'Return json {"value": "https://voxa.co.id<path>"} — full canonical URL for this page.',
+        robots: 'Return json {"value": "index, follow"} unless the page should be excluded from indexing.',
+        h1: 'Return json {"value": "<keyword-rich H1 in Bahasa Indonesia, 30-70 chars, mentions VOXA and the page-specific topic>"}',
+        multiple_h1: 'Return json {"value": "<single consolidated H1 in Bahasa Indonesia to replace the multiple H1s on this page, 30-70 chars>"}',
         organization_schema: `Return a JSON-LD Organization schema for VOXA. Include these REAL facts (do not invent ratings/reviews):
 {
   "@context": "https://schema.org",
@@ -170,70 +203,80 @@ Return the full JSON. Do NOT wrap in <script>.`,
   }
 }
 Return the full JSON. Do NOT wrap in <script>.`,
-        thin_content: 'DIRECT_WRITE_MODE',
-        thin_content: 'Return "MANUAL" — content rewrites require human review.',
-        alt_text: 'Return "AUTO" — alt text handled in a bulk pass.',
+        // thin_content uses a DEDICATED code path below (see 'if (input.fixType === "thin_content")')
+        // because it needs page-specific PAGE_CONTEXT injection and a longer example.
+        // It's intentionally not in this rules object.
+        alt_text: 'Return json {"value": "AUTO"} — alt text handled in a bulk pass.',
       };
       const rule = rules[input.fixType] || 'Return a specific fix in JSON or plain text.';
 
-      // Special handling for thin_content: use a dedicated short prompt with a
-      // concrete Bahasa Indonesia example so DeepSeek writes real content
-      // instead of returning meta-instructions. Bypass json_object format because
-      // it was making DeepSeek wrap responses in {fix_type,location,content}.
+      // thin_content uses a dedicated branch because it needs page-specific
+      // context (topic, target keywords, links, avoid list) and a concrete
+      // example so DeepSeek writes real content instead of meta-instructions.
       let response;
       if (input.fixType === 'thin_content') {
         const ctx = PAGE_CONTEXT[input.path];
         if (!ctx) {
           throw new TRPCError({ code: 'BAD_REQUEST', message: `Halaman ${input.path} tidak dikenal — konten SEO harus ditulis manual.` });
         }
-        const otherPagePath = Object.keys(PAGE_CONTEXT).find(p => p !== input.path) ?? '/';
         response = await invokeLLM({
+          temperature: 0.5,
           messages: [
             {
               role: 'system',
-              content: `You are an Indonesian SEO copywriter. Your job: write UNIQUE Bahasa Indonesia HTML content for one specific page of voxa.co.id (VOXA — Indonesian electric bicycle brand).
+              content: `You are an Indonesian SEO copywriter for VOXA.
 
-CRITICAL — Output rules:
-- Return a JSON object with exactly ONE field: {"value": "<h2>...</h2>..."}
-- The "value" field contains raw HTML in Bahasa Indonesia — nothing else
-- Allowed tags only: h2, h3, p, ul, li, a, strong, em
-- FORBIDDEN: script, iframe, style, form, position:absolute, display:none, left:-9999px, hidden content tricks, English content
-- FORBIDDEN: writing about what the code should do — you write the actual USER-FACING content
-- The content will be shown to real users in a visible section on the page`,
+${VOXA_CTX}
+
+Return json {"value": "<HTML string>"} — nothing else.
+Allowed HTML tags: h2, h3, p, ul, li, a, strong, em.
+FORBIDDEN tags: script, iframe, style, form.
+FORBIDDEN CSS tricks: position:absolute, display:none, left:-9999px, visibility:hidden, aria-hidden.
+The content is shown to real users in a visible section — do NOT write English meta-instructions.`,
             },
             {
               role: 'user',
-              content: `Write UNIQUE Bahasa Indonesia SEO content for exactly this page: ${input.path}
+              content: `Write UNIQUE Bahasa Indonesia SEO content for page ${input.path}.
 
 Page context:
 - Purpose: ${ctx.purpose}
 - Topic: ${ctx.topic}
-- Target keywords: ${ctx.targetKeywords.join(', ')}
+- Target keywords to weave in naturally: ${ctx.targetKeywords.join(', ')}
 - Content angle: ${ctx.contentAngle}
-- Internal links to include (must appear as <a href="X">text</a>): ${ctx.linkTo.join(', ')}
+- Internal links to include (as <a href="X">natural anchor text</a>): ${ctx.linkTo.join(', ')}
 - Topics to AVOID (they belong to other pages): ${ctx.avoidTopics.join('; ')}
 
-Length: 400-500 words. Structure: 1 <h2> heading + 2-3 <h3> subheadings + <p> paragraphs + 1 <ul> bulleted list.
+Length: 400-500 words in Bahasa Indonesia. Structure: 1 <h2> + 2-3 <h3> + <p> paragraphs + 1 <ul> bulleted list.
 
-EXAMPLE of correct output format (for a different page — DO NOT copy this content):
+Return json in this exact format:
+{"value": "<h2>...</h2><p>...</p>..."}
 
-{"value": "<h2>Contoh Heading Halaman Lain</h2><p>Ini adalah contoh paragraf pertama tentang topik halaman lain. Konten harus dalam Bahasa Indonesia dan spesifik untuk halaman terkait.</p><h3>Subheading Pertama</h3><p>Paragraf isi dengan link internal seperti <a href=\\"${otherPagePath}\\">nama halaman</a> yang natural.</p><ul><li>Poin pertama</li><li>Poin kedua</li></ul>"}
-
-Now generate the ACTUAL Bahasa Indonesia content for ${input.path} following the same JSON format. Return ONLY the JSON object.`,
+Generate ACTUAL content now — no descriptions of what to do.`,
             },
           ],
           response_format: { type: 'json_object' },
         });
       } else {
         response = await invokeLLM({
+          temperature: 0.5,
           messages: [
             {
               role: 'system',
-              content: `You are an SEO/GEO expert for VOXA (voxa.co.id), an Indonesian electric bicycle brand. Generate specific, ready-to-apply fixes. Rule for ${input.fixType}: ${rule}`,
+              content: `You are an SEO/GEO expert for VOXA generating one specific fix.
+
+${VOXA_CTX}
+
+Task rule for ${input.fixType}: ${rule}
+
+Return json only. No prose, no explanations, no code fences.`,
             },
             {
               role: 'user',
-              content: `Page path: ${input.path}\nIssue: ${input.title}\nDetail: ${input.issue}${input.currentValue ? `\nCurrent value: ${input.currentValue}` : ''}\n\nGenerate the fix. Return JSON: {"value": <string or object>}`,
+              content: `Page path: ${input.path}
+Issue: ${input.title}
+Detail: ${input.issue}${input.currentValue ? `\nCurrent value: ${input.currentValue}` : ''}
+
+Generate the fix now. Return json {"value": <string or object>}.`,
             },
           ],
           response_format: { type: 'json_object' },

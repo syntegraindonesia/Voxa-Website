@@ -66,6 +66,7 @@ export type InvokeParams = {
   output_schema?: OutputSchema;
   responseFormat?: ResponseFormat;
   response_format?: ResponseFormat;
+  temperature?: number;
 };
 
 export type ToolCall = {
@@ -281,6 +282,7 @@ export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
     messages: messages.map(normalizeMessage),
     max_tokens: 8192,
   };
+  if (params.temperature != null) payload.temperature = params.temperature;
 
   if (tools && tools.length > 0) {
     payload.tools = tools;
