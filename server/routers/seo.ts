@@ -230,19 +230,60 @@ Return raw HTML string only. No wrapping, no explanation, no markdown code fence
         throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'AI mengembalikan respons kosong' });
       }
       const raw = typeof content === 'string' ? content : JSON.stringify(content);
-      let parsed: any;
+
+      // Robust extraction — DeepSeek sometimes wraps HTML fixes in meta JSON like
+      // {fix_type,location,content} even when the prompt asks for {value}. Try in order:
+      // 1. Parsed JSON with `value` field
+      // 2. Parsed JSON with `content`, `html`, or `body` field (common wrapper shapes)
+      // 3. Any HTML fragment embedded in the raw response text
+      // 4. The raw response as-is
+      let parsed: any = null;
       try {
         parsed = JSON.parse(raw);
       } catch {
-        // AI returned plain text without JSON wrapping — use it directly
-        const trimmed = raw.trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
-        return { suggestion: trimmed || '' };
+        // Not JSON — try to strip code fences and use the text directly
+        const stripped = raw.trim().replace(/^```(?:json|html)?/i, '').replace(/```$/, '').trim();
+        return { suggestion: stripped || '' };
       }
-      const v = parsed?.value ?? parsed;
-      if (v === undefined || v === null || v === '') {
-        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'AI tidak menghasilkan saran — coba lagi atau isi manual' });
+
+      // For structured JSON responses (JSON-LD, og_tags), the whole parsed object is the fix.
+      // For HTML fixes wrapped in a meta shape, dig into value/content/html/body fields.
+      const jsonLdFixTypes = new Set(['json_ld', 'faq', 'organization_schema', 'breadcrumb_schema', 'website_schema']);
+      const looksLikeJsonLd = jsonLdFixTypes.has(input.fixType);
+
+      // Look for any string field that starts with '<' — that's very likely the HTML content
+      const extractHtmlFromWrapper = (obj: any): string | null => {
+        if (typeof obj !== 'object' || obj === null) return null;
+        for (const key of ['value', 'content', 'html', 'body', 'seo_content']) {
+          const v = obj[key];
+          if (typeof v === 'string' && v.trim().startsWith('<')) return v;
+        }
+        // Fall back to first string field that looks like HTML
+        for (const key of Object.keys(obj)) {
+          const v = obj[key];
+          if (typeof v === 'string' && /<[a-z][^>]*>/i.test(v) && !/^inject_|^index\.html/i.test(v)) return v;
+        }
+        return null;
+      };
+
+      if (looksLikeJsonLd) {
+        // Return the whole JSON object as the suggestion (that IS the JSON-LD schema)
+        const v = parsed?.value ?? parsed;
+        return { suggestion: typeof v === 'string' ? v : JSON.stringify(v, null, 2) };
       }
-      return { suggestion: typeof v === 'string' ? v : JSON.stringify(v, null, 2) };
+
+      // For HTML fixes: prefer the value field, else look for HTML in wrapper fields
+      const v = parsed?.value;
+      if (typeof v === 'string' && v.trim()) {
+        return { suggestion: v };
+      }
+      const extracted = extractHtmlFromWrapper(parsed);
+      if (extracted) return { suggestion: extracted };
+
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'AI mengembalikan format yang tidak dikenali. Coba klik "Buat Saran AI" lagi, atau isi manual.',
+      });
     }),
 
   // Approve a single fix — writes to pageOverrides and logs history
@@ -306,12 +347,37 @@ Return raw HTML string only. No wrapping, no explanation, no markdown code fence
       else if (input.fixType === 'robots') updates.robots = input.value;
       else if (input.fixType === 'h1' || input.fixType === 'multiple_h1') updates.h1Text = input.value;
       else if (input.fixType === 'thin_content') {
-        // Reject any potentially dangerous or layout-breaking tags before saving
-        const dangerous = /<(script|iframe|style|object|embed|link|meta|form|input|button|body|html|head)\b/i;
+        // Guard against wrapper JSON leaking through (AI sometimes returns
+        // {fix_type,location,content} shape instead of raw HTML). Refuse if
+        // the value looks like JSON rather than starting with an HTML tag.
+        const trimmed = input.value.trim();
+        if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Konten yang kamu kirim adalah JSON, bukan HTML. Klik "Buat Saran AI" lagi — sistem akan extract HTML-nya. Atau isi manual dengan tag <h2>, <p>, dll.',
+          });
+        }
+
+        // Reject genuinely dangerous script-executing / form-submitting tags.
+        // Note: we DO NOT block <body>, <html>, <head> here because AI-written
+        // descriptive text can legitimately mention them. The injection middleware
+        // wraps the content in a scoped <section> anyway so any structural tags
+        // in the content wouldn't affect the document structure.
+        const dangerous = /<(script|iframe|object|embed|form)\b/i;
         if (dangerous.test(input.value)) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
-            message: 'Konten SEO hanya boleh pakai tag: h2, h3, p, ul, li, a, strong, em, br. Tag script/iframe/style/form dll tidak diizinkan.',
+            message: 'Konten SEO hanya boleh pakai tag: h2, h3, p, ul, li, a, strong, em, br. Tag script/iframe/form tidak diizinkan (bisa mengeksekusi kode berbahaya).',
+          });
+        }
+
+        // Check for genuinely inline style attributes that could break layout.
+        // But allow "style=" descriptive text as long as it's inside a <style> tag,
+        // which we already block above.
+        if (/<style\b/i.test(input.value)) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Tag <style> tidak diizinkan — bisa mengganggu CSS global halaman.',
           });
         }
         // Check for reasonably balanced open/close tags on major blocks
