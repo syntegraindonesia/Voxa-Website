@@ -179,26 +179,10 @@ function defaultTemplate(fixType: string, path: string): string {
         ],
       }, null, 2);
     case "thin_content":
-      return `<h2>Tentang VOXA — Sepeda Listrik Asli Indonesia</h2>
-<p>VOXA adalah brand sepeda listrik asli Indonesia yang berkomitmen menghadirkan solusi transportasi hemat, ramah lingkungan, dan mudah dirawat untuk kebutuhan harian masyarakat perkotaan. Setiap unit VOXA didesain untuk perjalanan komuter yang lebih cepat, lebih murah, dan lebih nyaman dibanding kendaraan bermotor konvensional.</p>
-
-<h3>Kenapa Memilih VOXA</h3>
-<ul>
-  <li>Baterai lithium tahan lama dengan jarak tempuh 40-80 km per pengisian penuh</li>
-  <li>Garansi resmi baterai selama 1 tahun dan motor selama 6 bulan</li>
-  <li>Jaringan servis resmi tersebar di berbagai kota besar Indonesia</li>
-  <li>Suku cadang lengkap tersedia melalui katalog <a href="/sparepart">Sparepart VOXA</a></li>
-  <li>Harga kompetitif mulai Rp 3.400.000 dengan pilihan cicilan 0%</li>
-</ul>
-
-<h3>Katalog Produk VOXA</h3>
-<p>Jelajahi lini lengkap sepeda listrik VOXA — dari <a href="/sepeda-listrik">Liberty Series</a> yang cocok untuk komuter harian ringan, hingga Elite Rider S yang dirancang untuk performa maksimal. Semua unit menggunakan komponen berkualitas dengan standar keamanan yang teruji.</p>
-<p>Untuk pilihan baterai pengganti dan upgrade, cek <a href="/baterai">koleksi Baterai Greenlife</a>. Untuk kebutuhan sparepart original, tersedia <a href="/sparepart">30+ komponen resmi</a> di katalog Sparepart kami.</p>
-
-<h3>Layanan &amp; Dukungan</h3>
-<p>Kunjungi <a href="/showroom">showroom VOXA terdekat</a> untuk test ride sebelum membeli, atau baca <a href="/artikel">artikel VOXA</a> untuk tips perawatan sepeda listrik. Jika ingin menjadi bagian dari jaringan VOXA, cek program <a href="/distributor-voxa">Distributor VOXA</a>.</p>
-
-<p>VOXA percaya bahwa transportasi listrik bukan hanya tentang produk, tapi tentang membangun ekosistem yang mendukung pengguna dari pra-pembelian hingga perawatan jangka panjang. Baca lebih lanjut di halaman <a href="/tentang">Tentang VOXA</a>.</p>`;
+      // Intentionally minimal — the same template on every page would cause
+      // duplicate content penalties. Force user to click Buat Saran AI which
+      // generates page-specific content using the backend's PAGE_CONTEXT map.
+      return "";
 
     case "llms_txt":
       return `# VOXA
@@ -530,6 +514,20 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
               </pre>
               <div className="text-xs text-gray-500 mt-1">
                 Perubahan ini langsung terlihat oleh Google &amp; AI crawlers di next crawl. Tidak perlu deploy ulang.
+              </div>
+            </div>
+          )}
+
+          {/* Duplicate-content warning — thin_content MUST be unique per page */}
+          {f.fixType === "thin_content" && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-1">
+              <div className="text-xs uppercase font-bold text-red-800 tracking-wider mb-2">
+                ⚠️ Konten harus UNIK per halaman
+              </div>
+              <div className="text-xs text-red-900 space-y-1.5">
+                <div>Google menurunkan ranking halaman yang punya konten identik/mirip. JANGAN pakai teks generik "VOXA adalah brand sepeda listrik..." yang sama untuk semua halaman — itu justru merugikan.</div>
+                <div><strong>Klik "Buat Saran AI"</strong> di bawah — sistem akan generate konten khusus untuk <code className="bg-white/60 px-1 rounded">{f.path}</code> berdasarkan topik dan target keyword page ini. Tiap halaman dapat konten berbeda.</div>
+                <div>Jangan sekali-kali menyalin konten dari halaman lain ke halaman ini.</div>
               </div>
             </div>
           )}

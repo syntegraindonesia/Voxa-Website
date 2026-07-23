@@ -56,10 +56,15 @@ export async function injectSeoOverrides(html: string, path: string): Promise<st
   if (ov.ogTitle) headParts.push(`<meta property="og:title" content="${escapeAttr(ov.ogTitle)}" data-seo-override>`);
   if (ov.ogDescription) headParts.push(`<meta property="og:description" content="${escapeAttr(ov.ogDescription)}" data-seo-override>`);
   if (ov.ogImage) headParts.push(`<meta property="og:image" content="${escapeAttr(ov.ogImage)}" data-seo-override>`);
-  if (ov.jsonLd) {
-    const safe = ov.jsonLd.replace(/<\/script>/gi, '<\\/script>');
-    headParts.push(`<script type="application/ld+json" data-seo-override>${safe}</script>`);
-  }
+  const emitSchema = (raw: string | null | undefined, kind: string) => {
+    if (!raw) return;
+    const safe = raw.replace(/<\/script>/gi, '<\\/script>');
+    headParts.push(`<script type="application/ld+json" data-seo-override data-schema-kind="${kind}">${safe}</script>`);
+  };
+  emitSchema(ov.jsonLd, 'custom');
+  emitSchema(ov.organizationSchema, 'organization');
+  emitSchema(ov.breadcrumbSchema, 'breadcrumb');
+  emitSchema(ov.websiteSchema, 'website');
   const titleTag = ov.title ? `<title data-seo-override>${escapeAttr(ov.title)}</title>` : '';
 
   // Strip conflicting existing tags before injecting
@@ -152,6 +157,9 @@ export async function verifyFixLive(
       og_tags: /<meta[^>]+property=["']og:(?:title|description|image)["'][^>]+data-seo-override/i,
       json_ld: /<script[^>]+application\/ld\+json[^>]+data-seo-override/i,
       faq: /<script[^>]+application\/ld\+json[^>]+data-seo-override/i,
+      organization_schema: /<script[^>]+application\/ld\+json[^>]+data-schema-kind="organization"/i,
+      breadcrumb_schema: /<script[^>]+application\/ld\+json[^>]+data-schema-kind="breadcrumb"/i,
+      website_schema: /<script[^>]+application\/ld\+json[^>]+data-schema-kind="website"/i,
       h1: /<h1[^>]+data-seo-override/i,
       multiple_h1: /<h1[^>]+data-seo-override/i,
       thin_content: /<footer[^>]+data-seo-override[^>]*>/i,

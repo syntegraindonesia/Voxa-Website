@@ -126,7 +126,10 @@ export const pageOverrides = mysqlTable('pageOverrides', {
   ogImage: varchar('ogImage', { length: 512 }),
   canonical: varchar('canonical', { length: 512 }),
   robots: varchar('robots', { length: 128 }),
-  jsonLd: text('jsonLd'),                     // stringified JSON-LD schema block
+  jsonLd: text('jsonLd'),                       // stringified JSON-LD schema block (generic / custom)
+  organizationSchema: text('organizationSchema'), // Organization schema JSON string
+  breadcrumbSchema: text('breadcrumbSchema'),   // BreadcrumbList schema JSON string
+  websiteSchema: text('websiteSchema'),         // WebSite schema JSON string
   h1Text: varchar('h1Text', { length: 256 }),  // injected as visible H1 before React root (crawlers see it)
   bodyContent: text('bodyContent'),              // visible SEO content block injected as <footer> before </body>
   updatedAt: timestamp('updatedAt').defaultNow().onUpdateNow().notNull(),

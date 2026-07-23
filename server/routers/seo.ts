@@ -4,7 +4,7 @@ import { TRPCError } from '@trpc/server';
 import { protectedProcedure, router } from '../_core/trpc';
 import { getDb } from '../db';
 import { seoAudits, pageOverrides, seoFixHistory, llmsTxt } from '../../drizzle/schema';
-import { runSiteAudit, AUDITED_PAGES, type SiteAudit, type PageFinding } from '../_core/seoAudit';
+import { runSiteAudit, AUDITED_PAGES, PAGE_CONTEXT, type SiteAudit, type PageFinding } from '../_core/seoAudit';
 import { verifyFixLive } from '../_core/seoInject';
 import { invokeLLM } from '../_core/llm';
 
@@ -123,16 +123,89 @@ export const seoRouter = router({
         robots: 'Return "index, follow" unless the page should be excluded.',
         h1: 'Return a short, keyword-rich H1 (30-70 chars) in Bahasa Indonesia for this page. Include the primary topic. Include "VOXA" naturally. Return just plain text.',
         multiple_h1: 'Return a single consolidated H1 (30-70 chars) to replace the multiple H1s on this page. Return just plain text.',
-        thin_content: `Return an HTML content block (400-600 words in Bahasa Indonesia) about the page topic for a footer SEO section.
-Requirements:
-- Use ONLY these tags: <h2>, <h3>, <p>, <ul>, <li>, <a href="...">. No inline styles, no divs, no images.
-- 1 <h2> for the section title. 2-3 <h3> subheadings. 4-6 short <p> paragraphs.
-- Include a bulleted list (<ul>) with 4-6 items highlighting features.
-- Include 3-5 internal links (<a href>) to related VOXA pages like /sepeda-listrik, /baterai, /artikel, /showroom, /tentang.
-- Mention "VOXA" naturally 4-8 times.
-- Reference the page's actual topic: for "/" mention overall brand; for "/sepeda-listrik" mention product range; for "/tentang" mention company history; etc.
-- No promotional hype or fake urgency. Educational and factual tone.
-Return raw HTML string.`,
+        organization_schema: `Return a JSON-LD Organization schema for VOXA. Include these REAL facts (do not invent ratings/reviews):
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "VOXA",
+  "legalName": "PT Voxa Indo Nusa",
+  "url": "https://voxa.co.id",
+  "logo": "https://voxa.co.id/logo.png",
+  "description": "VOXA adalah brand sepeda listrik asli Indonesia sejak 2022, memproduksi kendaraan listrik berkualitas di Balaraja, Tangerang.",
+  "foundingDate": "2022",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Kawasan Industri Benua Permai Lestari",
+    "addressLocality": "Balaraja",
+    "addressRegion": "Banten",
+    "addressCountry": "ID"
+  },
+  "sameAs": ["https://instagram.com/voxa.id", "https://facebook.com/voxa.id"],
+  "areaServed": "Indonesia"
+}
+Return the full JSON object. Do NOT wrap in <script>.`,
+        breadcrumb_schema: `Return a JSON-LD BreadcrumbList schema for this page. Path segments become list items. First item is always "Beranda" at https://voxa.co.id. For "/tentang" the breadcrumb is Beranda > Tentang VOXA. Structure:
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Beranda", "item": "https://voxa.co.id"},
+    {"@type": "ListItem", "position": 2, "name": "<page name in Indonesian>", "item": "https://voxa.co.id<path>"}
+  ]
+}
+Return the full JSON. Do NOT wrap in <script>.`,
+        website_schema: `Return a JSON-LD WebSite schema for the VOXA homepage with a SearchAction. Structure:
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "VOXA",
+  "alternateName": "VOXA Indonesia",
+  "url": "https://voxa.co.id",
+  "description": "Sepeda listrik asli Indonesia — commuter cerdas, hemat, dan ramah lingkungan.",
+  "publisher": {"@type": "Organization", "name": "VOXA", "url": "https://voxa.co.id"},
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://voxa.co.id/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+Return the full JSON. Do NOT wrap in <script>.`,
+        thin_content: (() => {
+          const ctx = PAGE_CONTEXT[input.path];
+          if (!ctx) return 'Return unique HTML content for this specific page. NEVER reuse generic brand text — every page needs its own topic. Return raw HTML.';
+          return `You are writing UNIQUE SEO footer content for exactly ONE page: ${input.path}
+
+Google penalizes duplicate content. This content MUST be substantially different from every other page on voxa.co.id.
+Do NOT write generic "VOXA is a great electric bike brand" text — that belongs on the homepage, not here.
+
+PAGE-SPECIFIC CONTEXT (read carefully):
+- URL path: ${input.path}
+- Page purpose: ${ctx.purpose}
+- Main topic: ${ctx.topic}
+- Target keywords for THIS page: ${ctx.targetKeywords.join(', ')}
+- Content angle: ${ctx.contentAngle}
+- Internal links to include: ${ctx.linkTo.join(', ')}
+- Topics to AVOID (belong to other pages): ${ctx.avoidTopics.join('; ')}
+
+REQUIREMENTS:
+- 400-600 words in Bahasa Indonesia
+- Allowed HTML tags: <h2>, <h3>, <p>, <ul>, <li>, <a href="...">, <strong>. NO other tags. NO inline styles. NO images. NO scripts.
+- One <h2> as section title — must clearly reflect the page-specific topic (${ctx.topic}), not the brand in general
+- 2-3 <h3> subheadings each covering a different aspect of the page's specific topic
+- Naturally weave in the target keywords listed above (not stuffed)
+- Include EXACTLY these internal links in natural sentence context: ${ctx.linkTo.map(l => `<a href="${l}">`).join(', ')}
+- Mention "VOXA" 3-5 times (not more — avoid keyword stuffing)
+- Educational and factual tone. No "beli sekarang" hype. No exclamation marks.
+- Content must feel like a natural continuation of what THIS page is about
+
+CRITICAL RULES:
+1. NEVER write about topics in the AVOID list — those belong on other pages
+2. NEVER copy phrasing that would work on any generic page
+3. If the reader read this content on a different page (say ${Object.keys(PAGE_CONTEXT).find(p => p !== input.path)}), it should feel obviously wrong
+4. The <h2> title alone should tell reader which page they're on
+
+Return raw HTML string only. No wrapping, no explanation, no markdown code fences.`;
+        })(),
         thin_content: 'Return "MANUAL" — content rewrites require human review.',
         alt_text: 'Return "AUTO" — alt text handled in a bulk pass.',
       };
@@ -217,6 +290,18 @@ Return raw HTML string.`,
           throw new TRPCError({ code: 'BAD_REQUEST', message: 'JSON-LD tidak valid — periksa syntax JSON kamu (kurung kurawal, koma, quote)' });
         }
       }
+      else if (input.fixType === 'organization_schema') {
+        try { updates.organizationSchema = JSON.stringify(JSON.parse(input.value)); }
+        catch { throw new TRPCError({ code: 'BAD_REQUEST', message: 'Organization schema JSON tidak valid' }); }
+      }
+      else if (input.fixType === 'breadcrumb_schema') {
+        try { updates.breadcrumbSchema = JSON.stringify(JSON.parse(input.value)); }
+        catch { throw new TRPCError({ code: 'BAD_REQUEST', message: 'BreadcrumbList schema JSON tidak valid' }); }
+      }
+      else if (input.fixType === 'website_schema') {
+        try { updates.websiteSchema = JSON.stringify(JSON.parse(input.value)); }
+        catch { throw new TRPCError({ code: 'BAD_REQUEST', message: 'WebSite schema JSON tidak valid' }); }
+      }
       else if (input.fixType === 'canonical') updates.canonical = input.value;
       else if (input.fixType === 'robots') updates.robots = input.value;
       else if (input.fixType === 'h1' || input.fixType === 'multiple_h1') updates.h1Text = input.value;
@@ -237,6 +322,21 @@ Return raw HTML string.`,
             code: 'BAD_REQUEST',
             message: `HTML tidak seimbang (${opens} tag terbuka vs ${closes} tag tertutup). Setiap <h2>, <h3>, <p>, <ul>, <li> harus punya tag penutup.`,
           });
+        }
+        // Duplicate content safeguard — refuse if same value already applied on another path.
+        // This prevents accidental copy-paste of identical footer text across pages, which
+        // Google penalizes as duplicate content.
+        const normalize = (s: string) => s.replace(/\s+/g, ' ').toLowerCase().slice(0, 500);
+        const incomingNorm = normalize(input.value);
+        const otherRows = await db.select().from(pageOverrides);
+        for (const other of otherRows) {
+          if (other.path === input.path) continue;
+          if (other.bodyContent && normalize(other.bodyContent) === incomingNorm) {
+            throw new TRPCError({
+              code: 'BAD_REQUEST',
+              message: `Konten identik sudah diterapkan di halaman "${other.path}". Google penalize duplicate content — tiap halaman harus punya konten UNIK. Klik "Buat Saran AI" untuk generate konten khusus untuk ${input.path}.`,
+            });
+          }
         }
         updates.bodyContent = input.value;
       }
@@ -291,6 +391,9 @@ Return raw HTML string.`,
         { fixType: 'thin_content', value: r.bodyContent },
         { fixType: 'og_tags', value: r.ogTitle || r.ogDescription || r.ogImage ? 'og' : null },
         { fixType: 'json_ld', value: r.jsonLd },
+        { fixType: 'organization_schema', value: r.organizationSchema },
+        { fixType: 'breadcrumb_schema', value: r.breadcrumbSchema },
+        { fixType: 'website_schema', value: r.websiteSchema },
       ];
       for (const c of checks) {
         if (!c.value) continue;
@@ -332,6 +435,9 @@ Return raw HTML string.`,
       else if (input.fixType === 'robots') clear.robots = null;
       else if (input.fixType === 'h1' || input.fixType === 'multiple_h1') clear.h1Text = null;
       else if (input.fixType === 'thin_content') clear.bodyContent = null;
+      else if (input.fixType === 'organization_schema') clear.organizationSchema = null;
+      else if (input.fixType === 'breadcrumb_schema') clear.breadcrumbSchema = null;
+      else if (input.fixType === 'website_schema') clear.websiteSchema = null;
 
       await db.update(pageOverrides).set(clear).where(eq(pageOverrides.path, input.path));
       return { success: true };
@@ -403,6 +509,9 @@ Return raw HTML string.`,
       pushIf(r.robots, 'robots', 'Robots meta');
       pushIf(r.h1Text, 'h1', 'H1 heading');
       pushIf(r.bodyContent, 'thin_content', 'SEO content block');
+      pushIf(r.organizationSchema, 'organization_schema', 'Organization schema');
+      pushIf(r.breadcrumbSchema, 'breadcrumb_schema', 'BreadcrumbList schema');
+      pushIf(r.websiteSchema, 'website_schema', 'WebSite schema');
       if (r.ogTitle || r.ogDescription || r.ogImage) {
         pushIf(JSON.stringify({ title: r.ogTitle, description: r.ogDescription, image: r.ogImage }, null, 2), 'og_tags', 'OpenGraph tags');
       }

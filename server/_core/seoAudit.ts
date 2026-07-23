@@ -95,6 +95,83 @@ export const AUDITED_PAGES = [
   { path: '/bantuan',          name: 'Bantuan' },
 ] as const;
 
+// Page-specific context used by AI prompt generation to guarantee UNIQUE content per page.
+// If two pages had the same footer copy, Google would flag it as duplicate content and
+// de-index the extras. Each page below has its own topic, keywords, and content angle.
+export const PAGE_CONTEXT: Record<string, {
+  purpose: string;
+  topic: string;
+  targetKeywords: string[];
+  contentAngle: string;
+  linkTo: string[];
+  avoidTopics: string[];
+}> = {
+  '/': {
+    purpose: 'Landing page pertama untuk pengunjung baru — pengenalan brand VOXA secara umum',
+    topic: 'VOXA sebagai brand sepeda listrik Indonesia',
+    targetKeywords: ['sepeda listrik indonesia', 'VOXA', 'harga sepeda listrik', 'commuter cerdas', 'sepeda listrik terbaik'],
+    contentAngle: 'Ringkasan singkat brand, positioning, ajakan untuk eksplorasi kategori produk. Fokus di value proposition inti.',
+    linkTo: ['/sepeda-listrik', '/showroom', '/tentang'],
+    avoidTopics: ['sejarah perusahaan yang detail', 'lokasi showroom spesifik', 'FAQ garansi']
+  },
+  '/sepeda-listrik': {
+    purpose: 'Katalog produk sepeda listrik — hub untuk browsing model',
+    topic: 'katalog dan lini produk sepeda listrik VOXA',
+    targetKeywords: ['katalog sepeda listrik', 'harga VOXA Liberty', 'sepeda listrik seri Elite', 'harga sepeda listrik 3 juta', 'sepeda listrik VOXA Eiffel'],
+    contentAngle: 'Overview lini produk (Liberty, Eiffel, Elite, VOXA series), panduan memilih model sesuai kebutuhan, kisaran harga, perbedaan seri.',
+    linkTo: ['/baterai', '/sparepart', '/compare'],
+    avoidTopics: ['sejarah perusahaan', 'lokasi showroom', 'proses klaim garansi']
+  },
+  '/compare': {
+    purpose: 'Tool untuk membandingkan model — untuk user yang sudah shortlist',
+    topic: 'cara membandingkan sepeda listrik VOXA',
+    targetKeywords: ['perbandingan sepeda listrik', 'beda Liberty vs Elite', 'sepeda listrik untuk pemula', 'sepeda listrik komuter jarak jauh'],
+    contentAngle: 'Kriteria pembanding utama (jarak tempuh, kecepatan, kapasitas beban, harga), panduan memilih model sesuai use case (kota, jarak jauh, membawa barang).',
+    linkTo: ['/sepeda-listrik', '/baterai', '/tentang'],
+    avoidTopics: ['profil perusahaan', 'lokasi showroom', 'program distributor']
+  },
+  '/pemerintah': {
+    purpose: 'B2B / distributor / pengadaan armada — untuk mitra bisnis dan instansi',
+    topic: 'program distributor dan pengadaan armada VOXA',
+    targetKeywords: ['distributor sepeda listrik', 'pengadaan kendaraan listrik pemerintah', 'armada EV korporat', 'jadi mitra VOXA', 'sepeda listrik untuk instansi'],
+    contentAngle: 'Peluang menjadi distributor resmi, program armada untuk instansi pemerintah dan korporat, dukungan bisnis, keuntungan mitra, cara mendaftar.',
+    linkTo: ['/tentang', '/showroom', '/sepeda-listrik'],
+    avoidTopics: ['spesifikasi produk detail', 'panduan pemilihan untuk konsumen individu']
+  },
+  '/showroom': {
+    purpose: 'Info showroom fisik — lokasi, jam, apa yang bisa dilakukan',
+    topic: 'test ride dan lokasi showroom VOXA',
+    targetKeywords: ['showroom sepeda listrik jakarta', 'test ride VOXA', 'showroom sepeda listrik terdekat', 'kunjungi showroom VOXA', 'coba sepeda listrik'],
+    contentAngle: 'Manfaat test ride sebelum beli, pengalaman kunjungan showroom, list kota yang punya showroom, jam operasional umum, apa saja yang tersedia di showroom.',
+    linkTo: ['/sepeda-listrik', '/tentang', '/bantuan'],
+    avoidTopics: ['sejarah pendiri', 'program B2B', 'spesifikasi teknis mendalam']
+  },
+  '/tentang': {
+    purpose: 'Sejarah, misi, dan nilai perusahaan',
+    topic: 'sejarah dan misi PT Voxa Indo Nusa',
+    targetKeywords: ['profil perusahaan sepeda listrik', 'sejarah VOXA', 'PT Voxa Indo Nusa', 'pabrik sepeda listrik Balaraja', 'brand sepeda listrik Indonesia sejak 2022'],
+    contentAngle: 'Cerita berdirinya VOXA tahun 2022, fasilitas produksi di Balaraja Tangerang, komitmen ke ekosistem kendaraan listrik nasional, misi dan visi.',
+    linkTo: ['/showroom', '/pemerintah', '/artikel'],
+    avoidTopics: ['harga produk spesifik', 'promo terbaru', 'FAQ teknis']
+  },
+  '/artikel': {
+    purpose: 'Hub editorial — artikel tips, panduan, tren EV',
+    topic: 'artikel dan edukasi seputar sepeda listrik VOXA',
+    targetKeywords: ['tips sepeda listrik', 'artikel EV indonesia', 'cara merawat baterai lithium', 'blog sepeda listrik', 'panduan sepeda listrik'],
+    contentAngle: 'Kenapa edukasi EV penting, kategori artikel yang tersedia (tips perawatan, tren industri, panduan pembelian), ajakan untuk baca artikel terkait.',
+    linkTo: ['/tentang', '/sepeda-listrik', '/bantuan'],
+    avoidTopics: ['profil perusahaan detail', 'lokasi showroom', 'harga produk']
+  },
+  '/bantuan': {
+    purpose: 'Help center — FAQ, servis, garansi, kontak',
+    topic: 'bantuan pelanggan dan layanan purna jual VOXA',
+    targetKeywords: ['cara klaim garansi VOXA', 'servis sepeda listrik', 'jam operasional customer service', 'panduan pemakaian sepeda listrik', 'pertanyaan seputar VOXA'],
+    contentAngle: 'Cara mendapat bantuan (WhatsApp, showroom, email), waktu operasional, proses klaim garansi, perawatan berkala, kontak tim servis.',
+    linkTo: ['/showroom', '/sparepart', '/tentang'],
+    avoidTopics: ['promosi produk', 'sejarah perusahaan', 'program B2B']
+  },
+};
+
 export type PageFinding = {
   id: string;                       // unique id per fix (path + type)
   path: string;
@@ -330,16 +407,42 @@ function analyzePage(path: string, name: string, html: string, status: number, l
     });
   }
 
-  if (jsonLdBlocks.length === 0) {
+  // Break the generic "no JSON-LD" finding into 3 targeted, high-signal findings.
+  // Each maps to a specific schema type that AI crawlers actively use.
+  if (!jsonLdTypes.has('Organization')) {
     findings.push({
-      id: `${path}::json_ld`,
+      id: `${path}::organization_schema`,
       path, category: 'GEO', severity: 'HIGH',
-      fixType: 'json_ld',
-      title: `Halaman ${name} tidak punya JSON-LD structured data`,
-      issue: 'JSON-LD adalah cara AI assistants (ChatGPT, Claude, Perplexity) extract fakta dari halaman. Tanpa ini, halaman jarang jadi sumber jawaban AI.',
+      fixType: 'organization_schema',
+      title: `Halaman ${name} tidak punya Organization schema`,
+      issue: 'Organization schema memberitahu AI assistants siapa VOXA — nama legal, alamat, tanggal berdiri, logo, sosial media. Ini adalah building block pertama untuk muncul di jawaban AI dan Knowledge Panel Google.',
       currentValue: null,
       suggestedValue: null,
-      expectedImpact: `Skor GEO ${name} naik dari ${geoScore} → ~85. Berpotensi muncul di AI chatbot answers.`,
+      expectedImpact: `Skor GEO ${name} naik ~15 poin. Meningkatkan chance muncul sebagai sumber jawaban "apa itu VOXA" di ChatGPT/Perplexity.`,
+    });
+  }
+  if (!jsonLdTypes.has('BreadcrumbList') && path !== '/') {
+    findings.push({
+      id: `${path}::breadcrumb_schema`,
+      path, category: 'SEO', severity: 'MEDIUM',
+      fixType: 'breadcrumb_schema',
+      title: `Halaman ${name} tidak punya BreadcrumbList schema`,
+      issue: 'BreadcrumbList membantu Google menampilkan navigasi jalur di hasil pencarian ("Beranda › Tentang VOXA"). Meningkatkan CTR ~5-10%.',
+      currentValue: null,
+      suggestedValue: null,
+      expectedImpact: `Skor SEO ${name} naik ~5 poin. Tampilan hasil Google jadi lebih menarik.`,
+    });
+  }
+  if (!jsonLdTypes.has('WebSite') && path === '/') {
+    findings.push({
+      id: `${path}::website_schema`,
+      path, category: 'SEO', severity: 'MEDIUM',
+      fixType: 'website_schema',
+      title: `Homepage tidak punya WebSite schema dengan SearchAction`,
+      issue: 'WebSite schema di homepage memberitahu Google struktur situs + memungkinkan sitelinks searchbox di hasil pencarian.',
+      currentValue: null,
+      suggestedValue: null,
+      expectedImpact: 'Google berpotensi menampilkan search box langsung di hasil pencarian VOXA — meningkatkan CTR homepage 15-25%.',
     });
   }
 
@@ -477,6 +580,9 @@ export async function runSiteAudit(): Promise<SiteAudit> {
       if (f.fixType === 'faq' && ov.jsonLd) return false;
       if ((f.fixType === 'h1' || f.fixType === 'multiple_h1') && ov.h1Text) return false;
       if (f.fixType === 'thin_content' && ov.bodyContent) return false;
+      if (f.fixType === 'organization_schema' && (ov.organizationSchema || (ov.jsonLd && /"@type"\s*:\s*"Organization"/.test(ov.jsonLd)))) return false;
+      if (f.fixType === 'breadcrumb_schema' && (ov.breadcrumbSchema || (ov.jsonLd && /"@type"\s*:\s*"BreadcrumbList"/.test(ov.jsonLd)))) return false;
+      if (f.fixType === 'website_schema' && (ov.websiteSchema || (ov.jsonLd && /"@type"\s*:\s*"WebSite"/.test(ov.jsonLd)))) return false;
       return true;
     });
   }
