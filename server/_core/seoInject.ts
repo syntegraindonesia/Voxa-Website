@@ -83,12 +83,33 @@ export async function injectSeoOverrides(html: string, path: string): Promise<st
     out = out.replace(/<body([^>]*)>/i, `<body$1>\n${h1Html}`);
   }
 
-  // Visible SEO content footer — appears at bottom of every page, before </body>.
-  // Not disruptive to React app layout because it sits below #root.
-  // Google & AI crawlers see it, and users who scroll can read it.
+  // Visible SEO content footer — appears at very bottom of every page.
+  // Injected AFTER #root's closing so it never disrupts React's mount or layout.
+  // Wrapper is self-contained: box-sizing:border-box, no fixed positioning, scoped styles.
+  // Mobile-safe: no fixed widths, responsive padding, block-level display.
   if (ov.bodyContent) {
     const safe = ov.bodyContent.replace(/<\/script>/gi, '<\\/script>');
-    const wrapper = `<footer data-seo-override class="seo-content" style="max-width:1200px;margin:64px auto 32px;padding:32px 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#374151;line-height:1.7;border-top:1px solid #e5e7eb;">${safe}</footer>`;
+    // Inline styles use box-sizing:border-box, %-based width, and only block layout.
+    // No z-index, no position:fixed/absolute, no vh units — safe for any viewport.
+    const wrapper = `
+<section data-seo-override id="voxa-seo-content" style="all:initial;display:block;box-sizing:border-box;width:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#374151;line-height:1.6;background:#f9fafb;border-top:1px solid #e5e7eb;">
+  <div style="max-width:1200px;margin:0 auto;padding:32px 20px;box-sizing:border-box;">
+    <style data-seo-override>
+      #voxa-seo-content h2 { font-size: 20px; font-weight: 700; color: #111827; margin: 0 0 12px; letter-spacing: -0.02em; }
+      #voxa-seo-content h3 { font-size: 15px; font-weight: 700; color: #111827; margin: 20px 0 8px; }
+      #voxa-seo-content p { margin: 0 0 12px; font-size: 14px; }
+      #voxa-seo-content ul { margin: 0 0 16px; padding-left: 20px; }
+      #voxa-seo-content li { margin-bottom: 4px; font-size: 14px; }
+      #voxa-seo-content a { color: #37C5FF; text-decoration: underline; }
+      @media (max-width: 640px) {
+        #voxa-seo-content > div { padding: 20px 16px !important; }
+        #voxa-seo-content h2 { font-size: 18px; }
+        #voxa-seo-content h3 { font-size: 14px; }
+      }
+    </style>
+    ${safe}
+  </div>
+</section>`;
     out = out.replace(/<\/body>/i, `${wrapper}\n</body>`);
   }
 

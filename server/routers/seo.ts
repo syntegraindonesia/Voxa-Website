@@ -220,7 +220,26 @@ Return raw HTML string.`,
       else if (input.fixType === 'canonical') updates.canonical = input.value;
       else if (input.fixType === 'robots') updates.robots = input.value;
       else if (input.fixType === 'h1' || input.fixType === 'multiple_h1') updates.h1Text = input.value;
-      else if (input.fixType === 'thin_content') updates.bodyContent = input.value;
+      else if (input.fixType === 'thin_content') {
+        // Reject any potentially dangerous or layout-breaking tags before saving
+        const dangerous = /<(script|iframe|style|object|embed|link|meta|form|input|button|body|html|head)\b/i;
+        if (dangerous.test(input.value)) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Konten SEO hanya boleh pakai tag: h2, h3, p, ul, li, a, strong, em, br. Tag script/iframe/style/form dll tidak diizinkan.',
+          });
+        }
+        // Check for reasonably balanced open/close tags on major blocks
+        const opens = (input.value.match(/<(h2|h3|p|ul|li)\b/gi) || []).length;
+        const closes = (input.value.match(/<\/(h2|h3|p|ul|li)>/gi) || []).length;
+        if (Math.abs(opens - closes) > 2) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `HTML tidak seimbang (${opens} tag terbuka vs ${closes} tag tertutup). Setiap <h2>, <h3>, <p>, <ul>, <li> harus punya tag penutup.`,
+          });
+        }
+        updates.bodyContent = input.value;
+      }
       else if (input.fixType === 'llms_txt') {
         // Special case: writes to llmsTxt table, not pageOverrides
         await db.insert(llmsTxt).values({ id: 1, content: input.value }).onDuplicateKeyUpdate({ set: { content: input.value } });

@@ -534,6 +534,34 @@ function FindingCard({ f, onApplied }: { f: PageFinding; onApplied: () => void }
             </div>
           )}
 
+          {/* Placement details — only for thin_content since it modifies visible page layout */}
+          {f.fixType === "thin_content" && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
+              <div className="text-xs uppercase font-bold text-blue-800 tracking-wider">
+                📍 Penempatan &amp; Detail Teknis
+              </div>
+              <div className="text-xs text-blue-900 space-y-1.5">
+                <div><strong>Lokasi:</strong> Section terpisah di bagian paling bawah halaman, SETELAH aplikasi React (setelah semua konten hero, produk, footer React, dll).</div>
+                <div><strong>HTML tag:</strong> <code className="bg-white/60 px-1 rounded">&lt;section id="voxa-seo-content"&gt;</code> dengan <code className="bg-white/60 px-1 rounded">background:#f9fafb</code> dan border atas subtle untuk memisahkan visual.</div>
+                <div><strong>Layout isolation:</strong> Wrapper pakai <code className="bg-white/60 px-1 rounded">all:initial</code>, tidak ada <code className="bg-white/60 px-1 rounded">position:fixed</code>, tidak ada z-index, tidak ada viewport height — TIDAK bisa overlay atau mengganggu React app di atasnya.</div>
+                <div><strong>Mobile responsive:</strong> Padding otomatis mengecil ke 20px/16px pada layar &lt;640px. Font size juga adjust otomatis.</div>
+                <div><strong>Yang lihat:</strong> Semua user (browser desktop &amp; mobile), Googlebot, dan semua AI crawler. Konten muncul ketika user scroll ke paling bawah.</div>
+                <div><strong>Yang TIDAK terjadi:</strong> React app di atas tidak diubah. Navbar, hero, produk, tombol tetap seperti biasa. Konten SEO ini hanya section tambahan di bawah.</div>
+              </div>
+              <div className="text-xs text-blue-900 mt-2 pt-2 border-t border-blue-200">
+                <strong>Diagram struktur halaman setelah fix:</strong>
+                <pre className="mt-1 bg-white rounded p-2 text-[10px] font-mono text-gray-700 overflow-x-auto">{`<body>
+  <div id="root">       ← React app (navbar, hero, produk, cart, footer)
+    ...tidak diubah...
+  </div>
+  <section id="voxa-seo-content">   ← Section BARU (konten SEO ini)
+    ...konten yang kamu tulis...
+  </section>
+</body>`}</pre>
+              </div>
+            </div>
+          )}
+
           {/* Visual before/after preview — only for thin_content since it produces visible content */}
           {f.fixType === "thin_content" && editValue && (
             <div>
