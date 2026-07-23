@@ -170,60 +170,75 @@ Return the full JSON. Do NOT wrap in <script>.`,
   }
 }
 Return the full JSON. Do NOT wrap in <script>.`,
-        thin_content: (() => {
-          const ctx = PAGE_CONTEXT[input.path];
-          if (!ctx) return 'Return unique HTML content for this specific page. NEVER reuse generic brand text — every page needs its own topic. Return raw HTML.';
-          return `You are writing UNIQUE SEO footer content for exactly ONE page: ${input.path}
-
-Google penalizes duplicate content. This content MUST be substantially different from every other page on voxa.co.id.
-Do NOT write generic "VOXA is a great electric bike brand" text — that belongs on the homepage, not here.
-
-PAGE-SPECIFIC CONTEXT (read carefully):
-- URL path: ${input.path}
-- Page purpose: ${ctx.purpose}
-- Main topic: ${ctx.topic}
-- Target keywords for THIS page: ${ctx.targetKeywords.join(', ')}
-- Content angle: ${ctx.contentAngle}
-- Internal links to include: ${ctx.linkTo.join(', ')}
-- Topics to AVOID (belong to other pages): ${ctx.avoidTopics.join('; ')}
-
-REQUIREMENTS:
-- 400-600 words in Bahasa Indonesia
-- Allowed HTML tags: <h2>, <h3>, <p>, <ul>, <li>, <a href="...">, <strong>. NO other tags. NO inline styles. NO images. NO scripts.
-- One <h2> as section title — must clearly reflect the page-specific topic (${ctx.topic}), not the brand in general
-- 2-3 <h3> subheadings each covering a different aspect of the page's specific topic
-- Naturally weave in the target keywords listed above (not stuffed)
-- Include EXACTLY these internal links in natural sentence context: ${ctx.linkTo.map(l => `<a href="${l}">`).join(', ')}
-- Mention "VOXA" 3-5 times (not more — avoid keyword stuffing)
-- Educational and factual tone. No "beli sekarang" hype. No exclamation marks.
-- Content must feel like a natural continuation of what THIS page is about
-
-CRITICAL RULES:
-1. NEVER write about topics in the AVOID list — those belong on other pages
-2. NEVER copy phrasing that would work on any generic page
-3. If the reader read this content on a different page (say ${Object.keys(PAGE_CONTEXT).find(p => p !== input.path)}), it should feel obviously wrong
-4. The <h2> title alone should tell reader which page they're on
-
-Return raw HTML string only. No wrapping, no explanation, no markdown code fences.`;
-        })(),
+        thin_content: 'DIRECT_WRITE_MODE',
         thin_content: 'Return "MANUAL" — content rewrites require human review.',
         alt_text: 'Return "AUTO" — alt text handled in a bulk pass.',
       };
       const rule = rules[input.fixType] || 'Return a specific fix in JSON or plain text.';
 
-      const response = await invokeLLM({
-        messages: [
-          {
-            role: 'system',
-            content: `You are an SEO/GEO expert for VOXA (voxa.co.id), an Indonesian electric bicycle brand. Generate specific, ready-to-apply fixes. Rule for ${input.fixType}: ${rule}`,
-          },
-          {
-            role: 'user',
-            content: `Page path: ${input.path}\nIssue: ${input.title}\nDetail: ${input.issue}${input.currentValue ? `\nCurrent value: ${input.currentValue}` : ''}\n\nGenerate the fix. Return JSON: {"value": <string or object>}`,
-          },
-        ],
-        response_format: { type: 'json_object' },
-      });
+      // Special handling for thin_content: use a dedicated short prompt with a
+      // concrete Bahasa Indonesia example so DeepSeek writes real content
+      // instead of returning meta-instructions. Bypass json_object format because
+      // it was making DeepSeek wrap responses in {fix_type,location,content}.
+      let response;
+      if (input.fixType === 'thin_content') {
+        const ctx = PAGE_CONTEXT[input.path];
+        if (!ctx) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: `Halaman ${input.path} tidak dikenal — konten SEO harus ditulis manual.` });
+        }
+        const otherPagePath = Object.keys(PAGE_CONTEXT).find(p => p !== input.path) ?? '/';
+        response = await invokeLLM({
+          messages: [
+            {
+              role: 'system',
+              content: `You are an Indonesian SEO copywriter. Your job: write UNIQUE Bahasa Indonesia HTML content for one specific page of voxa.co.id (VOXA — Indonesian electric bicycle brand).
+
+CRITICAL — Output rules:
+- Return a JSON object with exactly ONE field: {"value": "<h2>...</h2>..."}
+- The "value" field contains raw HTML in Bahasa Indonesia — nothing else
+- Allowed tags only: h2, h3, p, ul, li, a, strong, em
+- FORBIDDEN: script, iframe, style, form, position:absolute, display:none, left:-9999px, hidden content tricks, English content
+- FORBIDDEN: writing about what the code should do — you write the actual USER-FACING content
+- The content will be shown to real users in a visible section on the page`,
+            },
+            {
+              role: 'user',
+              content: `Write UNIQUE Bahasa Indonesia SEO content for exactly this page: ${input.path}
+
+Page context:
+- Purpose: ${ctx.purpose}
+- Topic: ${ctx.topic}
+- Target keywords: ${ctx.targetKeywords.join(', ')}
+- Content angle: ${ctx.contentAngle}
+- Internal links to include (must appear as <a href="X">text</a>): ${ctx.linkTo.join(', ')}
+- Topics to AVOID (they belong to other pages): ${ctx.avoidTopics.join('; ')}
+
+Length: 400-500 words. Structure: 1 <h2> heading + 2-3 <h3> subheadings + <p> paragraphs + 1 <ul> bulleted list.
+
+EXAMPLE of correct output format (for a different page — DO NOT copy this content):
+
+{"value": "<h2>Contoh Heading Halaman Lain</h2><p>Ini adalah contoh paragraf pertama tentang topik halaman lain. Konten harus dalam Bahasa Indonesia dan spesifik untuk halaman terkait.</p><h3>Subheading Pertama</h3><p>Paragraf isi dengan link internal seperti <a href=\\"${otherPagePath}\\">nama halaman</a> yang natural.</p><ul><li>Poin pertama</li><li>Poin kedua</li></ul>"}
+
+Now generate the ACTUAL Bahasa Indonesia content for ${input.path} following the same JSON format. Return ONLY the JSON object.`,
+            },
+          ],
+          response_format: { type: 'json_object' },
+        });
+      } else {
+        response = await invokeLLM({
+          messages: [
+            {
+              role: 'system',
+              content: `You are an SEO/GEO expert for VOXA (voxa.co.id), an Indonesian electric bicycle brand. Generate specific, ready-to-apply fixes. Rule for ${input.fixType}: ${rule}`,
+            },
+            {
+              role: 'user',
+              content: `Page path: ${input.path}\nIssue: ${input.title}\nDetail: ${input.issue}${input.currentValue ? `\nCurrent value: ${input.currentValue}` : ''}\n\nGenerate the fix. Return JSON: {"value": <string or object>}`,
+            },
+          ],
+          response_format: { type: 'json_object' },
+        });
+      }
 
       const content = response.choices[0]?.message?.content ?? '';
       if (!content) {
@@ -274,16 +289,51 @@ Return raw HTML string only. No wrapping, no explanation, no markdown code fence
 
       // For HTML fixes: prefer the value field, else look for HTML in wrapper fields
       const v = parsed?.value;
-      if (typeof v === 'string' && v.trim()) {
-        return { suggestion: v };
-      }
-      const extracted = extractHtmlFromWrapper(parsed);
-      if (extracted) return { suggestion: extracted };
+      let suggestion = typeof v === 'string' && v.trim() ? v : extractHtmlFromWrapper(parsed);
 
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'AI mengembalikan format yang tidak dikenali. Coba klik "Buat Saran AI" lagi, atau isi manual.',
-      });
+      if (!suggestion) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'AI mengembalikan format yang tidak dikenali. Coba klik "Buat Saran AI" lagi, atau isi manual.',
+        });
+      }
+
+      // Quality sanity check specifically for thin_content — reject responses that
+      // are English meta-instructions or use cloaking tricks. Force user to retry.
+      if (input.fixType === 'thin_content') {
+        const looksLikeCloaking = /left\s*:\s*-?\d{3,}px|position\s*:\s*absolute\s*;\s*left\s*:|display\s*:\s*none|visibility\s*:\s*hidden|aria-hidden\s*=\s*["']true/i.test(suggestion);
+        if (looksLikeCloaking) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'AI menyarankan hidden content (cloaking) yang bisa kena penalty Google. Coba klik "Buat Saran AI" lagi.',
+          });
+        }
+        const looksLikeInstructions = /^(inject|the footer|should be|include:|example:|use css)/i.test(suggestion.trim());
+        if (looksLikeInstructions) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'AI mengembalikan instruksi bukan konten. Coba klik "Buat Saran AI" lagi.',
+          });
+        }
+        // Must start with an HTML tag, not English prose
+        if (!suggestion.trim().startsWith('<')) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'AI tidak mengembalikan HTML valid. Coba klik "Buat Saran AI" lagi.',
+          });
+        }
+        // Heuristic: too much English relative to length usually means AI wrote English by accident
+        const englishWords = (suggestion.match(/\b(the|and|with|for|should|footer|hidden|include|content|example|inject|shell)\b/gi) || []).length;
+        const totalWords = suggestion.replace(/<[^>]+>/g, '').split(/\s+/).length;
+        if (totalWords > 20 && englishWords / totalWords > 0.1) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'AI menulis dalam bahasa Inggris, bukan Indonesia. Coba klik "Buat Saran AI" lagi.',
+          });
+        }
+      }
+
+      return { suggestion };
     }),
 
   // Approve a single fix — writes to pageOverrides and logs history
