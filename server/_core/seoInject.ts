@@ -162,7 +162,7 @@ export async function verifyFixLive(
       website_schema: /<script[^>]+application\/ld\+json[^>]+data-schema-kind="website"/i,
       h1: /<h1[^>]+data-seo-override/i,
       multiple_h1: /<h1[^>]+data-seo-override/i,
-      thin_content: /<footer[^>]+data-seo-override[^>]*>/i,
+      thin_content: /<(section|footer)[^>]+data-seo-override[^>]*>/i,
     };
     const re = markers[fixType];
     if (!re) return { verified: false, reason: `No verification pattern for fix type "${fixType}"` };
