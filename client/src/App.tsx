@@ -32,6 +32,7 @@ import CheckoutPending from "./pages/CheckoutPending";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import CartSidebar from "./components/CartSidebar";
+import { PageSeoContent } from "./components/PageSeoContent";
 
 // Wrapper so /sepeda-listrik renders the Catalog page with the correct category
 function SepedaListrikCatalog() {
@@ -157,6 +158,11 @@ function App() {
                 </div>
                 <CartSidebar />
                 <FloatingWhatsApp />
+                {/* Renders nothing — imperatively syncs the middleware-injected
+                    <section id="voxa-seo-content"> with the current SPA route,
+                    so client-side navigation shows the correct per-page SEO
+                    content instead of stale content from the first page load. */}
+                <PageSeoContent />
               </TooltipProvider>
             </NavbarProvider>
           </CartProvider>

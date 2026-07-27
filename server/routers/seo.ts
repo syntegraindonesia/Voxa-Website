@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { eq, desc } from 'drizzle-orm';
 import { TRPCError } from '@trpc/server';
-import { protectedProcedure, router } from '../_core/trpc';
+import { protectedProcedure, publicProcedure, router } from '../_core/trpc';
 import { getDb } from '../db';
 import { seoAudits, pageOverrides, seoFixHistory, llmsTxt } from '../../drizzle/schema';
 import { runSiteAudit, AUDITED_PAGES, PAGE_CONTEXT, type SiteAudit, type PageFinding } from '../_core/seoAudit';
@@ -678,6 +678,22 @@ Generate the fix now. Return json {"value": <string or object>}.`,
     }
     return out;
   }),
+
+  // Public endpoint — returns just the body SEO content for a given path.
+  // Used by client-side React to update the injected <section> when the user
+  // navigates between routes without a full page reload. No auth required.
+  getPublicOverride: publicProcedure
+    .input(z.object({ path: z.string() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { bodyContent: null };
+      const [row] = await db
+        .select({ bodyContent: pageOverrides.bodyContent })
+        .from(pageOverrides)
+        .where(eq(pageOverrides.path, input.path))
+        .limit(1);
+      return { bodyContent: row?.bodyContent ?? null };
+    }),
 
   // Get override for a specific path
   getPageOverride: protectedProcedure
